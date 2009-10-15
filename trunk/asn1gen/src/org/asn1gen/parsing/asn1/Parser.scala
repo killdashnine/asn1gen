@@ -10,8 +10,12 @@ class Parser extends StdTokenParsers with ImplicitConversions {
   // Fill in abstract defs
   type Tokens = Lexer
   val lexical = new Tokens
-
-  def Root = Comment
+  
+  def Root = (LowerId ~ UpperId) ^^ { case lower ~ upper => AstPairId(lower, upper)}
+  
+  def LowerId = accept("lower id", { case lexical.LowerId(n) => AstLowerId(n) } )
+  
+  def UpperId = accept("upper id", { case lexical.UpperId(n) => AstUpperId(n) } )
   
   def Comment = accept("comment", { case lexical.CommentLit(n) => n } )
 }

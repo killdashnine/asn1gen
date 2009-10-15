@@ -1,7 +1,7 @@
 
-import org.junit._
-import Assert._
-import junit.framework._
+import _root_.org.junit._
+import _root_.org.junit.Assert._
+import _root_.junit.framework._
 
 package org.asn1gen.parsing.asn1 {
   class MyTest extends TestCase {
