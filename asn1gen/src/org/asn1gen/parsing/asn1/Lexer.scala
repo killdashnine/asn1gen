@@ -9,7 +9,7 @@ import scala.util.parsing.input.CharArrayReader.EofCh
  * @author John Ky <"newhoggy"+@+"gmail"+"."+"com">
  */
 class Lexer extends StdLexical with ImplicitConversions {
-  override def token: Parser[Token] = oneLineComment | multiLineComment
+  override def token: Parser[Token] = lowerId | upperId
     //( '\"' ~ rep(charSeq | letter) ~ '\"' ^^ lift(StringLit)
     /*( string ^^ StringLit
     | number ~ letter ^^ { case n ~ l => ErrorToken("Invalid number format : " + n + l) }
@@ -27,6 +27,17 @@ class Lexer extends StdLexical with ImplicitConversions {
     override def toString = "`" + chars + "'"
     def comment = chars
   }
+  
+  abstract case class Id(chars: String) extends Token {
+    override def toString =  chars
+    def name = chars
+  }
+
+  case class LowerId(override val chars: String) extends Id(chars) {
+  }
+
+  case class UpperId(override val chars: String) extends Id(chars) {
+  }
 
   def upper : Parser[Elem] = elem("uppercase letter", c => c >= 'A' && c <= 'Z')
   def lower : Parser[Elem] = elem("lowercase letter", c => c >= 'a' && c <= 'z')
@@ -42,6 +53,25 @@ class Lexer extends StdLexical with ImplicitConversions {
   
   
   def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
+  
+  // Can be a typereference or identifier
+  def lowerId =
+    ( lower
+    ~ ( ( letter
+        | digit
+        | hyphen <~ before(letter | digit)
+        ).* ^^ { m => ("" /: m)(_ + _) }
+      ).?
+    ) ^^ { case c ~ cs => LowerId("" + c + cs.getOrElse("")) }
+
+  def upperId =
+    ( upper
+    ~ ( ( letter
+        | digit
+        | hyphen <~ before(letter | digit)
+        ).* ^^ { m => ("" /: m)(_ + _) }
+      ).?
+    ) ^^ { case c ~ cs => UpperId("" + c + cs.getOrElse("")) }
   
   // 11.2
   def typeReference =
@@ -61,7 +91,7 @@ class Lexer extends StdLexical with ImplicitConversions {
         | hyphen <~ before(letter | digit)
         ).* ^^ { m => ("" /: m)(_ + _) }
       ).?
-    ) ^^ { case c ~ cs => (if (cs.isEmpty) c else "" + c + cs.get) }
+    ) ^^ { case c ~ cs => LowerId("" + c + cs.getOrElse("")) }
   
   // 11.4
   def valueReference = identifier
@@ -105,6 +135,6 @@ class Lexer extends StdLexical with ImplicitConversions {
   override def whitespace : Parser[CommentLit] =
     ( whitespaceChar ^^ { m => CommentLit("") }
     | oneLineComment
+    | multiLineComment
     ).* ^^ { cs => CommentLit(("" /: cs)(_ + _)) }
-
 }
