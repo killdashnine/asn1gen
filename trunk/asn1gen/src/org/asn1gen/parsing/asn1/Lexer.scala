@@ -4,40 +4,54 @@ import scala.util.parsing.combinator._
 import scala.util.parsing.combinator.syntactical._
 import scala.util.parsing.combinator.lexical._
 import scala.util.parsing.input.CharArrayReader.EofCh
+import scala.util.parsing.syntax._
+import collection.mutable.HashSet
+import org.asn1gen.parsing.syntax._
 
-/**
- * @author John Ky <"newhoggy"+@+"gmail"+"."+"com">
- */
-class Lexer extends StdLexical with ImplicitConversions {
-  override def token: Parser[Token] = lowerId | upperId
-    //( '\"' ~ rep(charSeq | letter) ~ '\"' ^^ lift(StringLit)
-    /*( string ^^ StringLit
-    | number ~ letter ^^ { case n ~ l => ErrorToken("Invalid number format : " + n + l) }
-    | '-' ~> whitespace ~ number ~ letter ^^ { case ws ~ num ~ l => ErrorToken("Invalid number format : -" + num + l) }
-    | '-' ~> whitespace ~ number ^^ { case ws ~ num => NumericLit("-" + num) }
-    | number ^^ NumericLit
-    | EofCh ^^^ EOF
-    | delim
-    | '\"' ~> failure("Unterminated string")
-    | rep(letter) ^^ checkKeyword
-    | failure("Illegal character")
-    )*/
+class Lexer extends Lexical with ImplicitConversions with Asn1Tokens {
+  // see `token' in `Scanners'
+  override def token: Parser[Token] =
+    ( lowerId ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
+    | upperId ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
+    )
 
-  case class CommentLit(chars: String) extends Token {
-    override def toString = "`" + chars + "'"
-    def comment = chars
-  }
-  
-  abstract case class Id(chars: String) extends Token {
-    override def toString =  chars
-    def name = chars
+  // see `whitespace in `Scanners'
+  override def whitespace : Parser[CommentLit] =
+    ( whitespaceChar ^^ { m => CommentLit("") }
+    | oneLineComment
+    | multiLineComment
+    ).* ^^ { cs => CommentLit(("" /: cs)(_ + _)) }
+
+  protected def comment: Parser[Any] = (
+      '*' ~ '/'  ^^ { case _ => ' '  }
+    | chrExcept(EofCh) ~ comment
+    )
+
+  /** The set of reserved identifiers: these will be returned as `Keyword's */
+  val reserved = new HashSet[String]
+
+  /** The set of delimiters (ordering does not matter) */
+  val delimiters = new HashSet[String]
+
+  private var _delim: Parser[Token] = null
+  protected def delim: Parser[Token] = {
+    if (_delim eq null) { // construct parser for delimiters by |'ing together the parsers for the individual delimiters, 
+    // starting with the longest one (hence the sort + reverse) -- otherwise a delimiter D will never be matched if 
+    // there is another delimiter that is a prefix of D   
+      def parseDelim(s: String): Parser[Token] = accept(s.toList) ^^ { x => Keyword(s) }
+      
+      val d = new Array[String](delimiters.size)
+      delimiters.copyToArray(d,0)
+      scala.util.Sorting.quickSort(d) 
+      _delim = d.toList.reverse.map(parseDelim).reduceRight[Parser[Token]](_ | _) // no offence :-)      
+    }
+    
+    _delim
   }
 
-  case class LowerId(override val chars: String) extends Id(chars) {
-  }
+  private def lift[T](f: String => T)(xs: List[Char]): T = f(xs.mkString("", "", ""))
 
-  case class UpperId(override val chars: String) extends Id(chars) {
-  }
+  private def lift2[T](f: String => T)(p: ~[Char, List[Char]]): T = lift(f)(p._1 :: p._2)
 
   def upper : Parser[Elem] = elem("uppercase letter", c => c >= 'A' && c <= 'Z')
   def lower : Parser[Elem] = elem("lowercase letter", c => c >= 'a' && c <= 'z')
@@ -47,11 +61,70 @@ class Lexer extends StdLexical with ImplicitConversions {
   def endln = ((cr ~ lf) | cr | lf)
   def anychar : Parser[Elem] = elem("any character", c => true)
   def space = elem("space", c => c == ' ')
-  def tab = elem("space", c => c == ' ')
+  def tab = elem("space", c => c == '\t')
   def slash = elem("space", c => c == '/')
   def asterisk = elem("space", c => c == '*')
+  def dquote = elem("single quote", c => c == '"')
+  def squote = elem("single quote", c => c == '\'')
+  def char_b = elem("b", c => c == 'b')
+  def char_0 = elem("0", c => c == '0')
+  def char_1 = elem("1", c => c == '1')
+  def not_char(ch : Char) = elem(ch.toString, c => c != ch)
   
   
+  // ASN1D 8.3.2<1-2>
+  def bstring_char =
+    ( char_0 | char_1 | space | tab | lf | cr )
+  
+  // ASN1D 8.3.2<1-2>
+  def bstring =
+    ( squote
+    ~ bstring_char.*
+    ~ squote
+    ~ char_b
+    ) ^^ { case _ ~ data ~ _ ~ _ =>
+      BString(data.filter(c => c == '0' || c == '1').mkString)
+    }
+  
+  // ASN1D 8.3.2<3>
+  def oneLineCommentMarker = hyphen ~ hyphen
+  
+  // ASN1D 8.3.2<3>
+  def oneLineCommentRemainder : Parser[String] =
+    ( oneLineCommentMarker ^^ { case m => "" }
+    | endln ^^ { case m => "" }
+    | (anychar ~ oneLineCommentRemainder) ^^ { case c ~ cs => c + cs }
+    )
+  
+  // ASN1D 8.3.2<3>
+  def oneLineComment =
+    ( oneLineCommentMarker
+    ~ oneLineCommentRemainder
+    ) ^^ { case m ~ text =>
+      CommentLit(text)
+    }
+
+  // ASN1D 8.3.2<4-5>
+  // Not implemented
+
+  // ASN1D 8.3.2<4-5>
+  def cstring_char =
+    ( (dquote ~ dquote) ^^ { _ => '"' }
+    | not_char('"')
+    )
+
+  // ASN1D 8.3.2<6-8>
+  def cstring =
+    ( dquote
+    ~ cstring_char.*
+    ~ dquote
+    ) ^^ { case _ ~ data ~ _=>
+      CString(data.mkString.lines.map(_.trim).mkString)
+    }
+
+  // ASN1D 8.3.2<7>
+  
+  // ASN1
   def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
   
   // Can be a typereference or identifier
@@ -73,16 +146,6 @@ class Lexer extends StdLexical with ImplicitConversions {
       ).?
     ) ^^ { case c ~ cs => UpperId("" + c + cs.getOrElse("")) }
   
-  // 11.2
-  def typeReference =
-    ( lower
-    ~ ( ( letter
-        | digit
-        | hyphen <~ before(letter | digit)
-        ).* ^^ { m => ("" /: m)(_ + _) }
-      ).?
-    ) ^^ { case c ~ cs => (if (cs.isEmpty) c else "" + c + cs.get) }
-
   // 11.3
   def identifier =
     ( lower
@@ -91,29 +154,9 @@ class Lexer extends StdLexical with ImplicitConversions {
         | hyphen <~ before(letter | digit)
         ).* ^^ { m => ("" /: m)(_ + _) }
       ).?
-    ) ^^ { case c ~ cs => LowerId("" + c + cs.getOrElse("")) }
-  
-  // 11.4
-  def valueReference = identifier
-  
-  // 11.5
-  def moduleReference = typeReference
+    ) ^^ { case c ~ cs => LowerId(c + cs.getOrElse("")) }
   
   // 11.6
-  def oneLineCommentMarker = hyphen ~ hyphen
-  
-  def oneLineCommentRemainder : Parser[String] =
-    ( oneLineCommentMarker ^^ { case m => "" }
-    | endln ^^ { case m => "" }
-    | (anychar ~ oneLineCommentRemainder) ^^ { case c ~ cs => c + cs }
-    )
-  
-  def oneLineComment =
-    ( oneLineCommentMarker
-    ~ oneLineCommentRemainder
-    ) ^^ { case m ~ text =>
-      CommentLit(text)
-    }
   
   def multiLineCommentBegin = slash ~ asterisk
   def multiLineCommentEnd = asterisk ~ slash
@@ -131,10 +174,4 @@ class Lexer extends StdLexical with ImplicitConversions {
   
   def multiLineComment : Parser[CommentLit] =
     multiLineCommentBegin ~> multiLineCommentRemainder
-
-  override def whitespace : Parser[CommentLit] =
-    ( whitespaceChar ^^ { m => CommentLit("") }
-    | oneLineComment
-    | multiLineComment
-    ).* ^^ { cs => CommentLit(("" /: cs)(_ + _)) }
 }
