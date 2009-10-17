@@ -14,6 +14,22 @@ trait Asn1Tokens extends Tokens {
   }
 
   /** The class of numeric literal tokens */
+  case class CommentLit(chars: String) extends Token {
+    override def toString = chars
+    def comment = chars
+  }
+
+  case class BString(chars: String) extends Token {
+    override def toString = chars
+    def string = chars
+  }
+
+  case class CString(chars: String) extends Token {
+    override def toString = chars
+    def string = chars
+  }
+
+  /** The class of numeric literal tokens */
   case class NumericLit(chars: String) extends Token {
     override def toString = chars
   }
@@ -24,11 +40,15 @@ trait Asn1Tokens extends Tokens {
   }    
 
   /** The class of identifier tokens */
-  case class Identifier(chars: String) extends Token {
+  case class LowerId(chars: String) extends Token {
     override def toString = "identifier "+chars
+    def name = chars
   }
-  
-  //// New stuff /////
+
+  case class UpperId(chars: String) extends Token {
+    override def toString = "identifier "+chars
+    def name = chars
+  }
   
   /** The class of module references. */
   case class ModuleReference(chars: String) extends Token {
