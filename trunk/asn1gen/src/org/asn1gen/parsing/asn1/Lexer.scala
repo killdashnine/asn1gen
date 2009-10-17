@@ -12,7 +12,7 @@ import org.asn1gen.extra.Extras
 class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras {
   // see `token' in `Scanners'
   override def token: Parser[Token] =
-    ( lowerId ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
+    ( identifier ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
     | upperId ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
     )
 
@@ -54,6 +54,8 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
 
   private def lift2[T](f: String => T)(p: ~[Char, List[Char]]): T = lift(f)(p._1 :: p._2)
 
+  def char(c : RandomAccessSeq.Projection[Char]) = elem(
+    "'" + c.first + "' to '" + c.last + "' ", c.contains(_))
   def upper : Parser[Elem] = elem("uppercase letter", c => 'A' <= c && c <= 'Z')
   def lower : Parser[Elem] = elem("lowercase letter", c => 'a' <= c && c <= 'z')
   def hyphen : Parser[Elem] = elem("hyphen", _ == '-')
@@ -71,6 +73,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   def bin_digit = elem("0", _.isBinDigit)
   def not_char(c : Char) = elem("not " + c.toString, _ != c)
   def upper_hex_digit = elem("hexadecimal digit", c => c.isUpperHexDigit)
+  def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
   
   // ASN1D 8.3.2<1-2>
   def bstring_char =
@@ -125,11 +128,11 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   // ASN1D 8.3.2<9>
   // Not implemented
   
-  // ASN1D 8.3.2<10>
+  // ASN1D 8.3.2<10-11>
   def hstring_char =
     ( upper_hex_digit | space | tab | lf | cr )
   
-  // ASN1D 8.3.2<1-2>
+  // ASN1D 8.3.2<10-11>
   def hstring =
     ( squote
     ~ hstring_char.*
@@ -139,11 +142,8 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
       HString(data.filter(_.isUpperHexDigit).mkString)
     }
   
-  // ASN1
-  def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
-  
-  // Can be a typereference or identifier
-  def lowerId =
+  // ASN1D 8.3.2<12-15>
+  def identifer =
     ( lower
     ~ ( ( letter
         | digit
@@ -152,6 +152,28 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
       ).?
     ) ^^ { case c ~ cs => LowerId("" + c + cs.getOrElse("")) }
 
+  // ASN1D 8.3.2<16>
+  // Not implemented
+
+  // ASN1D 8.3.2<17>
+  def modulereference = typereference
+  
+  // ASN1D 8.3.2<18>
+  def number =
+    ( ( char('0')
+      ~ not(char('0' to '9'))
+      ) ^^ { _ => "0" }
+    | ( char('1' to '9')
+      ~ char('0' to '9').*
+      ) ^^ { case x ~ xs => x + xs.mkString }
+    ) ^^ { n => NumberLit(n) }
+  
+  // ASN1D 8.3.2<19>
+  def objectclassreference = typereference
+
+  // ASN1D XXXXXXXXX
+  def typereference = char('x')
+    
   def upperId =
     ( upper
     ~ ( ( letter

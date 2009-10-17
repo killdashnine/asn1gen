@@ -35,7 +35,7 @@ trait Asn1Tokens extends Tokens {
   }
 
   /** The class of numeric literal tokens */
-  case class NumericLit(chars: String) extends Token {
+  case class NumberLit(chars: String) extends Token {
     override def toString = chars
   }
 

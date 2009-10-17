@@ -48,6 +48,21 @@ package test.org.asn1gen.parsing.asn1 {
       assertEquals("A01B23C45D67E89F", lexer.hstring(charseq).get.string)
     }
     
+    @Test def test_number_1() {
+      def charseq = new CharSequenceReader("0")
+      assertEquals("0", lexer.number(charseq).get.chars)
+    }
+    
+    @Test def test_number_2() {
+      def charseq = new CharSequenceReader("123456789")
+      assertEquals("123456789", lexer.number(charseq).get.chars)
+    }
+    
+    @Test def test_number_3() {
+      def charseq = new CharSequenceReader("00")
+      assertFalse(lexer.number(charseq).successful)
+    }
+    
     @Test def test_oneLineComment() {
       def charseq1 = new CharSequenceReader("--abc-- a\n");
       assertEquals("abc", lexer.oneLineComment(charseq1).get.comment);
