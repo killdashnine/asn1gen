@@ -7,11 +7,9 @@ import scala.util.parsing.combinator.lexical._
 import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.parsing.syntax._
 
-class Parser extends TokenParsers with ImplicitConversions with Asn1Tokens{
+class Parser extends TokenParsers with ImplicitConversions with Asn1Tokens {
   type Tokens = Lexer
-
-  //import lexical.{Keyword, NumericLit, StringLit, Identifier}
-
+  
   /** A parser which matches a numeric literal */
   def numericLit: Parser[String] = 
     elem("number", _.isInstanceOf[NumberLit]) ^^ (_.chars)
@@ -44,17 +42,15 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Tokens{
   
   def root = moduleDefinition
   
-  def moduleDefinition =
-    ( typeReference
+  def moduleDefinition = typeReference
+    /*( typeReference
     ~ lexical.Keyword("DEFINITIONS")
     ~ tagDefault
-    ) ^^ { case tr ~ _ ~ td => ModuleDefinition(ModuleReference2(tr.name)) }
+    ) ^^ { case tr ~ _ ~ td => ModuleDefinition(ModuleReference2(tr.name)) }*/
   
   def tagDefault = lexical.Keyword("AUTOMATIC") ~ lexical.Keyword("TAGS")
   
   def comment = accept("comment", { case lexical.CommentLit(n) => n } )
   
-  def typeReference = accept("type reference", {
-    case lexical.Identifier(n) => if (n.first.isUpperCase) ModuleReference2(n) else error ("moo")
-  })
+  def typeReference = elem("type reference", { case lexical.Identifier(n) => n.first.isUpperCase})
 }
