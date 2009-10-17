@@ -70,7 +70,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   def char(c : Char) = elem("'" + c + "'", _ == c)
   def bin_digit = elem("0", _.isBinDigit)
   def not_char(c : Char) = elem("not " + c.toString, _ != c)
-  def hex_digit = elem("hexadecimal digit", c => c.isUpperCase && c.isHexDigit)
+  def upper_hex_digit = elem("hexadecimal digit", c => c.isUpperHexDigit)
   
   // ASN1D 8.3.2<1-2>
   def bstring_char =
@@ -127,7 +127,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   
   // ASN1D 8.3.2<10>
   def hstring_char =
-    ( hex_digit | space | tab | lf | cr )
+    ( upper_hex_digit | space | tab | lf | cr )
   
   // ASN1D 8.3.2<1-2>
   def hstring =
@@ -136,7 +136,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
     ~ squote
     ~ char('H')
     ) ^^ { case _ ~ data ~ _ ~ _ =>
-      HString(data.filter(_.isBinDigit).mkString)
+      HString(data.filter(_.isUpperHexDigit).mkString)
     }
   
   // ASN1

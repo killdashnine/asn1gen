@@ -1,10 +1,9 @@
 package org.asn1gen.extra
 
 class ExtraChar(original: Char) {
-  def isHexDigit = {
+  def isUpperHexDigit = {
     (original >= '0' && original <= '9') ||
-    (original >= 'A' && original <= 'B') ||
-    (original >= 'a' && original <= 'b')
+    (original >= 'A' && original <= 'F')
   }
 
   def isBinDigit = {

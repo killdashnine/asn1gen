@@ -33,6 +33,21 @@ package test.org.asn1gen.parsing.asn1 {
       assertEquals("abc\"def", lexer.cstring(charseq).get.string)
     }
     
+    @Test def test_hstring_1() {
+      def charseq = new CharSequenceReader("'0123456789'H")
+      assertEquals("0123456789", lexer.hstring(charseq).get.string)
+    }
+    
+    @Test def test_hstring_2() {
+      def charseq = new CharSequenceReader("'A01B23C45D67E89F'H")
+      assertEquals("A01B23C45D67E89F", lexer.hstring(charseq).get.string)
+    }
+    
+    @Test def test_hstring_3() {
+      def charseq = new CharSequenceReader("' \nA01B2\r3C45D\t67E89F\n'H")
+      assertEquals("A01B23C45D67E89F", lexer.hstring(charseq).get.string)
+    }
+    
     @Test def test_oneLineComment() {
       def charseq1 = new CharSequenceReader("--abc-- a\n");
       assertEquals("abc", lexer.oneLineComment(charseq1).get.comment);
