@@ -7,8 +7,9 @@ import scala.util.parsing.input.CharArrayReader.EofCh
 import scala.util.parsing.syntax._
 import collection.mutable.HashSet
 import org.asn1gen.parsing.syntax._
+import org.asn1gen.extra.Extras
 
-class Lexer extends Lexical with ImplicitConversions with Asn1Tokens {
+class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras {
   // see `token' in `Scanners'
   override def token: Parser[Token] =
     ( lowerId ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
@@ -23,7 +24,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens {
     ).* ^^ { cs => CommentLit(("" /: cs)(_ + _)) }
 
   protected def comment: Parser[Any] = (
-      '*' ~ '/'  ^^ { case _ => ' '  }
+      '*' ~ '/'  ^^ { _ => ' ' }
     | chrExcept(EofCh) ~ comment
     )
 
@@ -53,37 +54,36 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens {
 
   private def lift2[T](f: String => T)(p: ~[Char, List[Char]]): T = lift(f)(p._1 :: p._2)
 
-  def upper : Parser[Elem] = elem("uppercase letter", c => c >= 'A' && c <= 'Z')
-  def lower : Parser[Elem] = elem("lowercase letter", c => c >= 'a' && c <= 'z')
-  def hyphen : Parser[Elem] = elem("hyphen", c => c == '-')
-  def lf : Parser[Elem] = elem("linefeed", c => c == '\n')
-  def cr : Parser[Elem] = elem("carriage return", c => c == '\r')
+  def upper : Parser[Elem] = elem("uppercase letter", c => 'A' <= c && c <= 'Z')
+  def lower : Parser[Elem] = elem("lowercase letter", c => 'a' <= c && c <= 'z')
+  def hyphen : Parser[Elem] = elem("hyphen", _ == '-')
+  def lf : Parser[Elem] = elem("linefeed", _ == '\n')
+  def cr : Parser[Elem] = elem("carriage return", _ == '\r')
   def endln = ((cr ~ lf) | cr | lf)
   def anychar : Parser[Elem] = elem("any character", c => true)
-  def space = elem("space", c => c == ' ')
-  def tab = elem("space", c => c == '\t')
-  def slash = elem("space", c => c == '/')
-  def asterisk = elem("space", c => c == '*')
-  def dquote = elem("single quote", c => c == '"')
-  def squote = elem("single quote", c => c == '\'')
-  def char_b = elem("b", c => c == 'b')
-  def char_0 = elem("0", c => c == '0')
-  def char_1 = elem("1", c => c == '1')
-  def not_char(ch : Char) = elem(ch.toString, c => c != ch)
-  
+  def space = elem("space", _ == ' ')
+  def tab = elem("space", _ == '\t')
+  def slash = elem("space", _ == '/')
+  def asterisk = elem("space", _ == '*')
+  def dquote = elem("single quote", _ == '"')
+  def squote = elem("single quote", _ == '\'')
+  def char(c : Char) = elem("'" + c + "'", _ == c)
+  def bin_digit = elem("0", _.isBinDigit)
+  def not_char(c : Char) = elem("not " + c.toString, _ != c)
+  def hex_digit = elem("hexadecimal digit", c => c.isUpperCase && c.isHexDigit)
   
   // ASN1D 8.3.2<1-2>
   def bstring_char =
-    ( char_0 | char_1 | space | tab | lf | cr )
+    ( bin_digit | space | tab | lf | cr )
   
   // ASN1D 8.3.2<1-2>
   def bstring =
     ( squote
     ~ bstring_char.*
     ~ squote
-    ~ char_b
+    ~ char('b')
     ) ^^ { case _ ~ data ~ _ ~ _ =>
-      BString(data.filter(c => c == '0' || c == '1').mkString)
+      BString(data.filter(_.isBinDigit).mkString)
     }
   
   // ASN1D 8.3.2<3>
@@ -122,7 +122,22 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens {
       CString(data.mkString.lines.map(_.trim).mkString)
     }
 
-  // ASN1D 8.3.2<7>
+  // ASN1D 8.3.2<9>
+  // Not implemented
+  
+  // ASN1D 8.3.2<10>
+  def hstring_char =
+    ( hex_digit | space | tab | lf | cr )
+  
+  // ASN1D 8.3.2<1-2>
+  def hstring =
+    ( squote
+    ~ hstring_char.*
+    ~ squote
+    ~ char('H')
+    ) ^^ { case _ ~ data ~ _ ~ _ =>
+      HString(data.filter(_.isBinDigit).mkString)
+    }
   
   // ASN1
   def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))

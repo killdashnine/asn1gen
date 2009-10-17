@@ -24,6 +24,11 @@ trait Asn1Tokens extends Tokens {
     def string = chars
   }
 
+  case class HString(chars: String) extends Token {
+    override def toString = chars
+    def string = chars
+  }
+
   case class CString(chars: String) extends Token {
     override def toString = chars
     def string = chars
