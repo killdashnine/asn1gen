@@ -45,18 +45,13 @@ trait Asn1Tokens extends Tokens {
   }    
 
   /** The class of identifier tokens */
-  case class LowerId(chars: String) extends Token {
+  case class Identifier(chars: String) extends Token {
     override def toString = "identifier "+chars
     def name = chars
   }
 
-  case class UpperId(chars: String) extends Token {
+  case class AmpIdentifier(chars: String) extends Token {
     override def toString = "identifier "+chars
     def name = chars
-  }
-  
-  /** The class of module references. */
-  case class ModuleReference(chars: String) extends Token {
-    override def toString = "module reference " + chars
   }
 }

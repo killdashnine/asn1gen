@@ -55,6 +55,6 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Tokens{
   def comment = accept("comment", { case lexical.CommentLit(n) => n } )
   
   def typeReference = accept("type reference", {
-    case lexical.UpperId(n) => ModuleReference2(n)
+    case lexical.Identifier(n) => if (n.first.isUpperCase) ModuleReference2(n) else error ("moo")
   })
 }

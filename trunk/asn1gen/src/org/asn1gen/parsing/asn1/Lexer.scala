@@ -12,8 +12,8 @@ import org.asn1gen.extra.Extras
 class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras {
   // see `token' in `Scanners'
   override def token: Parser[Token] =
-    ( identifier ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
-    | upperId ^^ { m => if (reserved contains m.name) Keyword(m.name) else m }
+    ( identifier
+    | ampIdentifier
     )
 
   // see `whitespace in `Scanners'
@@ -74,6 +74,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   def not_char(c : Char) = elem("not " + c.toString, _ != c)
   def upper_hex_digit = elem("hexadecimal digit", c => c.isUpperHexDigit)
   def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
+  def ampersand = elem("ampersand", _ == '&')
   
   // ASN1D 8.3.2<1-2>
   def bstring_char =
@@ -150,13 +151,13 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
         | hyphen <~ before(letter | digit)
         ).* ^^ { m => ("" /: m)(_ + _) }
       ).?
-    ) ^^ { case c ~ cs => LowerId("" + c + cs.getOrElse("")) }
+    ) ^^ { case c ~ cs => Identifier("" + c + cs.getOrElse("")) }
 
   // ASN1D 8.3.2<16>
   // Not implemented
 
   // ASN1D 8.3.2<17>
-  def modulereference = typereference
+  // ???
   
   // ASN1D 8.3.2<18>
   def number =
@@ -169,31 +170,80 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
     ) ^^ { n => NumberLit(n) }
   
   // ASN1D 8.3.2<19>
-  def objectclassreference = typereference
+  // ???
 
-  // ASN1D XXXXXXXXX
-  def typereference = char('x')
+  // ASN1D 8.3.2<20>
+  def objectfieldreference =
+    ( ampersand
+    ~ objectreference
+    )
+  
+  // ASN1D 8.3.2<21>
+  def objectreference = valuereference
+  
+  // ASN1D 8.3.2<22>
+  // ???
+  
+  // ASN1D 8.3.2<23>
+  // ???
+  
+  // ASN1D 8.3.2<24>
+  def signednumber =
+    ( number
+    | char('-') ~ not(char('0')) ~ number
+    )
+  
+  // ASN1D 8.3.2<25>
+  // ???
+
+  // ASN1D 8.3.2<26,29>
+  // ???
+
+  // ASN1D 8.3.2<27-30>
+  // Not implemented
+  
+  // ASN1D 8.3.2<31>
+  def valuefieldreference =
+    ( char('&')
+    ~ valuereference
+    )
     
-  def upperId =
-    ( upper
-    ~ ( ( letter
-        | digit
-        | hyphen <~ before(letter | digit)
-        ).* ^^ { m => ("" /: m)(_ + _) }
-      ).?
-    ) ^^ { case c ~ cs => UpperId("" + c + cs.getOrElse("")) }
+  // ASN1D 8.3.2<32>
+  def valuereference = identifier
   
+  // ASN1D 8.3.2<33>
+  // ???
+
+  // ASN1D 8.3.2<34>
+  // ???
+    
+  // ASN1D 8.3.2<35-37>
+  // Not implemented
+    
   // 11.3
-  def identifier =
-    ( lower
+  def identifier_string =
+    ( letter
     ~ ( ( letter
         | digit
         | hyphen <~ before(letter | digit)
         ).* ^^ { m => ("" /: m)(_ + _) }
       ).?
-    ) ^^ { case c ~ cs => LowerId(c + cs.getOrElse("")) }
+    ) ^^ { case c ~ cs =>
+      c + cs.getOrElse("");
+    }
   
+  def identifier = identifier_string ^^ { name =>
+    if (reserved contains name) Keyword(name) else Identifier(name)
+  }
+
+  
+  def ampIdentifier = (char('&') ~> identifier_string) ^^ { name =>
+    if (reserved contains name) Keyword(name) else error("keyword not allowed")
+  }
+      
   // 11.6
+  
+  
   
   def multiLineCommentBegin = slash ~ asterisk
   def multiLineCommentEnd = asterisk ~ slash

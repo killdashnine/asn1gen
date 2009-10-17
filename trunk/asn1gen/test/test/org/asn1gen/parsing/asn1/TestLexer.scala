@@ -75,7 +75,7 @@ package test.org.asn1gen.parsing.asn1 {
 
     @Test def test_identifier() {
       def charseq2 = new CharSequenceReader("idenT-IFIER-");
-      assertEquals("idenT-IFIER", lexer.identifier(charseq2).get.name);
+      assertEquals("idenT-IFIER", lexer.identifier(charseq2).get.chars);
     }
   }
 }
