@@ -14,7 +14,7 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Tokens{
 
   /** A parser which matches a numeric literal */
   def numericLit: Parser[String] = 
-    elem("number", _.isInstanceOf[NumericLit]) ^^ (_.chars)
+    elem("number", _.isInstanceOf[NumberLit]) ^^ (_.chars)
 
   /** A parser which matches a string literal */
   def stringLit: Parser[String] = 
