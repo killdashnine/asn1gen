@@ -42,11 +42,13 @@ class Parser extends TokenParsers with ImplicitConversions {
   
   def root = moduleDefinition
   
-  def moduleDefinition = typeReference
-    /*( typeReference
+  def moduleDefinition =
+    ( moduleReference
     ~ lexical.Keyword("DEFINITIONS")
     ~ tagDefault
-    ) ^^ { case tr ~ _ ~ td => ModuleDefinition(ModuleReference2(tr.name)) }*/
+    ) ^^ { case reference ~ _ ~ tagDefault => ModuleDefinition(reference) }
+  
+  def moduleReference = typeReference ^^ { case TypeReference(n) => ModuleReference(n) }
   
   def tagDefault = lexical.Keyword("AUTOMATIC") ~ lexical.Keyword("TAGS")
   
@@ -66,5 +68,10 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D: 8.2.3<9>
   // TODO: not implemented
 
-  def typeReference = elem("type reference", { case lexical.Identifier(n) => n.first.isUpperCase})
+  def typeReference = elem(
+    "type reference",
+    { case lexical.Identifier(n) => n.first.isUpperCase}) ^^ {
+      case lexical.Identifier(n) => TypeReference(n) 
+    }
+  
 }
