@@ -77,7 +77,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   def not_char(c : Char) = elem("not " + c.toString, _ != c)
   def upper_hex_digit = elem("hexadecimal digit", c => c.isUpperHexDigit)
   def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
-  def ampersand = elem("ampersand", _ == '&')
+  def ampersand = elem("ampersand", _ == '&') ^^ { _ => Operator("&") }
   
   // ASN1D 8.3.2<1-2>
   def bstring_char =

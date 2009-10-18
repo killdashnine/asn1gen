@@ -86,7 +86,7 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   // ASN1D: 8.2.3<20>
   // TODO: unsure if specification means there should be no space after '&'
   def objectFieldReference =
-    ( typeReference
+    ( lexical.Operator("&") ~> typeReference
     ) ^^ { case TypeReference(n) => ObjectFieldReference(n) }
   
   def typeReference = elem(
@@ -94,5 +94,4 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     { case lexical.Identifier(n) => n.first.isUpperCase}) ^^ {
       case lexical.Identifier(n) => TypeReference(n) 
     }
-  
 }
