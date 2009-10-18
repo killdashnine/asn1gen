@@ -14,7 +14,10 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   override def token: Parser[Token] =
     ( identifier
     | ampIdentifier
-    )
+    ) ^^ {
+      case t : Asn1Token => t.prevComment = lastComment; t
+      case t => t 
+    }
 
   // see `whitespace in `Scanners'
   override def whitespace : Parser[CommentLit] =
@@ -151,7 +154,10 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
         | hyphen <~ before(letter | digit)
         ).* ^^ { m => ("" /: m)(_ + _) }
       ).?
-    ) ^^ { case c ~ cs => Identifier("" + c + cs.getOrElse("")) }
+    ) ^^ { case c ~ cs =>
+      println()
+      Identifier("" + c + cs.getOrElse(""))
+    }
 
   // ASN1D 8.3.2<16>
   // Not implemented
@@ -167,7 +173,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
     | ( char('1' to '9')
       ~ char('0' to '9').*
       ) ^^ { case x ~ xs => x + xs.mkString }
-    ) ^^ { n => NumberLit(n) }
+    ) ^^ { n => Number(n) }
   
   // ASN1D 8.3.2<19>
   // ???
@@ -243,7 +249,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
       
   // 11.6
   
-  
+  var lastComment : String = ""
   
   def multiLineCommentBegin = slash ~ asterisk
   def multiLineCommentEnd = asterisk ~ slash
@@ -260,5 +266,8 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
     )
   
   def multiLineComment : Parser[CommentLit] =
-    multiLineCommentBegin ~> multiLineCommentRemainder
+    multiLineCommentBegin ~> multiLineCommentRemainder ^^ { comment =>
+      lastComment = comment.comment
+      comment
+    }
 }

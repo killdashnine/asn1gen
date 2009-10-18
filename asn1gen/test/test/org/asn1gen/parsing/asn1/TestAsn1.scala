@@ -15,5 +15,19 @@ package test.org.asn1gen.parsing.asn1 {
         case x => fail("Parse failed: " + x)
       }
     }
+
+    @Test def test2() {
+      Asn1.parse("MyModule   DEFINITIONS   AUTOMATIC   TAGS") match {
+        case Success(x, _) => { println(x)}
+        case x => fail("Parse failed: " + x)
+      }
+    }
+
+    @Test def test3() {
+      Asn1.parse("-- hello -- MyModule DEFINITIONS AUTOMATIC TAGS") match {
+        case Success(x, _) => { println(x)}
+        case x => fail("Parse failed: " + x)
+      }
+    }
   }
 }
