@@ -17,3 +17,7 @@ case class ModuleReference(chars : String) extends Node {
   def name = chars
 }
 
+case class TypeReference(chars : String) extends Node {
+  def name = chars
+}
+

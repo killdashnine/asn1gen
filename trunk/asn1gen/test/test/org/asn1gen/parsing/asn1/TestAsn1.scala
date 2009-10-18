@@ -7,14 +7,13 @@ import _root_.scala.util.parsing.input._
 
 package test.org.asn1gen.parsing.asn1 {
   class TestAsn1 extends TestCase {
-    @Test def test1() {
-      def result = Asn1.parse("MyModule DEFINITIONS AUTOMATIC TAGS");
-      assertEquals(ModuleDefinition(ModuleReference("MyModule")), result.get);
-    }
+    import Asn1.{parse, Failure, Success}
 
-    @Test def test2() {
-      def result = Asn1.parse("_modulereference_");
-      assertEquals(None, result);
+    @Test def test1() {
+      Asn1.parse("MyModule DEFINITIONS AUTOMATIC TAGS") match {
+        case Success(x, _) => { println(x)}
+        case x => fail("Parse failed: " + x)
+      }
     }
   }
 }
