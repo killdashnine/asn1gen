@@ -12,6 +12,9 @@ trait Asn1Tokens extends Tokens {
     var prevComment : String = ""
   }
   
+  case class Operator(chars: String) extends Asn1Token {
+  }
+  
   /** The class of keyword tokens */
   case class Keyword(chars: String) extends Asn1Token {
     override def toString = "`"+chars+"'"
