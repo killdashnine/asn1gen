@@ -7,18 +7,9 @@ import scala.util.parsing.combinator.lexical._
 import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.parsing.syntax._
 
-class Parser extends TokenParsers with ImplicitConversions {
+class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   type Tokens = Lexer
   
-  /** A parser which matches a numeric literal */
-  def numericLit: Parser[String] = 
-    elem("number", _.isInstanceOf[lexical.NumberLit]) ^^ (_.chars)
-
-  /** A parser which matches a string literal */
-  def stringLit: Parser[String] = 
-    elem("string literal", _.isInstanceOf[lexical.StringLit]) ^^ (_.chars)
-
-
   val lexical = new Tokens
   lexical.reserved +=
     ( "ABSENT", "ABSTRACT-SYNTAX", "ALL", "APPLICATION", "AUTOMATIC"
@@ -48,8 +39,6 @@ class Parser extends TokenParsers with ImplicitConversions {
     ~ tagDefault
     ) ^^ { case reference ~ _ ~ tagDefault => ModuleDefinition(reference) }
   
-  def moduleReference = typeReference ^^ { case TypeReference(n) => ModuleReference(n) }
-  
   def tagDefault = lexical.Keyword("AUTOMATIC") ~ lexical.Keyword("TAGS")
   
   // ASN1D 8.3.2<1-2>
@@ -68,6 +57,38 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D: 8.2.3<9>
   // TODO: not implemented
 
+  // ASN1D: 8.2.3<10-11>
+  def hstring = accept("hstring", {case lexical.HString(s) => HString(s)})
+  
+  // ASN1D: 8.2.3<12-14>
+  def identifier = elem(
+    "identifier",
+    { case lexical.Identifier(n) => n.first.isLowerCase}) ^^ {
+      case lexical.Identifier(n) => TypeReference(n) 
+    }
+
+  // ASN1D: 8.2.3<15-16>
+  // TODO: not implemented
+  
+  // ASN1D: 8.2.3<17>
+  def moduleReference =
+    ( typeReference
+    ) ^^ { case tr@TypeReference(_) => tr.asModuleReference }
+  
+  // ASN1D: 8.2.3<18>
+  def number = accept("number", {case lexical.Number(s) => Number(s)})
+  
+  // ASN1D: 8.2.3<19>
+  def objectClassReference =
+    ( typeReference
+    ) ^^ { case TypeReference(n) => ObjectClassReference(n) }
+  
+  // ASN1D: 8.2.3<20>
+  // TODO: unsure if specification means there should be no space after '&'
+  def objectFieldReference =
+    ( typeReference
+    ) ^^ { case TypeReference(n) => ObjectFieldReference(n) }
+  
   def typeReference = elem(
     "type reference",
     { case lexical.Identifier(n) => n.first.isUpperCase}) ^^ {

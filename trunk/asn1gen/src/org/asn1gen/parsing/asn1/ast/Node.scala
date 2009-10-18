@@ -1,23 +1,42 @@
 package org.asn1gen.parsing.asn1.ast
 
-class Node {
-}
+import org.asn1gen.parsing.syntax.Asn1Tokens
 
-case class ModuleDefinition(reference : ModuleReference) extends Node {
-  def name = reference.name
+trait Asn1Nodes {
+  class Node {
+    object Tokens extends Asn1Tokens {}
+  }
+  
+  case class BString(chars : String) extends Node {
+  }
+  
+  case class CString(chars : String) extends Node {
+  }
+  
+  case class HString(chars : String) extends Node {
+  }
+  
+  case class ModuleDefinition(reference : ModuleReference) extends Node {
+    def name = reference.name
+  }
+  
+  case class ModuleReference(chars : String) extends Node {
+    def name = chars
+  }
+  
+  case class Number(chars : String) extends Node {
+  }
+  
+  case class ObjectClassReference(chars : String) extends Node {
+    def name = chars
+  }
+  
+  case class ObjectFieldReference(chars : String) extends Node {
+    def name = chars
+  }
+  
+  case class TypeReference(chars : String) extends Node {
+    def name = chars
+    def asModuleReference = ModuleReference(chars)
+  }
 }
-
-case class BString(chars : String) extends Node {
-}
-
-case class CString(chars : String) extends Node {
-}
-
-case class ModuleReference(chars : String) extends Node {
-  def name = chars
-}
-
-case class TypeReference(chars : String) extends Node {
-  def name = chars
-}
-
