@@ -9,7 +9,7 @@ package test.org.asn1gen.parsing.asn1 {
   class TestAsn1 extends TestCase {
     @Test def test1() {
       def result = Asn1.parse("MyModule DEFINITIONS AUTOMATIC TAGS");
-      assertEquals(ModuleDefinition(ModuleReference2("MyModule")), result.get);
+      assertEquals(ModuleDefinition(ModuleReference("MyModule")), result.get);
     }
 
     @Test def test2() {

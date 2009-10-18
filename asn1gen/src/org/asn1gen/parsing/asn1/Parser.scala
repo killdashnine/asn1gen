@@ -7,16 +7,16 @@ import scala.util.parsing.combinator.lexical._
 import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.parsing.syntax._
 
-class Parser extends TokenParsers with ImplicitConversions with Asn1Tokens {
+class Parser extends TokenParsers with ImplicitConversions {
   type Tokens = Lexer
   
   /** A parser which matches a numeric literal */
   def numericLit: Parser[String] = 
-    elem("number", _.isInstanceOf[NumberLit]) ^^ (_.chars)
+    elem("number", _.isInstanceOf[lexical.NumberLit]) ^^ (_.chars)
 
   /** A parser which matches a string literal */
   def stringLit: Parser[String] = 
-    elem("string literal", _.isInstanceOf[StringLit]) ^^ (_.chars)
+    elem("string literal", _.isInstanceOf[lexical.StringLit]) ^^ (_.chars)
 
 
   val lexical = new Tokens
@@ -50,7 +50,21 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Tokens {
   
   def tagDefault = lexical.Keyword("AUTOMATIC") ~ lexical.Keyword("TAGS")
   
-  def comment = accept("comment", { case lexical.CommentLit(n) => n } )
+  // ASN1D 8.3.2<1-2>
+  def bstring = accept("bstring", {case lexical.BString(s) => BString(s)})
   
+  // ASN1D 8.3.2<3>
+  // TODO: unused
+  def comment = accept("comment", {case lexical.CommentLit(n) => n} )
+  
+  // ASN1D: 8.2.3<4-5>
+  // TODO: not implemented
+  
+  // ASN1D: 8.2.3<6-8>
+  def cstring = accept("cstring", {case lexical.CString(s) => CString(s)})
+  
+  // ASN1D: 8.2.3<9>
+  // TODO: not implemented
+
   def typeReference = elem("type reference", { case lexical.Identifier(n) => n.first.isUpperCase})
 }

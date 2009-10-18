@@ -1,10 +1,19 @@
 package org.asn1gen.parsing.asn1.ast
 
-class Node {}
-
-case class ModuleDefinition(name : ModuleReference2) extends Node {
+class Node {
 }
 
-case class ModuleReference2(name : String) extends Node {
+case class ModuleDefinition(reference : ModuleReference) extends Node {
+  def name = reference.name
+}
+
+case class BString(chars : String) extends Node {
+}
+
+case class CString(chars : String) extends Node {
+}
+
+case class ModuleReference(chars : String) extends Node {
+  def name = chars
 }
 
