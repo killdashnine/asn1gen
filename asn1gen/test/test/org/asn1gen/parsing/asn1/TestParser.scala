@@ -7,25 +7,24 @@ import _root_.scala.util.parsing.input._
 
 package test.org.asn1gen.parsing.asn1 {
   class TestParser extends TestCase {
-    def TestParser = {}
     
     object TheParser extends Parser {
       def parse[N](root : Parser[N], input: String) =
         phrase(root)(new lexical.Scanner(input))
     }
     
-    import TheParser.{parse, Failure, Success}
+    import TheParser._
     
     @Test def test_parse_1() {
-      parse(TheParser.typeReference, "typeReference") match {
+      parse(typeReference, "typeReference") match {
         case Success(result, _) => { fail("Must not succeed") }
         case x => {}
       };
     }
     
     @Test def test_parse_2() {
-      parse(TheParser.typeReference, "TypeReference") match {
-        case Success(result, _) => {}
+      parse(typeReference, "TypeReference") match {
+        case Success(TypeReference(_), _) => {}
         case x => { fail("Parse failed: " + x) }
       };
     }
