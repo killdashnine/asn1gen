@@ -64,7 +64,7 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   def identifier = elem(
     "identifier",
     { case lexical.Identifier(n) => n.first.isLowerCase}) ^^ {
-      case lexical.Identifier(n) => TypeReference(n) 
+      case lexical.Identifier(n) => Identifier(n) 
     }
 
   // ASN1D: 8.2.3<15-16>
@@ -86,12 +86,95 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   // ASN1D: 8.2.3<20>
   // TODO: unsure if specification means there should be no space after '&'
   def objectFieldReference =
-    ( lexical.Operator("&") ~> typeReference
-    ) ^^ { case TypeReference(n) => ObjectFieldReference(n) }
+    ( valueFieldReference
+    )
   
-  def typeReference = elem(
+  // ASN1D: 8.2.3<21>
+  def objectReference =
+    ( lexical.Operator("&") ~> valueReference
+    ) ^^ { case ValueReference(n) => ObjectFieldReference(n) }
+
+  // ASN1D: 8.2.3<22>
+  def objectSetFieldReference =
+    ( lexical.Operator("&") ~> objectSetReference
+    ) ^^ { case ObjectSetReference(n) => ObjectSetFieldReference(n) }
+
+  // ASN1D: 8.2.3<23>
+  def objectSetReference =
+    ( typeReference
+    ) ^^ { case TypeReference(n) => ObjectSetReference(n) }
+  
+  // ASN1D: 8.2.3<24>
+  def nonZeroNumber =
+    acceptIf {
+      case lexical.Number(n) => n != "0"
+    } {
+      _ => "signed zero not allowed"
+    } ^^ {
+      case lexical.Number(n) => Number(n)
+    }
+  
+  def signedNumber =
+    ( lexical.Operator("-").?
+    ~ nonZeroNumber 
+    ) ^^ {
+      case Some(_) ~ number => number
+      case None ~ number => number.negative
+    }
+  
+  // ASN1D: 8.2.3<25>
+  def typeFieldReference =
+    ( lexical.Operator("&") ~> typeReference
+    ) ^^ { case TypeReference(n) => TypeFieldReference(n) }
+  
+  // ASN1D: 8.2.3<26>
+  /*def typeReference = elem(
     "type reference",
     { case lexical.Identifier(n) => n.first.isUpperCase}) ^^ {
       case lexical.Identifier(n) => TypeReference(n) 
+    }*/
+  def typeReference =
+    accept("type reference", { case lexical.Identifier(n) => TypeReference(n)}) ^? {
+      case tr@TypeReference(n) if (n.first.isUpperCase) => tr
+    } | failure ("incorrect type reference")
+
+  // ASN1D: 8.2.3<27>
+  // Not implemented
+
+  // ASN1D: 8.2.3<28>
+  // Implemented in lexer
+
+  // ASN1D: 8.2.3<29>
+  // Not applicable
+  
+  // ASN1D: 8.2.3<30>
+  // Not implemented
+
+  // ASN1D: 8.2.3<31>
+  def valueFieldReference =
+    ( lexical.Operator("&") ~> valueReference
+    ) ^^ {
+      case ValueReference(n) => ValueFieldReference(n)
     }
+
+  // ASN1D: 8.2.3<31>
+  def valueReference =
+    ( identifier
+    ) ^^ {
+      case Identifier(n) => ValueReference(n)
+    }
+
+  // ASN1D: 8.2.3<33>
+  def valueSetFieldReference =
+    ( lexical.Operator("&") ~> typeReference
+    ) ^^ {
+      case TypeReference(n) => ValueSetFieldReference(n)
+    }
+
+  // ASN1D: 8.2.3<34>
+  /*def word = elem(
+    "type reference",
+    { case lexical.Identifier(n) => !n.exists.isUpperCase}) ^^ {
+      case lexical.Identifier(n) => TypeReference(n) 
+    */
 }

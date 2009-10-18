@@ -16,6 +16,9 @@ trait Asn1Nodes {
   case class HString(chars : String) extends Node {
   }
   
+  case class Identifier(chars : String) extends Node {
+  }
+  
   case class ModuleDefinition(reference : ModuleReference) extends Node {
     def name = reference.name
   }
@@ -25,6 +28,7 @@ trait Asn1Nodes {
   }
   
   case class Number(chars : String) extends Node {
+    def negative = Number("-" + chars)
   }
   
   case class ObjectClassReference(chars : String) extends Node {
@@ -35,8 +39,32 @@ trait Asn1Nodes {
     def name = chars
   }
   
+  case class ObjectSetFieldReference(chars : String) extends Node {
+    def name = chars
+  }
+  
+  case class ObjectSetReference(chars : String) extends Node {
+    def name = chars
+  }
+  
+  case class TypeFieldReference(chars : String) extends Node {
+    def name = chars
+  }
+  
   case class TypeReference(chars : String) extends Node {
     def name = chars
     def asModuleReference = ModuleReference(chars)
+  }
+
+  case class ValueFieldReference(chars : String) extends Node {
+    def name = chars
+  }
+
+  case class ValueReference(chars : String) extends Node {
+    def name = chars
+  }
+
+  case class ValueSetFieldReference(chars : String) extends Node {
+    def name = chars
   }
 }
