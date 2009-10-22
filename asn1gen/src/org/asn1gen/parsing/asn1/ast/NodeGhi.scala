@@ -16,6 +16,7 @@ case class HString(chars : String) extends Node {
 }
 
 case class Identifier(chars : String) extends Node {
+  def name = chars
 }
 
 case class IElems() extends Node {

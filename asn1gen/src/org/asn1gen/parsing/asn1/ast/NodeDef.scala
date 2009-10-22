@@ -21,7 +21,7 @@ case class DefinedSyntaxToken() extends Node {
 case class DefinedType() extends Node {
 }
 
-case class DefinedValue() extends Node {
+case class DefinedValue() extends Node with NamedNumberValue {
 }
 
 case class DefinitiveIdentifier() extends Node {

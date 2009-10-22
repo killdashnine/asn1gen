@@ -9,6 +9,7 @@ class Node {
 trait Asn1Nodes {
   type Node = ast.Node
   
+  // Concrete nodes
   type ActualParameter = ast.ActualParameter
   type ActualParameterList = ast.ActualParameterList
   type AdditionalElementSetSpec = ast.AdditionalElementSetSpec
@@ -289,4 +290,7 @@ trait Asn1Nodes {
   type VariableTypeValueSetFieldSpec = ast.VariableTypeValueSetFieldSpec
   type Word = ast.Word
   type WithSyntaxSpec = ast.WithSyntaxSpec
+  
+  // Traits
+  type NamedNumberValue = ast.NamedNumberValue
 }

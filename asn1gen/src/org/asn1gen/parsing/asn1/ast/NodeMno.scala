@@ -36,7 +36,8 @@ case class NamedBit() extends Node {
 case class NamedConstraint() extends Node {
 }
 
-case class NamedNumber() extends Node {
+case class NamedNumber(identifier: Identifier, value: NamedNumberValue) extends Node {
+  def name = identifier.name
 }
 
 case class NamedType() extends Node {
