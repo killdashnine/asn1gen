@@ -10,22 +10,46 @@ package test.org.asn1gen.parsing.asn1 {
     import Asn1._
 
     @Test def test1() {
-      Asn1.parse("MyModule DEFINITIONS AUTOMATIC TAGS") match {
-        case Asn1.Success(ModuleDefinition(ModuleReference("MyModule")), _) =>
+      val text = """
+        ModuleName DEFINITIONS ::= BEGIN END
+        """
+      Asn1.parse(text) match {
+        case Asn1.Success(
+          ModuleDefinition(
+            ModuleIdentifier(
+              ModuleReference("ModuleName"),
+              DefinitiveIdentifier()),
+            TagDefault(),
+            ExtensionDefault(),
+            ModuleBody(_, _, _)), _) =>
         case x => fail("Parse failed: " + x)
       }
     }
 
     @Test def test2() {
-      Asn1.parse("MyModule   DEFINITIONS   AUTOMATIC   TAGS") match {
-        case Asn1.Success(ModuleDefinition(ModuleReference("MyModule")), _) =>
+      Asn1.parse(" ModuleName    DEFINITIONS    ::= BEGIN  END") match {
+        case Asn1.Success(
+          ModuleDefinition(
+            ModuleIdentifier(
+              ModuleReference("ModuleName"),
+              DefinitiveIdentifier()),
+            TagDefault(),
+            ExtensionDefault(),
+            ModuleBody(_, _, _)), _) =>
         case x => fail("Parse failed: " + x)
       }
     }
 
     @Test def test3() {
-      Asn1.parse("-- hello -- MyModule DEFINITIONS AUTOMATIC TAGS") match {
-        case Asn1.Success(ModuleDefinition(ModuleReference("MyModule")), _) =>
+      Asn1.parse("-- hello -- ModuleName DEFINITIONS ::= BEGIN Moo ::= INTEGER END") match {
+        case Asn1.Success(
+          ModuleDefinition(
+            ModuleIdentifier(
+              ModuleReference("ModuleName"),
+              DefinitiveIdentifier()),
+            TagDefault(),
+            ExtensionDefault(),
+            ModuleBody(_, _, _)), _) =>
         case x => fail("Parse failed: " + x)
       }
     }

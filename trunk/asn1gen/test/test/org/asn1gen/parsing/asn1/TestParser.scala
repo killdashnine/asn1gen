@@ -28,5 +28,48 @@ package test.org.asn1gen.parsing.asn1 {
         case x => { fail("Parse failed: " + x) }
       };
     }
+
+    @Test def test_word_1() {
+      parse(word, "WORD") match {
+        case Success(Word("WORD"), _) => {}
+        case x => { fail("Parse failed: " + x) }
+      };
+    }
+
+    @Test def test_word_2() {
+      parse(word, "word") match {
+        case Success(Word("_"), _) => fail("Parser failure expected")
+        case x =>
+      };
+    }
+
+    @Test def test_word_3() {
+      parse(word, "WOrD") match {
+        case Success(Word("_"), _) => fail("Parser failure expected")
+        case x =>
+      }
+    }
+    
+    // ASN1D 9.2.2<2>
+    @Test def test_moduleIdentifier_1() {
+      parse(moduleIdentifier, "MyModule") match {
+        case Success(ModuleIdentifier(ModuleReference("MyModule"), _), _) =>
+        case x => fail("Parser failure expected")
+      }
+    } // TODO: cover other cases.
+
+    @Test def test_kw_definitions() {
+      parse(kw("DEFINITIONS"), "DEFINITIONS") match {
+        case Success(Keyword("DEFINITIONS"), _) =>
+        case x => fail("Parse failed: " + x)
+      }
+    } // TODO: cover other cases.
+
+    @Test def test_op_assignment() {
+      parse(op("::="), "::=") match {
+        case Success(Operator("::="), _) =>
+        case x => fail("Parse failed: " + x)
+      }
+    } // TODO: cover other cases.
   }
 }
