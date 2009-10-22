@@ -36,9 +36,22 @@ package test.org.asn1gen.parsing.asn1 {
       }
     }
 
-    @Test def test_integerType() {
+    @Test def test_integerType_1() {
       parse(integerType, "INTEGER") match {
         case Success(result, _) => 
+        case x => fail("Parse 'integerType' failure")
+      }
+    }
+    
+    @Test def test_integerType_2() {
+      parse(integerType, "INTEGER { a(1), b(2), c(3) }") match {
+        case Success(
+          result@IntegerType(
+            List(
+              NamedNumber(Identifier("a"), SignedNumber(false, Number("1"))),
+              NamedNumber(Identifier("b"), SignedNumber(false, Number("2"))),
+              NamedNumber(Identifier("c"), SignedNumber(false, Number("3"))))),
+          _) => println(result)
         case x => fail("Parse 'integerType' failure")
       }
     }
