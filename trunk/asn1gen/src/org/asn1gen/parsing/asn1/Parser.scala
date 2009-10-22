@@ -55,11 +55,11 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   def hstring = accept("hstring", {case lexical.HString(s) => HString(s)})
   
   // ASN1D: 8.2.3<12-14>
-  def identifier = elem(
-    "identifier",
-    { case lexical.Identifier(n) => n.first.isLowerCase}) ^^ {
-      case lexical.Identifier(n) => Identifier(n) 
-    }
+  def identifier = elem("identifier") {
+    case lexical.Identifier(n) if n.first.isLowerCase => Identifier(n)
+  }
+  
+  def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] = elem(kind, {_: Elem => true}) ^? f
 
   // ASN1D: 8.2.3<15-16>
   // TODO: not implemented
@@ -524,13 +524,12 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   
   // ASN1D 10.3.2<1>
   def integerType =
-    ( ( kw("INTEGER")
-      ~ op("{")
+    ( kw("INTEGER")
+    ~ ( op("{")
       ~ rep1sep(namedNumber, op(","))
       ~ op("}")
-      )
-    | kw("INTEGER")
-    )
+      ).?
+    ) ^^ { _ => IntegerType() }
   
   // ASN1D 10.3.2<6>
   def namedNumber =
