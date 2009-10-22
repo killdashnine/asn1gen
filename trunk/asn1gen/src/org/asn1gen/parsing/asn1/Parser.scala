@@ -109,22 +109,16 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     ) ^^ { case TypeReference(n) => ObjectSetReference(n) }
   
   // ASN1D: 8.2.3<24>
-  def nonZeroNumber =
-    acceptIf {
-      case lexical.Number(n) => n != "0"
-    } {
-      _ => "signed zero not allowed"
-    } ^^ {
-      case lexical.Number(n) => Number(n)
-    }
   
   def signedNumber =
-    ( lexical.Operator("-").?
-    ~ nonZeroNumber 
-    ) ^^ {
-      case Some(_) ~ number => number
-      case None ~ number => number.negative
-    }
+    ( ( lexical.Operator("-") ~ number
+      ) ^? { case _ ~ number if number.chars != "0" =>
+        SignedNumber(true, number)
+      }
+    | number ^^ { number =>
+        SignedNumber(false, number)
+      }
+    )
   
   // ASN1D: 8.2.3<25>
   def typeFieldReference =
@@ -475,7 +469,7 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     ( externalValueReference
     | valueReference
     | parameterizedValue
-    )
+    ) ^^ { _ => DefinedValue() } // TODO
   
   // ASN1D 9.3.2<10>
   def externalValueReference =
@@ -548,12 +542,16 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
       ~ op("(")
       ~ signedNumber
       ~ op(")")
-      )
+      ) ^^ { case id ~ _ ~ sn ~ _ =>
+        NamedNumber(id, sn)
+      }
     | ( identifier
       ~ op("(")
       ~ definedValue
       ~ op(")")
-      )
+      ) ^^ { case id ~ _ ~ dv ~ _ =>
+        NamedNumber(id, dv)
+      }
     )
   
   // ASN1D 10.3.2<11>
