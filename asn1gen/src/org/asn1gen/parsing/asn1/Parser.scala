@@ -33,28 +33,36 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   
   def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] = elem(kind, {_: Elem => true}) ^? f
 
-  def op(chars: String) = accept("operator " + chars, {case lexical.Operator(chars) => Operator(chars)})
-  def kw(chars: String) = accept("keyword " + chars, {case lexical.Keyword(chars) => Keyword(chars)})
+  def op(chars: String) = elem("operator " + chars) {case lexical.Operator(chars) => Operator(chars)}
+  def kw(chars: String) = elem("keyword " + chars) {case lexical.Keyword(chars) => Keyword(chars)}
   def empty = success("")
 
   // ASN1D 8.3.2<1-2>
-  def bstring = accept("bstring", {case lexical.BString(s) => BString(s)})
+  def bstring = elem("bstring") {
+    case lexical.BString(s) => BString(s)
+  }
   
   // ASN1D 8.3.2<3>
   // TODO: unused
-  def comment = accept("comment", {case lexical.CommentLit(n) => n} )
+  def comment = elem("comment") {
+    case lexical.CommentLit(n) => n
+  }
   
   // ASN1D: 8.2.3<4-5>
   // TODO: not implemented
   
   // ASN1D: 8.2.3<6-8>
-  def cstring = accept("cstring", {case lexical.CString(s) => CString(s)})
+  def cstring = elem("cstring") {
+    case lexical.CString(s) => CString(s)
+  }
   
   // ASN1D: 8.2.3<9>
   // TODO: not implemented
 
   // ASN1D: 8.2.3<10-11>
-  def hstring = accept("hstring", {case lexical.HString(s) => HString(s)})
+  def hstring = elem("hstring") {
+    case lexical.HString(s) => HString(s)
+  }
   
   // ASN1D: 8.2.3<12-14>
   def identifier = elem("identifier") {
@@ -70,7 +78,9 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     ) ^^ { case tr@TypeReference(_) => tr.asModuleReference }
   
   // ASN1D: 8.2.3<18>
-  def number = accept("number", {case lexical.Number(s) => Number(s)})
+  def number = elem("number") {
+    case lexical.Number(s) => Number(s)
+  }
   
   // ASN1D: 8.2.3<19>
   def objectClassReference =
@@ -127,8 +137,9 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     { case lexical.Identifier(n) => n.first.isUpperCase}) ^^ {
       case lexical.Identifier(n) => TypeReference(n) 
     }*/
-  def typeReference =
-    accept("type reference", { case lexical.Identifier(n) => TypeReference(n)}) ^? {
+  def typeReference = elem("type reference") {
+      case lexical.Identifier(n) => TypeReference(n)
+    } ^? {
       case tr@TypeReference(n) if (n.first.isUpperCase) => tr
     } | failure ("incorrect type reference")
 
