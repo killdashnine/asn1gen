@@ -12,7 +12,8 @@ import org.asn1gen.extra.Extras
 class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras {
   // see `token' in `Scanners'
   override def token: Parser[Token] =
-    ( identifier
+    ( number
+    | identifier
     | ampIdentifier
     | operator
     ) ^^ {
