@@ -30,7 +30,7 @@ case class SetValue() extends Node {
 case class Setting() extends Node {
 }
 
-case class SignedNumber(negative: boolean, magnitude: Number) extends Node with NamedNumberValue {
+case class SignedNumber(negative: Boolean, magnitude: Number) extends Node with NamedNumberValue {
 }
 
 case class SimpleDefinedType() extends Node {

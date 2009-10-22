@@ -33,8 +33,8 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   
   def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] = elem(kind, {_: Elem => true}) ^? f
 
-  def op(chars: String) = elem("operator " + chars) {case lexical.Operator(chars) => Operator(chars)}
-  def kw(chars: String) = elem("keyword " + chars) {case lexical.Keyword(chars) => Keyword(chars)}
+  def op(chars: String) = elem("operator " + chars) {case lexical.Operator(s) if s == chars => Operator(chars)}
+  def kw(chars: String) = elem("keyword " + chars) {case lexical.Keyword(s) if s == chars => Keyword(chars)}
   def empty = success("")
 
   // ASN1D 8.3.2<1-2>
@@ -204,11 +204,11 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     ~ type_
     )
   
-  def type_ : Parser[Any] =
+  def type_ : Parser[Type] =
     ( builtinType
     | referencedType
     | constrainedType
-    )
+    ) ^^ { _ => Type() }
   
   def builtinType =
     ( bitStringType
@@ -231,7 +231,7 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     | setType
     | setOfType
     | taggedType
-    )
+    ) ^^ { _ => BuiltinType() }
   
   def referencedType =
     ( definedType
@@ -520,7 +520,10 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   // ASN1D 10.1.2
   def booleanType = kw("BOOLEAN")
   
-  def booleanValue = kw("TRUE") | kw("FALSE")
+  def booleanValue =
+    ( kw("TRUE") ^^ { _ => BooleanValue(true) }
+    | kw("FALSE") ^^ { _ => BooleanValue(false) }
+    )
   
   // ASN1D 10.2.2
   def nullType = kw("NULL")
@@ -1567,6 +1570,6 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
 
   // ASN1D 17.2.2<32>
   def actualParameterList = op("{") ~ rep1sep(actualParameter, op(",")) ~ op("}")
-  def actualParameter = type_	| value | valueSet | definedObjectClass | object_ | objectSet
+  def actualParameter : Parser[Any] = type_ | value | valueSet | definedObjectClass | object_ | objectSet
 }
 
