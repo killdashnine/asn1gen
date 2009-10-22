@@ -49,7 +49,12 @@ package test.org.asn1gen.parsing.asn1 {
               DefinitiveIdentifier()),
             TagDefault(),
             ExtensionDefault(),
-            ModuleBody(_, _, _)), _) =>
+            ModuleBody(
+              _,
+              _,
+              AssignmentList(
+                List(
+                  Assignment())))), _) =>
         case x => fail("Parse failed: " + x)
       }
     }
