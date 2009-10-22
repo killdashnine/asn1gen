@@ -38,7 +38,7 @@ package test.org.asn1gen.parsing.asn1 {
 
     @Test def test_integerType_1() {
       parse(integerType, "INTEGER") match {
-        case Success(result, _) => 
+        case Success(result@IntegerType(Nil), _) => 
         case x => fail("Parse 'integerType' failure")
       }
     }
