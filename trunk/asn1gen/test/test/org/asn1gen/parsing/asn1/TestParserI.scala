@@ -23,6 +23,13 @@ package test.org.asn1gen.parsing.asn1 {
     }
 
     @Test def test_identifier_2() {
+      parse(identifier, "abc-DEF") match {
+        case Success(Identifier("abc-DEF"), _) => 
+        case x => fail("Parse 'identifier' failure: " + x)
+      }
+    }
+
+    @Test def test_identifier_3() {
       parse(identifier, "ABCDEF") match {
         case Success(Identifier("ABCDEF"), _) => fail("Parse success for 'identifier' unexpected: ")
         case x => 
