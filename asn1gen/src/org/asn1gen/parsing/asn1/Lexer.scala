@@ -14,6 +14,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   override def token: Parser[Token] =
     ( identifier
     | ampIdentifier
+    | operator
     ) ^^ {
       case t : Asn1Token => t.prevComment = lastComment; t
       case t => t 
@@ -30,6 +31,49 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
       '*' ~ '/'  ^^ { _ => ' ' }
     | chrExcept(EofCh) ~ comment
     )
+  
+  def operator_char = elem("operator", c => c == ':' || c == '=')
+  
+  def literal(s: String): Parser[String] = new Parser[String] {
+    def apply(in: Input) = {
+      val source = in.source
+      val offset = in.offset
+      val start = offset
+      var i = 0
+      var j = start
+      while (i < s.length && j < source.length && s.charAt(i) == source.charAt(j)) {
+        i += 1
+        j += 1
+      }
+      if (i == s.length)
+        Success(source.subSequence(start, j).toString, in.drop(j - offset))
+      else 
+        Failure("`"+s+"' expected but `"+in.first+"' found", in.drop(start - offset))
+    }
+  }
+
+  def operator =
+    ( literal("...")
+    | literal("::=")
+    | literal("..")
+    | literal("@.")
+    | literal("[[")
+    | literal("]]")
+    | literal("!")
+    | literal("(")
+    | literal(")")
+    | literal(",")
+    | literal(".")
+    | literal(":")      
+    | literal(";")
+    | literal("<")
+    | literal("[")
+    | literal("]")
+    | literal("^")
+    | literal("{")
+    | literal("|")
+    | literal("}")
+    ) ^^ { cs => Operator(cs) }
 
   /** The set of reserved identifiers: these will be returned as `Keyword's */
   val reserved = new HashSet[String]
@@ -52,7 +96,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
     
     _delim
   }
-
+  
   private def lift[T](f: String => T)(xs: List[Char]): T = f(xs.mkString("", "", ""))
 
   private def lift2[T](f: String => T)(p: ~[Char, List[Char]]): T = lift(f)(p._1 :: p._2)
