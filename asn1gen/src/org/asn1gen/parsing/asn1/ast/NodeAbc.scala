@@ -42,7 +42,7 @@ case class BitStringValue() extends Node {
 case class BooleanType() extends Node {
 }
 
-case class BooleanValue() extends Node {
+case class BooleanValue(value: Boolean) extends Node {
 }
 
 case class BuiltinType() extends Node {
