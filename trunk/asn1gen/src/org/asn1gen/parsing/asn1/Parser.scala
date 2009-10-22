@@ -31,6 +31,8 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     , "WITH"
     )
   
+  def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] = elem(kind, {_: Elem => true}) ^? f
+
   def op(chars: String) = accept("operator " + chars, {case lexical.Operator(chars) => Operator(chars)})
   def kw(chars: String) = accept("keyword " + chars, {case lexical.Keyword(chars) => Keyword(chars)})
   def empty = success("")
@@ -59,8 +61,6 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     case lexical.Identifier(n) if n.first.isLowerCase => Identifier(n)
   }
   
-  def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] = elem(kind, {_: Elem => true}) ^? f
-
   // ASN1D: 8.2.3<15-16>
   // TODO: not implemented
   
