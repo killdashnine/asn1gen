@@ -534,7 +534,10 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
       ~ rep1sep(namedNumber, op(","))
       ~ op("}")
       ).?
-    ) ^^ { _ => IntegerType() }
+    ) ^^ {
+      case _ ~ None => IntegerType(Nil)
+      case _ ~ Some(_ ~ namedNumbers ~ _) => IntegerType(namedNumbers)
+    }
   
   // ASN1D 10.3.2<6>
   def namedNumber =

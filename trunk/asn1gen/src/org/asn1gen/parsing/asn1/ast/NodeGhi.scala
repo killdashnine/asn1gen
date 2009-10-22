@@ -40,7 +40,7 @@ case class InstanceOfType() extends Node {
 case class InstanceOfValue() extends Node {
 }
 
-case class IntegerType() extends Node {
+case class IntegerType(namedNumbers: List[NamedNumber]) extends Node {
 }
 
 case class IntegerValue() extends Node {
