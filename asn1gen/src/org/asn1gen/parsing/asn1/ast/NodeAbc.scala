@@ -24,7 +24,7 @@ case class AssignedIdentifier() extends Node {
 case class Assignment() extends Node {
 }
 
-case class AssignmentList() extends Node {
+case class AssignmentList(assignments: List[Assignment]) extends Node {
 }
 
 case class AtNotation() extends Node {

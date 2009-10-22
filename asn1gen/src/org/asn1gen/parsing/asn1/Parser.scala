@@ -183,7 +183,7 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   // ASN1D: 9.1.2<1-2>
   def assignmentList =
     ( assignment.+
-    ) ^^ { _ => AssignmentList() }
+    ) ^^ { assignments => AssignmentList(assignments) }
   
   def assignment =
     ( typeAssignment
@@ -193,7 +193,7 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     | objectAssignment
     | objectSetAssignment
     | parameterizedAssignment
-    )
+    ) ^^ { _ => Assignment() }
   
   // ASN1D: 9.1.2<3>
   def opAssignment = lexical.Operator("::=")
