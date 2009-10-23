@@ -34,13 +34,13 @@ case class Includes() extends Node {
 case class InnerTypeConstraints() extends Node {
 }
 
-case class InstanceOfType() extends Node {
+case class InstanceOfType() extends Node with BuiltinTypeKind {
 }
 
 case class InstanceOfValue() extends Node {
 }
 
-case class IntegerType(namedNumbers: List[NamedNumber]) extends Node {
+case class IntegerType(namedNumbers: List[NamedNumber]) extends Node with BuiltinTypeKind {
 }
 
 case class IntegerValue() extends Node {

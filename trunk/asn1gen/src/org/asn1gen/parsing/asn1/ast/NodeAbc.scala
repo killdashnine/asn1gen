@@ -21,7 +21,7 @@ case class AlternativeTypeLists() extends Node {
 case class AssignedIdentifier() extends Node {
 }
 
-case class Assignment() extends Node {
+case class Assignment(kind : AssignmentKind) extends Node {
 }
 
 case class AssignmentList(assignments: List[Assignment]) extends Node {
@@ -33,19 +33,19 @@ case class AtNotation() extends Node {
 case class BString(chars : String) extends Node {
 }
 
-case class BitStringType() extends Node {
+case class BitStringType() extends Node with BuiltinTypeKind {
 }
 
 case class BitStringValue() extends Node {
 }
 
-case class BooleanType() extends Node {
+case class BooleanType() extends Node with BuiltinTypeKind {
 }
 
 case class BooleanValue(value: Boolean) extends Node {
 }
 
-case class BuiltinType() extends Node {
+case class BuiltinType(kind: BuiltinTypeKind) extends Node with TypeKind {
 }
 
 case class BuiltinValue() extends Node {
@@ -63,7 +63,7 @@ case class Cell() extends Node {
 case class CharacterStringList() extends Node {
 }
 
-case class CharacterStringType() extends Node {
+case class CharacterStringType() extends Node with BuiltinTypeKind {
 }
 
 case class CharacterStringValue() extends Node {
@@ -72,7 +72,7 @@ case class CharacterStringValue() extends Node {
 case class CharsDefn() extends Node {
 }
 
-case class ChoiceType() extends Node {
+case class ChoiceType() extends Node with BuiltinTypeKind {
 }
 
 case class ChoiceValue() extends Node {
@@ -102,7 +102,7 @@ case class ComponentTypeList() extends Node {
 case class ComponentTypeLists() extends Node {
 }
 
-case class ConstrainedType() extends Node {
+case class ConstrainedType() extends Node with TypeKind {
 }
 
 case class Constraint() extends Node {

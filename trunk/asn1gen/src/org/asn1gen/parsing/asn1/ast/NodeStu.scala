@@ -3,25 +3,25 @@ package org.asn1gen.parsing.asn1.ast
 case class SelectionType() extends Node {
 }
 
-case class SequenceOfType() extends Node {
+case class SequenceOfType() extends Node with BuiltinTypeKind {
 }
 
 case class SequenceOfValue() extends Node {
 }
 
-case class SequenceType() extends Node {
+case class SequenceType() extends Node with BuiltinTypeKind {
 }
 
 case class SequenceValue() extends Node {
 }
 
-case class SetOfType() extends Node {
+case class SetOfType() extends Node with BuiltinTypeKind {
 }
 
 case class SetOfValue() extends Node {
 }
 
-case class SetType() extends Node {
+case class SetType() extends Node with BuiltinTypeKind {
 }
 
 case class SetValue() extends Node {
@@ -87,7 +87,7 @@ case class Tag() extends Node {
 case class TagDefault() extends Node {
 }
 
-case class TaggedType() extends Node {
+case class TaggedType() extends Node with BuiltinTypeKind {
 }
 
 case class TaggedValue() extends Node {
@@ -99,10 +99,10 @@ case class TokenOrGroupSpec() extends Node {
 case class Tuple() extends Node {
 }
 
-case class Type() extends Node {
+case class Type(kind: TypeKind) extends Node {
 }
 
-case class TypeAssignment() extends Node {
+case class TypeAssignment(name: TypeReference, `type`: Type) extends Node with AssignmentKind {
 }
 
 case class TypeConstraint() extends Node {

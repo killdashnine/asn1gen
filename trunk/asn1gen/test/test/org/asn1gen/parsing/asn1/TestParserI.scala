@@ -51,7 +51,7 @@ package test.org.asn1gen.parsing.asn1 {
               NamedNumber(Identifier("a"), SignedNumber(false, Number("1"))),
               NamedNumber(Identifier("b"), SignedNumber(false, Number("2"))),
               NamedNumber(Identifier("c"), SignedNumber(false, Number("3"))))),
-          _) => println(result)
+          _) =>
         case x => fail("Parse 'integerType' failure")
       }
     }

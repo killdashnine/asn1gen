@@ -3,7 +3,7 @@ package org.asn1gen.parsing.asn1.ast
 case class Value() extends Node {
 }
 
-case class ValueAssignment() extends Node {
+case class ValueAssignment() extends Node with AssignmentKind {
 }
 
 case class ValueConstraint() extends Node {
@@ -39,7 +39,7 @@ case class ValueSetFromObjects() extends Node {
 case class ValueSetOptionalitySpec() extends Node {
 }
 
-case class ValueSetTypeAssignment() extends Node {
+case class ValueSetTypeAssignment() extends Node with AssignmentKind {
 }
 
 case class VariableTypeValueFieldSpec() extends Node {
