@@ -16,11 +16,11 @@ package test.org.asn1gen.parsing.asn1 {
     import TheParser._
     
     @Test def test_type_1() {
-      parse(type_, "INTEGER { a(1), b(2), c(3) }") match {
+      parse(`type`, "INTEGER { a(1), b(2), c(3) }") match {
         case Success(
-          result@Type(),
-          _) => println(result)
-        case x => println(x); fail("Parse 'type_' failure: " + x)
+          result@Type(_),
+          _) =>
+        case x => fail("Parse 'type_' failure: " + x)
       }
     }
   }

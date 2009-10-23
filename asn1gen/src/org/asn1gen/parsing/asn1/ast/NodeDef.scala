@@ -54,13 +54,13 @@ case class Elements() extends Node {
 case class Elems() extends Node {
 }
 
-case class EmbeddedPDVType() extends Node {
+case class EmbeddedPDVType() extends Node with BuiltinTypeKind {
 }
 
 case class EmbeddedPDVValue() extends Node {
 }
 
-case class EnumeratedType() extends Node {
+case class EnumeratedType() extends Node with BuiltinTypeKind {
 }
 
 case class EnumeratedValue() extends Node {
@@ -129,7 +129,7 @@ case class ExternalObjectReference() extends Node {
 case class ExternalObjectSetReference() extends Node {
 }
 
-case class ExternalType() extends Node {
+case class ExternalType() extends Node with BuiltinTypeKind {
 }
 
 case class ExternalTypeReference() extends Node {

@@ -19,8 +19,8 @@ package test.org.asn1gen.parsing.asn1 {
       parse(booleanValue, "TRUE") match {
         case Success(
           result@BooleanValue(true),
-          _) => println(result)
-        case x => println(x); fail("Parse 'booleanValue' failure: " + x)
+          _) =>
+        case x => fail("Parse 'booleanValue' failure: " + x)
       }
     }
     
@@ -28,26 +28,26 @@ package test.org.asn1gen.parsing.asn1 {
       parse(booleanValue, "FALSE") match {
         case Success(
           result@BooleanValue(false),
-          _) => println(result)
-        case x => println(x); fail("Parse 'booleanValue' failure: " + x)
+          _) =>
+        case x => fail("Parse 'booleanValue' failure: " + x)
       }
     }
     
     @Test def test_builtinType_1() {
       parse(builtinType, "NULL") match {
         case Success(
-          result@BuiltinType(),
-          _) => println(result)
-        case x => println(x); fail("Parse 'builtinType' failure: " + x)
+          result@BuiltinType(_),
+          _) =>
+        case x => fail("Parse 'builtinType' failure: " + x)
       }
     }
     
     @Test def test_builtinType_2() {
       parse(builtinType, "INTEGER { a(1), b(2), c(3) }") match {
         case Success(
-          result@BuiltinType(),
-          _) => println(result)
-        case x => println(x); fail("Parse 'builtinType' failure: " + x)
+          result@BuiltinType(_),
+          _) =>
+        case x => fail("Parse 'builtinType' failure: " + x)
       }
     }
   }

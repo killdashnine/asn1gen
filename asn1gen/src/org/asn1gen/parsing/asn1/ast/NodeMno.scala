@@ -49,7 +49,7 @@ case class NamedValue() extends Node {
 case class NonZeroNumber() extends Node {
 }
 
-case class NullType() extends Node {
+case class NullType() extends Node with BuiltinTypeKind {
 }
 
 case class NullValue() extends Node {
@@ -71,19 +71,19 @@ case class ObjIdComponents() extends Node {
 case class Object() extends Node {
 }
 
-case class ObjectAssignment() extends Node {
+case class ObjectAssignment() extends Node with AssignmentKind {
 }
 
 case class ObjectClass() extends Node {
 }
 
-case class ObjectClassAssignment() extends Node {
+case class ObjectClassAssignment() extends Node with AssignmentKind {
 }
 
 case class ObjectClassDefn() extends Node {
 }
 
-case class ObjectClassFieldType() extends Node {
+case class ObjectClassFieldType() extends Node with BuiltinTypeKind {
 }
 
 case class ObjectClassFieldValue() extends Node {
@@ -106,7 +106,7 @@ case class ObjectFieldSpec() extends Node {
 case class ObjectFromObject() extends Node {
 }
 
-case class ObjectIdentifierType() extends Node {
+case class ObjectIdentifierType() extends Node with BuiltinTypeKind {
 }
 
 case class ObjectIdentifierValue() extends Node {
@@ -121,7 +121,7 @@ case class ObjectReference() extends Node {
 case class ObjectSet() extends Node {
 }
 
-case class ObjectSetAssignment() extends Node {
+case class ObjectSetAssignment() extends Node with AssignmentKind {
 }
 
 case class ObjectSetElements() extends Node {
@@ -147,7 +147,7 @@ case class ObjectSetReference(chars : String) extends Node {
 case class ObjectSetSpec() extends Node {
 }
 
-case class OctetStringType() extends Node {
+case class OctetStringType() extends Node with BuiltinTypeKind {
 }
 
 case class OctetStringValue() extends Node {

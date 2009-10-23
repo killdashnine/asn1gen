@@ -9,7 +9,7 @@ case class Parameter() extends Node {
 case class ParameterList() extends Node {
 }
 
-case class ParameterizedAssignment() extends Node {
+case class ParameterizedAssignment() extends Node with AssignmentKind {
 }
 
 case class ParameterizedObject() extends Node {
@@ -72,7 +72,7 @@ case class PrimitiveFieldName() extends Node {
 case class Quadruple() extends Node {
 }
 
-case class RealType() extends Node {
+case class RealType() extends Node with BuiltinTypeKind {
 }
 
 case class RealValue() extends Node {
@@ -84,7 +84,7 @@ case class Reference() extends Node {
 case class ReferencedObjects() extends Node {
 }
 
-case class ReferencedType() extends Node {
+case class ReferencedType() extends Node with TypeKind {
 }
 
 case class ReferencedValue() extends Node {
@@ -93,7 +93,7 @@ case class ReferencedValue() extends Node {
 case class RelativeOidComponents() extends Node {
 }
 
-case class RelativeOidType() extends Node {
+case class RelativeOidType() extends Node with BuiltinTypeKind {
 }
 
 case class RelativeOidValue() extends Node {

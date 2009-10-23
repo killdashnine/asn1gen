@@ -18,7 +18,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_signedNumber_1() {
       parse(signedNumber, "1") match {
         case Success(SignedNumber(_, _), _) => 
-        case x => println(x);fail("Parse 'signedNumber' failure: " + x)
+        case x => fail("Parse 'signedNumber' failure: " + x)
       }
     }
   }

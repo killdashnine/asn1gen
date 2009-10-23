@@ -43,7 +43,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test3() {
       Asn1.parse("-- hello -- ModuleName DEFINITIONS ::= BEGIN Moo ::= INTEGER END") match {
         case Asn1.Success(
-          ModuleDefinition(
+          md@ModuleDefinition(
             ModuleIdentifier(
               ModuleReference("ModuleName"),
               DefinitiveIdentifier()),
@@ -54,7 +54,7 @@ package test.org.asn1gen.parsing.asn1 {
               _,
               AssignmentList(
                 List(
-                  Assignment())))), _) =>
+                  Assignment(x))))), _) => println(md)
         case x => fail("Parse failed: " + x)
       }
     }
