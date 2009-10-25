@@ -13,8 +13,55 @@ class GenJavaChoiceIds(out: PrintWriter) {
           DefinitiveIdentifier()),
         TagDefault(),
         ExtensionDefault(),
-        ModuleBody(_, _, tal))
-      => println(tal)
+        ModuleBody(_, _, assignmentList))
+      => generate(assignmentList)
+    }
+  }
+
+  def generate(assignmentList: AssignmentList): Unit = {
+    assignmentList match {
+      case AssignmentList(assignments) => assignments foreach { assignment =>
+        generate(assignment)
+      }
+    }
+  }
+
+  def generate(assignment: Assignment): Unit = {
+    assignment match {
+      case Assignment(
+        TypeAssignment(
+          TypeReference(name),
+          Type(
+            BuiltinType(
+              ChoiceType(
+                AlternativeTypeLists(rootAlternativeTypeList, _, _, _))))))
+      => {
+        println(name)
+        generate(rootAlternativeTypeList)
+      }
+    }
+  }
+  
+  def generate(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+    rootAlternativeTypeList match {
+      case RootAlternativeTypeList(namedTypes) => namedTypes foreach { namedType =>
+        generate(namedType)
+      }
+    }
+  }
+  
+  def generate(namedType: NamedType): Unit = {
+    namedType match {
+      case NamedType(
+        Identifier(name),
+        Type(
+          BuiltinType(
+            DefaultTaggedType(
+              Tag(_, LiteralClassNumber(Number(tagNumber))),
+              _))))
+      => {
+        println(name + " = " + tagNumber)
+      }
     }
   }
 }
