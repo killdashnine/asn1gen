@@ -4,6 +4,8 @@ import _root_.junit.framework.TestCase
 import _root_.org.asn1gen.parsing.asn1._
 import _root_.org.asn1gen.parsing.asn1.ast._
 import _root_.scala.util.parsing.input._
+import _root_.org.asn1gen.gen._
+import _root_.java.io.PrintWriter
 
 package test.org.asn1gen.gen {
   class TestGenJavaTags extends TestCase {
@@ -14,14 +16,9 @@ package test.org.asn1gen.gen {
         ModuleName DEFINITIONS ::= BEGIN MyChoice ::= CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER } END
         """
       Asn1.parse(text) match {
-        case Asn1.Success(
-          moduleDefinition@ModuleDefinition(
-            ModuleIdentifier(
-              ModuleReference("ModuleName"),
-              DefinitiveIdentifier()),
-            TagDefault(),
-            ExtensionDefault(),
-            ModuleBody(_, _, _)), _) => println(moduleDefinition)
+        case Asn1.Success(moduleDefinition, _) => {
+          new GenJavaChoiceIds(new PrintWriter(System.out)).generate(moduleDefinition)
+        }
         case x => fail("Parse failed: " + x)
       }
     }
