@@ -15,7 +15,11 @@ case class AdditionalEnumeration() extends Node {
 case class AlternativeTypeList() extends Node {
 }
 
-case class AlternativeTypeLists() extends Node {
+case class AlternativeTypeLists(
+  typeList: RootAlternativeTypeList,
+  extensionAndException: Option[ExtensionAndException],
+  extensionAdditionAlternatives: Option[ExtensionAdditionAlternatives],
+  optionalExtensionMarker: Option[OptionalExtensionMarker]) extends Node {
 }
 
 case class AssignedIdentifier() extends Node {
@@ -72,13 +76,10 @@ case class CharacterStringValue() extends Node {
 case class CharsDefn() extends Node {
 }
 
-case class ChoiceType() extends Node with BuiltinTypeKind {
+case class ChoiceType(typeLists: AlternativeTypeLists) extends Node with BuiltinTypeKind {
 }
 
 case class ChoiceValue() extends Node {
-}
-
-case class ClassNumber() extends Node {
 }
 
 case class Class_() extends Node {

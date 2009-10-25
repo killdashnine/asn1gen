@@ -40,7 +40,7 @@ case class NamedNumber(identifier: Identifier, value: NamedNumberValue) extends 
   def name = identifier.name
 }
 
-case class NamedType() extends Node {
+case class NamedType(id: Identifier, t: Type) extends Node {
 }
 
 case class NamedValue() extends Node {

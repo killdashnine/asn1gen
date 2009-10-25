@@ -7,7 +7,7 @@ import scala.util.parsing.combinator.lexical._
 import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.parsing.syntax._
 
-class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
+class Parser extends TokenParsers with ImplicitConversions {
   type Tokens = Lexer
   
   val lexical = new Tokens
@@ -855,35 +855,35 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   def taggedType =
     ( ( tag
       ~ `type`
-      )
+      ) ^^ { case tag ~ t => DefaultTaggedType(tag, t) }
     | ( tag
       ~ kw("IMPLICIT")
       ~ `type`
-      )
+      ) ^^ { case tag ~ _ ~ t => ImplicitTaggedType(tag, t) }
     | ( tag
       ~ kw("EXPLICIT")
       ~ `type`
-      )
-    ) ^^ { _ => TaggedType() } // TODO
+      ) ^^ { case tag ~ _ ~ t => ExplicitTaggedType(tag, t) }
+    )
   
   def tag =
     ( op("[")
     ~ class_
     ~ classNumber
     ~ op("]")
-    )
+    ) ^^ { case _ ~ c ~ cn ~ _ => Tag(c, cn) }
   
   def classNumber =
-    ( number
-    | definedValue
+    ( number ^^ { n => LiteralClassNumber(n) }
+    | definedValue ^^ { dv => DefinedClassNumber(dv) }
     )
   
   // ASN1D 12.1.4<7>
   def class_ =
-    ( kw("UNIVERSAL")
-    | kw("APPLICATION")
-    | kw("PRIVATE")
-    | empty
+    ( kw("UNIVERSAL") ^^ { _ => UniversalClass() }
+    | kw("APPLICATION") ^^ { _ => ApplicationClass() }
+    | kw("PRIVATE") ^^ { _ => PrivateClass() }
+    | empty ^^ { _ => DefaultClass() }
     )
   
   // ASN1D 12.1.4<15>
@@ -962,7 +962,9 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
     )
   
   // ASN1D 12.2.2<24>
-  def namedType = identifier ~ `type`
+  def namedType =
+    ( identifier ~ `type`
+    ) ^^ { case id ~ t => NamedType(id, t) }
 
   // ASN1D 12.2.2<25>
   def sequenceValue =
@@ -1036,25 +1038,27 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   // ASN1D 12.6.2<1>
   def choiceType =
     ( kw("CHOICE") ~ op("{") ~ alternativeTypeLists ~ op("}")
-    ) ^^ { _ => ChoiceType() } // TODO
+    ) ^^ { case _ ~ _ ~ typeLists ~ _ => ChoiceType(typeLists) }
 
   // ASN1D 12.6.2<3>
   def alternativeTypeLists =
-    ( rootAlternativeTypeList
+    ( ( rootAlternativeTypeList
+      ) ^^ { ratl => AlternativeTypeLists(ratl, None, None, None) }
     | ( rootAlternativeTypeList
       ~ op(",")
       ~ extensionAndException
       ~ extensionAdditionAlternatives
       ~ optionalExtensionMarker
-      )
+      ) ^^ { case ratl ~ _ ~ eae ~ eaa ~ oem => AlternativeTypeLists(ratl, Some(eae), Some(eaa), Some(oem)) }
     )
   
   // ASN1D 12.6.2<4>
-  def rootAlternativeTypeList = alternativeTypeList
+  def rootAlternativeTypeList =
+    alternativeTypeList ^^ { atl => RootAlternativeTypeList(atl) }
   def extensionAdditionAlternatives =
     ( op(",") ~ extensionAdditionAlternativesList
     | empty
-    )
+    ) ^^ { _ => ExtensionAdditionAlternatives() } // TODO
 
   def extensionAdditionAlternativesList =
     rep1sep(extensionAdditionAlternative, op(","))
@@ -1085,12 +1089,12 @@ class Parser extends TokenParsers with ImplicitConversions with Asn1Nodes {
   def extensionAndException =
     ( op("...")
     | op("...") ~ exceptionSpec
-    )
+    ) ^^ { _ => ExtensionAndException() } // TODO
 
   def optionalExtensionMarker =
     ( op(",") ~ op("...")
     | empty
-    )
+    ) ^^ { _ => OptionalExtensionMarker() } // TODO
 
   def extensionEndMarker = op(",") ~ op("...")
   

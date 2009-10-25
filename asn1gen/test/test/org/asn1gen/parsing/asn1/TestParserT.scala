@@ -23,5 +23,36 @@ package test.org.asn1gen.parsing.asn1 {
         case x => fail("Parse 'type_' failure: " + x)
       }
     }
+    
+    @Test def test_type_2() {
+      parse(`type`, "CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
+        case Success(
+          result@Type(
+            BuiltinType(
+              ChoiceType(
+                AlternativeTypeLists(
+                  RootAlternativeTypeList(
+                    List(
+                      NamedType(
+                        Identifier("choice1"),
+                        Type(
+                          BuiltinType(
+                            DefaultTaggedType(
+                              Tag(DefaultClass(), LiteralClassNumber(Number("0"))),
+                              Type(
+                                BuiltinType(IntegerType(List()))))))),
+                      NamedType(
+                        Identifier("choice2"),
+                        Type(
+                          BuiltinType(
+                            DefaultTaggedType(
+                              Tag(DefaultClass(), LiteralClassNumber(Number("1"))),
+                              Type(BuiltinType(IntegerType(List()))))))))),
+                  None,None,None))))
+,
+          _) => println(result)
+        case x => fail("Parse 'type_' failure: " + x)
+      }
+    }
   }
 }
