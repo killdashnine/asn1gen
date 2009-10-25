@@ -54,5 +54,14 @@ package test.org.asn1gen.parsing.asn1 {
         case x => fail("Parse 'type_' failure: " + x)
       }
     }
+    
+    @Test def test_typeAssignment_1() {
+      parse(typeAssignment, "hello ::= CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
+        case Success(
+          result,
+          _) =>
+        case x => fail("Parse 'type' failure: " + x)
+      }
+    }
   }
 }

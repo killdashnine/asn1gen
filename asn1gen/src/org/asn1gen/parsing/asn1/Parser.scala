@@ -31,7 +31,8 @@ class Parser extends TokenParsers with ImplicitConversions {
     , "WITH"
     )
   
-  def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] = elem(kind, {_: Elem => true}) ^? f
+  def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] =
+    elem(kind, {_: Elem => true}) ^? (f, _ => "Expecting " + kind + ".")
 
   def op(chars: String) = elem("operator " + chars) {case lexical.Operator(`chars`) => Operator(chars)}
   def kw(chars: String) = elem("keyword " + chars) {case lexical.Keyword(`chars`) => Keyword(chars)}
@@ -194,13 +195,12 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { assignmentKind => Assignment(assignmentKind) }
   
   // ASN1D: 9.1.2<3>
-  def opAssignment = lexical.Operator("::=")
   
   def typeAssignment =
     ( typeReference
-    ~ opAssignment
+    ~ op("::=")
     ~ `type`
-    ) ^^ { case n ~ _ ~ t => TypeAssignment(n, t) }
+    ) ^^ { case n ~ _ ~ t => TypeAssignment(n, t) } | failure("type assignment")
   
   def `type` : Parser[Type] =
     ( builtinType
@@ -243,7 +243,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   def valueAssignment =
     ( valueReference
     ~ `type`
-    ~ opAssignment
+    ~ op("::=")
     ~ value
     ) ^^ { _ => ValueAssignment() } // TODO
   
@@ -287,7 +287,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   def valueSetTypeAssignment =
     ( typeReference
     ~ `type`
-    ~ opAssignment
+    ~ op("::=")
     ~ valueSet
     ) ^^ { _ => ValueSetTypeAssignment() } // TODO
 
@@ -297,21 +297,21 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 9.1.2<10>
   def objectClassAssignment =
     ( objectClassReference
-    ~ opAssignment
+    ~ op("::=")
     ~ objectClass
     ) ^^ { _ => ObjectClassAssignment() } // TODO
   
   def objectAssignment =
     ( objectReference
     ~ definedObjectClass
-    ~ opAssignment
+    ~ op("::=")
     ~ object_
     ) ^^ { _ => ObjectAssignment() } // TODO
   
   def objectSetAssignment =
     ( objectSetReference
     ~ definedObjectClass
-    ~ opAssignment
+    ~ op("::=")
     ~ objectSet
     ) ^^ { _ => ObjectSetAssignment() } // TODO
   
