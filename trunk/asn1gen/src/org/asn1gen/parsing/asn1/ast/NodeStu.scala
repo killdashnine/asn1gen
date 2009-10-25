@@ -81,13 +81,7 @@ case class TableConstraint() extends Node {
 case class TableRow() extends Node {
 }
 
-case class Tag() extends Node {
-}
-
 case class TagDefault() extends Node {
-}
-
-case class TaggedType() extends Node with BuiltinTypeKind {
 }
 
 case class TaggedValue() extends Node {
