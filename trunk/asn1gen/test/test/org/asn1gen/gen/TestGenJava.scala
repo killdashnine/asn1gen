@@ -8,7 +8,7 @@ import _root_.org.asn1gen.gen._
 import _root_.org.asn1gen.io.IndentWriter
 
 package test.org.asn1gen.gen {
-  class TestGenJavaTags extends TestCase {
+  class TestGenJava extends TestCase {
     import Asn1._
     
     @Test def test1() {
@@ -17,7 +17,7 @@ package test.org.asn1gen.gen {
         """
       Asn1.parse(text) match {
         case Asn1.Success(moduleDefinition, _) => {
-          new GenJavaChoiceIds(new IndentWriter(System.out)).generate(moduleDefinition)
+          new GenJava(new IndentWriter(System.out)).generate(moduleDefinition)
         }
         case x => fail("Parse failed: " + x)
       }

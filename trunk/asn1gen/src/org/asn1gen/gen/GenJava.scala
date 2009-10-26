@@ -4,7 +4,7 @@ import java.io.PrintWriter
 import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.io._
 
-class GenJavaChoiceIds(out: IndentWriter) {
+class GenJava(out: IndentWriter) {
   
   def generate(moduleDefinition: ModuleDefinition): Unit = {
     moduleDefinition match {
@@ -44,22 +44,27 @@ class GenJavaChoiceIds(out: IndentWriter) {
       => {
         out.println("public class " + name + " {")
         out.indent(2) {
-          generate(rootAlternativeTypeList)
+          out.println("//////////////////////////////////////////////////////////////////")
+          out.println("// Choice IDs")
+          generateChoiceIds(rootAlternativeTypeList)
+          out.println("private AsnType elem_;")
+          out.println()
+          generateSimpleGetters(rootAlternativeTypeList)
         }
         out.println("}")
       }
     }
   }
   
-  def generate(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+  def generateChoiceIds(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
       case RootAlternativeTypeList(namedTypes) => namedTypes foreach { namedType =>
-        generate(namedType)
+        generateChoiceIds(namedType)
       }
     }
   }
   
-  def generate(namedType: NamedType): Unit = {
+  def generateChoiceIds(namedType: NamedType): Unit = {
     namedType match {
       case NamedType(
         Identifier(name),
@@ -69,7 +74,38 @@ class GenJavaChoiceIds(out: IndentWriter) {
               Tag(_, LiteralClassNumber(Number(tagNumber))),
               _))))
       => {
-        out.println("public static int " + name + " = " + tagNumber + ";")
+        out.println()
+        out.println("@ChoiceId")
+        out.println("public static int " + name.toUpperCase + " = " + tagNumber + ";")
+      }
+    }
+  }
+
+  def generateSimpleGetters(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+    rootAlternativeTypeList match {
+      case RootAlternativeTypeList(namedTypes) => namedTypes foreach { namedType =>
+        generateSimpleGetters(namedType)
+      }
+    }
+  }
+  
+  def generateSimpleGetters(namedType: NamedType): Unit = {
+    namedType match {
+      case NamedType(
+        Identifier(name),
+        Type(
+          BuiltinType(
+            DefaultTaggedType(
+              _,
+              type_))))
+      => {
+        val getter = "get" + name.first.toUpperCase + name.substring(1)
+        out.println()
+        out.println("public AsnInteger " + getter + "() {")
+        out.indent(2) {
+          out.println("return (AsnInteger)elem_;")
+        }
+        out.println("}")
       }
     }
   }
