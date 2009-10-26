@@ -53,8 +53,10 @@ class GenJavaChoiceIds(out: IndentWriter) {
   
   def generate(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
-      case RootAlternativeTypeList(namedTypes) => namedTypes foreach { namedType =>
-        generate(namedType)
+      case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
+        namedTypes foreach { namedType =>
+          generate(namedType)
+        }
       }
     }
   }

@@ -58,8 +58,10 @@ class GenJava(out: IndentWriter) {
   
   def generateChoiceIds(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
-      case RootAlternativeTypeList(namedTypes) => namedTypes foreach { namedType =>
-        generateChoiceIds(namedType)
+      case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
+        namedTypes foreach { namedType =>
+          generateChoiceIds(namedType)
+        }
       }
     }
   }
@@ -83,8 +85,10 @@ class GenJava(out: IndentWriter) {
 
   def generateSimpleGetters(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
-      case RootAlternativeTypeList(namedTypes) => namedTypes foreach { namedType =>
-        generateSimpleGetters(namedType)
+      case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
+        namedTypes foreach { namedType =>
+          generateSimpleGetters(namedType)
+        }
       }
     }
   }

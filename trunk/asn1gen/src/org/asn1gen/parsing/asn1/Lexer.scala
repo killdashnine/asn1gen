@@ -28,8 +28,8 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
     | multiLineComment
     ).* ^^ { cs => CommentLit(("" /: cs)(_ + _)) }
 
-  protected def comment: Parser[Any] = (
-      '*' ~ '/'  ^^ { _ => ' ' }
+  protected def comment: Parser[Any] =
+    ( '*' ~ '/'  ^^ { _ => ' ' }
     | chrExcept(EofCh) ~ comment
     )
   

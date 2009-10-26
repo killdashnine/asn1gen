@@ -13,10 +13,11 @@ package test.org.asn1gen.gen {
     
     @Test def test1() {
       val text = """
-        ModuleName DEFINITIONS ::= BEGIN MyChoice ::= CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER } END
+        ModuleName3 DEFINITIONS ::= BEGIN MyChoice2 ::= CHOICE { choice1 [1] INTEGER, choice2 [5] INTEGER } END
         """
       Asn1.parse(text) match {
         case Asn1.Success(moduleDefinition, _) => {
+          println(moduleDefinition)
           new GenJavaChoiceIds(new IndentWriter(System.out)).generate(moduleDefinition)
         }
         case x => fail("Parse failed: " + x)
