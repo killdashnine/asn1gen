@@ -15,7 +15,13 @@ package test.org.asn1gen.parsing.asn1 {
     
     import TheParser._
     
-    @Test def test_me() {
+    @Test def test_valueAssignment_1() {
+      parse(typeAssignment, "value-reference TypeReference ::= integer:12") match {
+        case Success(
+          result,
+          _) =>
+        case x => fail("Parse 'type' failure: " + x)
+      }
     }
   }
 }

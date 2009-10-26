@@ -52,9 +52,9 @@ package test.org.asn1gen.parsing.asn1 {
     }
 
     @Test def test_builtinType_3() {
-      parse(`type`, "CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
+      parse(builtinType, "CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
         case Success(
-          result@Type(_),
+          result@BuiltinType(_),
           _) =>
         case x => fail("Parse 'type_' failure: " + x)
       }

@@ -13,7 +13,7 @@ package test.org.asn1gen.gen {
     
     @Test def test1() {
       val text = """
-        ModuleName DEFINITIONS ::= BEGIN MyChoice ::= CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER } END
+        ModuleName DEFINITIONS ::= BEGIN -- xasdfsfd -- MyChoice ::= CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER } END
         """
       Asn1.parse(text) match {
         case Asn1.Success(moduleDefinition, _) => {

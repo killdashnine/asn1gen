@@ -111,7 +111,7 @@ case class RestrictedCharacterStringValue() extends Node {
 case class Root() extends Node {
 }
 
-case class RootAlternativeTypeList(namedTypes: List[NamedType]) extends Node {
+case class RootAlternativeTypeList(alternativeTypeList: AlternativeTypeList) extends Node {
 }
 
 case class RootComponentTypeList() extends Node {

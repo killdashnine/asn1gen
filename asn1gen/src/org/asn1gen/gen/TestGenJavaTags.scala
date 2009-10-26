@@ -43,7 +43,7 @@ object GenJavaTags {
   def generate(alternativeTypeLists: AlternativeTypeLists, out: PrintWriter): Unit = {
     alternativeTypeLists match {
       case AlternativeTypeLists(
-        RootAlternativeTypeList(namedTypes), _, _, _)
+        RootAlternativeTypeList(AlternativeTypeList(namedTypes)), _, _, _)
       => {
         namedTypes foreach { namedType : NamedType =>
           generate(namedType, out)

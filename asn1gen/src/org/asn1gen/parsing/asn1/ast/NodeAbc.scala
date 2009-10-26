@@ -12,7 +12,7 @@ case class AdditionalElementSetSpec() extends Node {
 case class AdditionalEnumeration() extends Node {
 }
 
-case class AlternativeTypeList() extends Node {
+case class AlternativeTypeList(namedTypes: List[NamedType]) extends Node {
 }
 
 case class AlternativeTypeLists(
@@ -37,13 +37,7 @@ case class AtNotation() extends Node {
 case class BString(chars : String) extends Node {
 }
 
-case class BitStringType() extends Node with BuiltinTypeKind {
-}
-
 case class BitStringValue() extends Node {
-}
-
-case class BooleanType() extends Node with BuiltinTypeKind {
 }
 
 case class BooleanValue(value: Boolean) extends Node {
