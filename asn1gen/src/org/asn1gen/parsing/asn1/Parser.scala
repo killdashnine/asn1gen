@@ -915,7 +915,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   def classNumber =
     ( number ^^ { n => LiteralClassNumber(n) }
     | definedValue ^^ { dv => DefinedClassNumber(dv) }
-    ) ^^ { _ => ClassNumber() }
+    )
   
   // ASN1D 12.1.4<7>
   def class_ =
@@ -923,7 +923,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     | kw("APPLICATION") ^^ { _ => ApplicationClass() }
     | kw("PRIVATE") ^^ { _ => PrivateClass() }
     | empty ^^ { _ => DefaultClass() }
-    ) ^^ { _ => Class_() }
+    )
   
   // ASN1D 12.1.4<15>
   // See ASN1D 9.2.2<1>
