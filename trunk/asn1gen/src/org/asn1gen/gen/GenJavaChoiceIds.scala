@@ -62,6 +62,7 @@ class GenJavaChoiceIds(out: IndentWriter) {
   }
   
   def generate(namedType: NamedType): Unit = {
+    println("XX: " + namedType)
     namedType match {
       case NamedType(
         Identifier(name),
