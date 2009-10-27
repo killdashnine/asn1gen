@@ -31,7 +31,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     , "WITH"
     )
   
-  def elem[U](kind: String)(f: PartialFunction[Elem, U]) : Parser[U] =
+  def elem[U](kind: String)(f: PartialFunction[Elem, U]): Parser[U] =
     elem(kind, {_: Elem => true}) ^? (f, _ => "Expecting " + kind + ".")
 
   def op(chars: String) = elem("operator " + chars) {case lexical.Operator(`chars`) => Operator(chars)}
@@ -92,12 +92,12 @@ class Parser extends TokenParsers with ImplicitConversions {
   // TODO: unsure if specification means there should be no space after '&'
   def objectFieldReference =
     ( valueFieldReference
-    )
+    ) ^^ { _ => ObjectFieldReference() }
   
   // ASN1D: 8.2.3<21>
   def objectReference =
     ( lexical.Operator("&") ~> valueReference
-    ) ^^ { case ValueReference(n) => ObjectFieldReference(n) }
+    ) ^^ { case ValueReference(n) => ObjectReference(n) }
 
   // ASN1D: 8.2.3<22>
   def objectSetFieldReference =
@@ -200,11 +200,11 @@ class Parser extends TokenParsers with ImplicitConversions {
     ~ type_
     ) ^^ { case n ~ _ ~ t => TypeAssignment(n, t) } | failure("type assignment")
   
-  def type_ : Parser[Type] =
+  def type_ : Parser[Type_] =
     ( builtinType
     | referencedType
     | constrainedType
-    ) ^^ { kind => Type(kind) }
+    ) ^^ { kind => Type_(kind) }
   
   def builtinType =
     ( bitStringType
@@ -246,13 +246,13 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { _ => ValueAssignment() } // TODO
   
   // ASN1D 9.1.2<5>
-  def value =
+  def value: Parser[Value] =
     ( builtinValue
     | referencedValue
     ) ^^ { _ => Value() }
   
   // ASN1D 9.1.2<6>
-  def builtinValue : Parser[Any] =
+  def builtinValue: Parser[BuiltinValue] =
     ( bitStringValue
     | booleanValue
     | characterStringValue
@@ -355,7 +355,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     | nameForm
     | definitiveNumberForm
     | definitiveNameAndNumberForm
-    )
+    ) ^^ { _ => DefinitiveObjectIdComponent() }
   
   def definitiveNumberForm =
     ( number
@@ -385,7 +385,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // Not implemented
     
   // ASN1D 9.2.2<12>
-  def moduleBody : Parser[ModuleBody] =
+  def moduleBody: Parser[ModuleBody] =
     ( exports
     ~ imports
     ~ assignmentList
@@ -422,26 +422,26 @@ class Parser extends TokenParsers with ImplicitConversions {
     ( rep1sep(symbol, op(","))
     ~ kw("FROM")
     ~ globalModuleReference
-    )
+    ) ^^ { _ => SymbolsFromModule() }
   
   // ASN1D 9.2.2<22>
   def globalModuleReference =
     ( moduleReference
     ~ assignedIdentifier
-    )
+    ) ^^ { _ => GlobalModuleReference() }
   
   // ASN1D 9.2.2<27>
   def assignedIdentifier =
     ( objectIdentifierValue
     | definedValue
     | empty
-    )
+    ) ^^ { _ => AssignedIdentifier() }
 
   // ASN1D 9.2.2<30>
   def symbol =
     ( reference
     | parameterizedReference
-    )
+    ) ^^ { _ => Symbol() }
 
   def reference =
     ( typeReference
@@ -449,12 +449,12 @@ class Parser extends TokenParsers with ImplicitConversions {
     | objectClassReference
     | objectReference
     | objectSetReference
-    )
+    ) ^^ { _ => Reference() }
   
   def parameterizedReference =
     ( reference
     | reference ~ op("{") ~ op("}")
-    )
+    ) ^^ { _ => ParameterizedReference() }
   
   // ASN1D 9.3.2<1>
   def definedType =
@@ -462,14 +462,14 @@ class Parser extends TokenParsers with ImplicitConversions {
     | typeReference
     | parameterizedType
     | parameterizedValueSetType
-    )
+    ) ^^ { _ => DefinedType() }
 
   // ASN1D 9.3.2<3>
   def externalTypeReference =
     ( moduleReference
     ~ op(".")
     ~ typeReference
-    )
+    ) ^^ { _ => ExternalTypeReference() }
   
   // ASN1D 9.3.2<8>
   def definedValue =
@@ -483,46 +483,46 @@ class Parser extends TokenParsers with ImplicitConversions {
     ( moduleReference
     ~ op(".")
     ~ valueReference
-    )
+    ) ^^ { _ => ExternalValueReference() }
   
   // ASN1D 9.3.2<14>
   def definedObjectClass =
     ( externalObjectClassReference
     | objectClassReference
     | usefulObjectClassReference
-    )
+    ) ^^ { _ => DefinedObjectClass() }
   
   // ASN1D 9.3.2<15>
   def externalObjectClassReference =
     ( moduleReference
     ~ op(".")
     ~ objectClassReference
-    )
+    ) ^^ { _ => ExternalObjectClassReference() }
   
   // ASN1D 9.3.2<19>
   def definedObject =
     ( externalObjectReference
     | objectReference
-    )
+    ) ^^ { _ => DefinedObject() }
   
   // ASN1D 9.3.2<20>
   def externalObjectReference =
     ( moduleReference
     ~ op(".")
     ~ objectReference
-    )
+    ) ^^ { _ => ExternalObjectReference() }
   
   // ASN1D 9.3.2<24>
   def definedObjectSet =
     ( externalObjectSetReference
     | objectSetReference
-    )
+    ) ^^ { _ => DefinedObjectSet() }
   
   def externalObjectSetReference =
     ( moduleReference
     ~ op(".")
     ~ objectSetReference
-    )
+    ) ^^ { _ => ExternalObjectSetReference() }
   
   // ASN1D 10.1.2
   def booleanType =
@@ -1188,12 +1188,12 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 13.2.2<1>
   def singleValue =
     ( value
-    ) ^^ { _ => SingleValue() }
+    ) ^^ { v => SingleValue(v) }
 
   // ASN1D 13.3.2<1>
   def containedSubtype =
     ( includes ~ type_
-    ) ^^ { _ => ContainedSubtype() }
+    ) ^^ { case i ~ t => ContainedSubtype(i, t) }
 
   // ASN1D 13.3.7<7>
   def includes =
@@ -1204,7 +1204,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 13.4.2<1>
   def valueRange =
     ( lowerEndPoint ~ op("..") ~ upperEndPoint
-    ) ^^ { _ => ValueRange() }
+    ) ^^ { case lep ~ _ ~ uep => ValueRange(lep, uep) }
 
   // ASN1D 13.4.2<3>
   def lowerEndPoint =
@@ -1231,7 +1231,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 13.6.2<1>
   def permittedAlphabet =
     ( kw("FROM") ~ constraint
-    ) ^^ { _ => PermittedAlphabet() }
+    ) ^^ { case _ ~ c => PermittedAlphabet(c) }
   
   // ASN1D 13.6.2<5>
   // See ASN1D 13.4.2<1>
@@ -1245,7 +1245,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 13.7.2<1>
   def patternConstraint =
     ( kw("PATTERN") ~ value
-    ) ^^ { _ => PatternConstraint() }
+    ) ^^ { case _ ~ v => PatternConstraint(v) }
 
   // ASN1D 13.8.2<1>
   def innerTypeConstraints =
@@ -1256,7 +1256,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 13.8.2<3>
   def singleTypeConstraint =
     ( constraint
-    ) ^^ { _ => SingleTypeConstraint() }
+    ) ^^ { c => SingleTypeConstraint(c) }
 
   // ASN1D 13.9.2<1>
   // See ASN1D 13.8.2<1>
@@ -1270,27 +1270,33 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 13.9.2<5>
   def fullSpecification =
     ( op("{") ~ typeConstraints ~ op("}")
-    ) ^^ { _ => FullSpecification() }
+    ) ^^ { case _ ~ tc ~ _ => FullSpecification(tc) }
 
   // ASN1D 13.9.2<7>
   def partialSpecification =
-    ( op("{") ~ op("...") ~ op(",") ~ typeConstraints ~ op("}")
-    ) ^^ { _ => PartialSpecification() }
+    ( op("{")
+    ~ op("...")
+    ~ op(",")
+    ~ typeConstraints
+    ~ op("}")
+    ) ^^ { case _ ~ _ ~ _ ~ tc ~ _ => PartialSpecification(tc) }
 
   // ASN1D 13.9.2<9>
   def typeConstraints =
     ( rep1sep(namedConstraint, op(","))
-    ) ^^ { _ => TypeConstraints() }
+    ) ^^ { namedConstraints => TypeConstraints(namedConstraints) }
 
   // ASN1D 13.9.2<10>
   def namedConstraint =
-    ( identifier ~ componentConstraint
-    ) ^^ { _ => NamedConstraint() }
+    ( identifier
+    ~ componentConstraint
+    ) ^^ { case i ~ cc => NamedConstraint(i, cc) }
 
   // ASN1D 13.9.2<12>
   def componentConstraint =
-    ( valueConstraint ~ presenceConstraint
-    ) ^^ { _ => ComponentConstraint() }
+    ( valueConstraint
+    ~ presenceConstraint
+    ) ^^ { case vc ~ pc => ComponentConstraint(vc, pc) }
   def valueConstraint =
     ( constraint
     | empty
@@ -1312,28 +1318,28 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { _ => ContentsConstraint() }
   
   // ASN1D 13.11.2<1>
-  def elementSetSpecs : Parser[Any] =
+  def elementSetSpecs: Parser[ElementSetSpecs] =
     ( rootElementSetSpec
     | rootElementSetSpec ~ op(",") ~ op("...")
     | rootElementSetSpec ~ op(",") ~ op("...") ~ op(",") ~ additionalElementSetSpec
     ) ^^ { _ => ElementSetSpecs() }
   
   // ASN1D 13.11.2<2>
-  def rootElementSetSpec : Parser[Any] =
+  def rootElementSetSpec =
     ( elementSetSpec
-    ) ^^ { _ => RootElementSetSpec() }
-  def additionalElementSetSpec : Parser[Any] =
+    ) ^^ { ess => RootElementSetSpec(ess) }
+  def additionalElementSetSpec =
     ( elementSetSpec
-    ) ^^ { _ => AdditionalElementSetSpec() }
+    ) ^^ { ess => AdditionalElementSetSpec(ess) }
   
   // ASN1D 13.11.2<9>
-  def elementSetSpec : Parser[Any] =
+  def elementSetSpec: Parser[ElementSetSpec] =
     ( unions
     | kw("ALL") ~ exclusions
     ) ^^ { _ => ElementSetSpec() }
 
   // ASN1D 13.11.2<10>
-  def unions : Parser[Any] =
+  def unions: Parser[Unions] =
     ( intersections
     | uElems ~ unionMark ~ intersections
     ) ^^ { _ => Unions() }
@@ -1348,7 +1354,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { _ => UnionMark() }
  
   // ASN1D 13.11.2<12>
-  def intersections : Parser[Any] =
+  def intersections: Parser[Intersections] =
     ( intersectionElements
     | iElems ~ intersectionMark ~ intersectionElements
     ) ^^ { _ => Intersections() }
@@ -1394,7 +1400,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { _ => SubtypeElements() }
   
   // ASN1D 13.12.2<1>
-  def constraint : Parser[Any] =
+  def constraint =
     ( op("(") ~ constraintSpec ~ exceptionSpec ~ op(")")
     ) ^^ { _ => Constraint() }
 
@@ -1414,7 +1420,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ~ op("{")
     ~ repsep(userDefinedConstraintParameter, op(","))
     ~ op("}")
-    ) ^^ { _ => UserDefinedConstraint() }
+    ) ^^ { case _ ~ _ ~ _ ~ parameters ~ _ => UserDefinedConstraint(parameters) }
   
   // ASN1D 13.13.2<3>
   def userDefinedConstraintParameter	=
@@ -1440,7 +1446,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 14.1.2<7>
   def externalValue =
     ( sequenceValue
-    ) ^^ { _ => ExternalValue() }
+    ) ^^ { sv => ExternalValue(sv) }
 
   // ASN1D 14.2.2<1>
   def embeddedPDVType =
@@ -1450,7 +1456,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 14.2.2<5>
   def embeddedPDVValue =
     ( sequenceValue
-    ) ^^ { _ => EmbeddedPDVValue() }
+    ) ^^ { sv => EmbeddedPDVValue(sv) }
 
   // ASN1D 14.3.2<1>
   def unrestrictedCharacterStringType =
@@ -1460,7 +1466,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 14.3.2<6>
   def unrestrictedCharacterStringValue =
     ( sequenceValue
-    ) ^^ { _ => UnrestrictedCharacterStringValue() }
+    ) ^^ { sv => UnrestrictedCharacterStringValue(sv) }
 
   // ASN1D 15.2.2<1>
   def objectClass =
@@ -1473,7 +1479,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ~ op("{")
     ~ rep1sep(fieldSpec, op(","))
     ~ withSyntaxSpec
-    ) ^^ { _ => ObjectClassDefn() }
+    ) ^^ { case _ ~ _ ~ fieldSpecs ~ wss => ObjectClassDefn(fieldSpecs, wss) }
 
   def fieldSpec =
     ( typeFieldSpec
@@ -1497,8 +1503,11 @@ class Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 15.2.2<6>
   def fixedTypeValueFieldSpec =
-    ( valueFieldReference ~ type_ ~ unique ~ valueOptionalitySpec
-    ) ^^ { _ => FixedTypeValueFieldSpec() }
+    ( valueFieldReference
+    ~ type_
+    ~ unique
+    ~ valueOptionalitySpec
+    ) ^^ { case vfr ~ t ~ u ~ vos => FixedTypeValueFieldSpec(vfr, t, u, vos) }
 
   // ASN1D 15.2.2<7>
   def unique =
@@ -1571,12 +1580,12 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { _ => PrimitiveFieldName() }
 
   // ASN1D 15.2.2<34>
-  def object_ : Parser[Any] =
+  def object_ : Parser[Object_] =
     ( objectDefn
     | definedObject
     | objectFromObject
     | parameterizedObject
-    ) ^^ { _ => Object() }
+    ) ^^ { _ => Object_() }
 
   // ASN1D 15.2.2<35>
   def objectDefn =
@@ -1611,7 +1620,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   def syntaxList =
     ( op("{") ~ tokenOrGroupSpec.+ ~ op("}")
     ) ^^ { _ => SyntaxList() }
-  def tokenOrGroupSpec : Parser[Any] =
+  def tokenOrGroupSpec =
     ( requiredToken
     | optionalGroup
     ) ^^ { _ => TokenOrGroupSpec() }
@@ -1621,7 +1630,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { _ => RequiredToken() }
   
   // ASN1D 15.3.2<3>
-  def optionalGroup =
+  def optionalGroup: Parser[OptionalGroup] =
     ( op("[") ~ tokenOrGroupSpec.+ ~ op("]")
     ) ^^ { _ => OptionalGroup() }
 
@@ -1640,7 +1649,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // See ASN1D 15.2.2<38>
   
   // ASN1D 15.5.2<1>
-  def objectSet =
+  def objectSet: Parser[ObjectSet] =
     ( op("{") ~ objectSetSpec ~ op("}")
     ) ^^ { _ => ObjectSet() }
 
@@ -1769,7 +1778,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 15.7.2<17>
   def simpleTableConstraint =
     ( objectSet
-    ) ^^ { _ => SimpleTableConstraint() }
+    ) ^^ { os => SimpleTableConstraint(os) }
 
   // ASN1D 15.7.2<22>
   def componentRelationConstraint =	
@@ -1779,7 +1788,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ~ op("{")
     ~ rep1sep(atNotation, op(","))
     ~ op("}")
-    ) ^^ { _ => ComponentRelationConstraint() }
+    ) ^^ { case _ ~ dos ~ _ ~ _ ~ ans ~ _ => ComponentRelationConstraint(dos, ans) }
   
   // ASN1D 15.7.2<24>
   def atNotation =
@@ -1790,17 +1799,17 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 15.7.2<28>
   def componentIdList =
     ( rep1sep(identifier, op("."))
-    ) ^^ { _ => ComponentIdList() }
+    ) ^^ { identifiers => ComponentIdList(identifiers) }
 
   // ASN1D 15.7.2<36>
   def typeConstraint =
     ( type_
-    ) ^^ { _ => TypeConstraint() }
+    ) ^^ { t => TypeConstraint(t) }
 
   // ASN1D 15.9<6>
   def instanceOfValue =
     ( value
-    ) ^^ { _ => InstanceOfValue() }
+    ) ^^ { v => InstanceOfValue(v) }
   
   // ASN1D 15.9.2<1>
   def usefulObjectClassReference =
@@ -1828,23 +1837,37 @@ class Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 17.2.2<3>
   def parameterizedTypeAssignment =
-    ( typeReference ~ parameterList ~ op("::=") ~ type_
-    ) ^^ { _ => ParameterizedTypeAssignment() }
+    ( typeReference
+    ~ parameterList
+    ~ op("::=")
+    ~ type_
+    ) ^^ { case tr ~ pl ~ _ ~ t => ParameterizedTypeAssignment(tr, pl, t) }
 
   // ASN1D 17.2.2<5>
   def parameterizedValueAssignment =
-    ( valueReference ~ parameterList ~ type_ ~ op("::=") ~ value
-    ) ^^ { _ => ParameterizedValueAssignment() }
+    ( valueReference
+    ~ parameterList
+    ~ type_
+    ~ op("::=")
+    ~ value
+    ) ^^ { case vr ~ pl ~ t ~ _ ~ v => ParameterizedValueAssignment(vr, pl, t, v) }
 
   // ASN1D 17.2.2<6>
   def parameterizedValueSetTypeAssignment =
-    ( typeReference ~ parameterList ~ type_ ~ op("::=") ~ valueSet
-    ) ^^ { _ => ParameterizedValueSetTypeAssignment() }
+    ( typeReference
+    ~ parameterList
+    ~ type_
+    ~ op("::=")
+    ~ valueSet
+    ) ^^ { case tr ~ pl ~ t ~ _ ~ vs => ParameterizedValueSetTypeAssignment(tr, pl, t, vs) }
 
   // ASN1D 17.2.2<8>
   def parameterizedObjectClassAssignment =
-    ( objectClassReference ~ parameterList ~ op("::=") ~ objectClass
-    ) ^^ { _ => ParameterizedObjectClassAssignment() }
+    ( objectClassReference
+    ~ parameterList
+    ~ op("::=")
+    ~ objectClass
+    ) ^^ { case ocr ~ pl ~ _ ~ oc => ParameterizedObjectClassAssignment(ocr, pl, oc) }
 
   // ASN1D 17.2.2<9>
   def parameterizedObjectAssignment =
@@ -1853,7 +1876,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ~ definedObjectClass
     ~ op("::=")
     ~ object_
-    ) ^^ { _ => ParameterizedObjectAssignment() }
+    ) ^^ { case or ~ pl ~ doc ~ _ ~ o => ParameterizedObjectAssignment(or, pl, doc, o) }
 
   // ASN1D 17.2.2<10>
   def parameterizedObjectSetAssignment =
@@ -1862,7 +1885,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     ~ definedObjectClass
     ~ op("::=")
     ~ objectSet
-    ) ^^ { _ => ParameterizedObjectSetAssignment() }
+    ) ^^ { case osr ~ pl ~ doc ~ _ ~ os => ParameterizedObjectSetAssignment(osr, pl, doc, os) }
 
   // ASN1D 17.2.2<11>
   def parameterList =
@@ -1882,18 +1905,18 @@ class Parser extends TokenParsers with ImplicitConversions {
   // Se ASN1D 13.13.2<7>
   def dummyGovernor =
     ( dummyReference
-    ) ^^ { _ => DummyGovernor() }
+    ) ^^ { dg => DummyGovernor(dg) }
   def dummyReference =
     ( reference
-    ) ^^ { _ => DummyReference() }
+    ) ^^ { r => DummyReference(r) }
   
   // ASN1D 17.2.2<25>
   def parameterizedType =
     ( simpleDefinedType ~ actualParameterList
-    ) ^^ { _ => ParameterizedType() }
+    ) ^^ { case sdt ~ apl => ParameterizedType(sdt, apl) }
   def parameterizedValueSetType =
     ( simpleDefinedType ~ actualParameterList
-    ) ^^ { _ => ParameterizedValueSetType() }
+    ) ^^ { case sdt ~ apl => ParameterizedValueSetType(sdt, apl) }
   def simpleDefinedType =
     ( externalTypeReference
     | typeReference
@@ -1902,7 +1925,8 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 17.2.2<27>
   def parameterizedValue =
     ( simpleDefinedValue ~ actualParameterList
-    ) ^^ { _ => ParameterizedValue() }
+    ) ^^ { case sdv ~ apl => ParameterizedValue(sdv, apl) }
+  
   def simpleDefinedValue =
     ( externalValueReference
     | valueReference
@@ -1911,25 +1935,30 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 17.2.2<29>
   def parameterizedObjectClass =
     ( definedObjectClass ~ actualParameterList
-    ) ^^ { _ => ParameterizedObjectClass() }
+    ) ^^ { case doc ~ apl => ParameterizedObjectClass(doc, apl) }
 
   // ASN1D 17.2.2<30>
   def parameterizedObject =
     ( definedObject ~ actualParameterList
-    ) ^^ { _ => ParameterizedObject() }
+    ) ^^ { case definedObject ~ apl => ParameterizedObject(definedObject, apl) }
 
   // ASN1D 17.2.2<31>
   def parameterizedObjectSet =
     ( definedObjectSet ~ actualParameterList
-    ) ^^ { _ => ParameterizedObjectSet() }
+    ) ^^ { case dos ~ apl => ParameterizedObjectSet(dos, apl) }
 
   // ASN1D 17.2.2<32>
   def actualParameterList =
     ( op("{") ~ rep1sep(actualParameter, op(",")) ~ op("}")
-    ) ^^ { _ => ActualParameterList() }
+    ) ^^ { case _ ~ parameters ~ _ => ActualParameterList(parameters) }
   
-  def actualParameter : Parser[Any] =
-    ( type_ | value | valueSet | definedObjectClass | object_ | objectSet
-    ) ^^ { _ => ActualParameter() }
+  def actualParameter =
+    ( type_ ^^ { t => ActualTypeParameter(t) }
+    | value ^^ { v => ActualValueParameter(v) }
+    | valueSet ^^ { vs => ActualValueSetParameter(vs) }
+    | definedObjectClass ^^ { doc => ActualDefinedObjectClassParameter(doc) }
+    | object_ ^^ { o => ActualObjectParameter(o) }
+    | objectSet ^^ { os => ActualObjectSetParameter(os) }
+    )
 }
 

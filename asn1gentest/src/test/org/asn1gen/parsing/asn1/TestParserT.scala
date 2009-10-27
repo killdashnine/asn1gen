@@ -18,7 +18,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_type_1() {
       parse(type_, "INTEGER { a(1), b(2), c(3) }") match {
         case Success(
-          result@Type(_),
+          result@Type_(_),
           _) =>
         case x => fail("Parse 'type_' failure: " + x)
       }
@@ -27,28 +27,29 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_type_2() {
       parse(type_, "CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
         case Success(
-          result@Type(
+          result@Type_(
             BuiltinType(
               ChoiceType(
                 AlternativeTypeLists(
                   RootAlternativeTypeList(
-                    List(
-                      NamedType(
-                        Identifier("choice1"),
-                        Type(
-                          BuiltinType(
-                            DefaultTaggedType(
-                              Tag(DefaultClass(), LiteralClassNumber(Number("0"))),
-                              Type(
-                                BuiltinType(IntegerType(List()))))))),
-                      NamedType(
-                        Identifier("choice2"),
-                        Type(
-                          BuiltinType(
-                            DefaultTaggedType(
-                              Tag(DefaultClass(), LiteralClassNumber(Number("1"))),
-                              Type(BuiltinType(IntegerType(List()))))))))),
-                  None,None,None))))
+                    AlternativeTypeList(
+                      List(
+                        NamedType(
+                          Identifier("choice1"),
+                          Type_(
+                            BuiltinType(
+                              DefaultTaggedType(
+                                Tag(DefaultClass(), LiteralClassNumber(Number("0"))),
+                                Type_(
+                                  BuiltinType(IntegerType(List()))))))),
+                        NamedType(
+                          Identifier("choice2"),
+                          Type_(
+                            BuiltinType(
+                              DefaultTaggedType(
+                                Tag(DefaultClass(), LiteralClassNumber(Number("1"))),
+                                Type_(BuiltinType(IntegerType(List())))))))))),
+                    None,None,None))))
 ,
           _) => println(result)
         case x => fail("Parse 'type_' failure: " + x)
@@ -70,11 +71,12 @@ package test.org.asn1gen.parsing.asn1 {
         case Success(
           TypeAssignment(
             TypeReference("TypeReference"),
-            Type(BuiltinType(ChoiceType(AlternativeTypeLists(
+            Type_(BuiltinType(ChoiceType(AlternativeTypeLists(
               RootAlternativeTypeList(
-                List(
-                  NamedType(Identifier("integer"),Type(BuiltinType(IntegerType(List())))),
-                  NamedType(Identifier("boolean"),Type(BuiltinType(BooleanType()))))),
+                AlternativeTypeList(
+                  List(
+                    NamedType(Identifier("integer"),Type_(BuiltinType(IntegerType(List())))),
+                    NamedType(Identifier("boolean"),Type_(BuiltinType(BooleanType())))))),
               None,
               None,
               None))))),
@@ -87,8 +89,8 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_typeAssignment_3() {
       parse(typeAssignment, "Pair ::= SEQUENCE { x INTEGER, y INTEGER }") match {
         case Success(
-          result,
-          _) => println(result)
+          result@TypeAssignment(TypeReference("Pair"), Type_(BuiltinType(SequenceType()))),
+          _) =>
         case x => fail("Parse 'type' failure: " + x)
       }
     }

@@ -37,7 +37,7 @@ class GenJavaChoiceIds(out: IndentWriter) {
       case Assignment(
         TypeAssignment(
           TypeReference(name),
-          Type(
+          Type_(
             BuiltinType(
               ChoiceType(
                 AlternativeTypeLists(rootAlternativeTypeList, _, _, _))))))
@@ -66,7 +66,7 @@ class GenJavaChoiceIds(out: IndentWriter) {
     namedType match {
       case NamedType(
         Identifier(name),
-        Type(
+        Type_(
           BuiltinType(
             DefaultTaggedType(
               Tag(_, LiteralClassNumber(Number(tagNumber))),

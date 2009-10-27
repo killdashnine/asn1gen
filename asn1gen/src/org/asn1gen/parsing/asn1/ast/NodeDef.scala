@@ -36,12 +36,6 @@ case class DefinitiveNumberForm() extends Node {
 case class DefinitiveObjectIdComponent() extends Node {
 }
 
-case class DummyGovernor() extends Node {
-}
-
-case class DummyReference() extends Node {
-}
-
 case class ElementSetSpec() extends Node {
 }
 
@@ -55,9 +49,6 @@ case class Elems() extends Node {
 }
 
 case class EmbeddedPDVType() extends Node with BuiltinTypeKind {
-}
-
-case class EmbeddedPDVValue() extends Node {
 }
 
 case class EnumeratedType() extends Node with BuiltinTypeKind {
@@ -135,9 +126,6 @@ case class ExternalType() extends Node with BuiltinTypeKind {
 case class ExternalTypeReference() extends Node {
 }
 
-case class ExternalValue() extends Node {
-}
-
 case class ExternalValueReference() extends Node {
 }
 
@@ -153,11 +141,6 @@ case class FieldSpec() extends Node {
 case class FixedTypeFieldVal() extends Node {
 }
 
-case class FixedTypeValueFieldSpec() extends Node {
-}
-
 case class FixedTypeValueSetFieldSpec() extends Node {
 }
 
-case class FullSpecification() extends Node {
-}
