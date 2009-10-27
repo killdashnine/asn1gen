@@ -33,14 +33,11 @@ case class NameForm() extends Node {
 case class NamedBit() extends Node {
 }
 
-case class NamedConstraint() extends Node {
-}
-
 case class NamedNumber(identifier: Identifier, value: NamedNumberValue) extends Node {
   def name = identifier.name
 }
 
-case class NamedType(id: Identifier, t: Type) extends Node {
+case class NamedType(id: Identifier, t: Type_) extends Node {
 }
 
 case class NamedValue() extends Node {
@@ -68,9 +65,6 @@ case class NumericRealValue() extends Node {
 case class ObjIdComponents() extends Node {
 }
 
-case class Object() extends Node {
-}
-
 case class ObjectAssignment() extends Node with AssignmentKind {
 }
 
@@ -78,9 +72,6 @@ case class ObjectClass() extends Node {
 }
 
 case class ObjectClassAssignment() extends Node with AssignmentKind {
-}
-
-case class ObjectClassDefn() extends Node {
 }
 
 case class ObjectClassFieldType() extends Node with BuiltinTypeKind {
@@ -96,8 +87,7 @@ case class ObjectClassReference(chars : String) extends Node {
 case class ObjectDefn() extends Node {
 }
 
-case class ObjectFieldReference(chars : String) extends Node {
-  def name = chars
+case class ObjectFieldReference() extends Node {
 }
 
 case class ObjectFieldSpec() extends Node {
@@ -115,7 +105,8 @@ case class ObjectIdentifierValue() extends Node {
 case class ObjectOptionalitySpec() extends Node {
 }
 
-case class ObjectReference() extends Node {
+case class ObjectReference(chars : String) extends Node {
+  def name = chars
 }
 
 case class ObjectSet() extends Node {

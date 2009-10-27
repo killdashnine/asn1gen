@@ -39,15 +39,6 @@ case class SimpleDefinedType() extends Node {
 case class SimpleDefinedValue() extends Node {
 }
 
-case class SimpleTableConstraint() extends Node {
-}
-
-case class SingleTypeConstraint() extends Node {
-}
-
-case class SingleValue() extends Node {
-}
-
 case class SizeConstraint() extends Node {
 }
 
@@ -93,16 +84,7 @@ case class TokenOrGroupSpec() extends Node {
 case class Tuple() extends Node {
 }
 
-case class Type(kind: TypeKind) extends Node {
-}
-
-case class TypeAssignment(name: TypeReference, `type`: Type) extends Node with AssignmentKind {
-}
-
-case class TypeConstraint() extends Node {
-}
-
-case class TypeConstraints() extends Node {
+case class TypeAssignment(name: TypeReference, `type`: Type_) extends Node with AssignmentKind {
 }
 
 case class TypeFieldReference(chars : String) extends Node {
@@ -141,9 +123,6 @@ case class Unique() extends Node {
 case class UnrestrictedCharacterStringType() extends Node {
 }
 
-case class UnrestrictedCharacterStringValue() extends Node {
-}
-
 case class UpperEndPoint() extends Node {
 }
 
@@ -154,9 +133,6 @@ case class UsefulObjectClassReference() extends Node {
 }
 
 case class UsefulType() extends Node {
-}
-
-case class UserDefinedConstraint() extends Node {
 }
 
 case class UserDefinedConstraintParameter() extends Node {

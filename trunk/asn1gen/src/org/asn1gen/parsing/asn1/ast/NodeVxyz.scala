@@ -19,9 +19,6 @@ case class ValueFromObject() extends Node {
 case class ValueOptionalitySpec() extends Node {
 }
 
-case class ValueRange() extends Node {
-}
-
 case class ValueReference(chars : String) extends Node {
   def name = chars
 }

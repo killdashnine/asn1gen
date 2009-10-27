@@ -144,7 +144,7 @@ trait Asn1Nodes {
   type NumberForm = ast.NumberForm
   type NumericRealValue = ast.NumericRealValue
   type ObjIdComponents = ast.ObjIdComponents
-  type Object = ast.Object
+  type Object_ = ast.Object_
   type ObjectAssignment = ast.ObjectAssignment
   type ObjectClass = ast.ObjectClass
   type ObjectClassAssignment = ast.ObjectClassAssignment
@@ -251,7 +251,7 @@ trait Asn1Nodes {
   type TaggedValue = ast.TaggedValue
   type TokenOrGroupSpec = ast.TokenOrGroupSpec
   type Tuple = ast.Tuple
-  type Type = ast.Type
+  type Type_ = ast.Type_
   type TypeAssignment = ast.TypeAssignment
   type TypeConstraint = ast.TypeConstraint
   type TypeConstraints = ast.TypeConstraints
