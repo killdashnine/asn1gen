@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class Enumeration() extends Node {
+case class Enumeration(
+  enumerationItems: List[EnumerationItem]
+) extends Node {
 }
 

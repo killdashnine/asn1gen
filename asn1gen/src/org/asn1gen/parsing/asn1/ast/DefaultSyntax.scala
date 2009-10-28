@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class DefaultSyntax() extends Node {
+case class DefaultSyntax(
+  fieldSettings: List[FieldSetting]
+) extends Node {
 }
 

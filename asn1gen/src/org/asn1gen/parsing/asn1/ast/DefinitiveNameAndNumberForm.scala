@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class DefinitiveNameAndNumberForm() extends Node {
+case class DefinitiveNameAndNumberForm(
+  identifier: Identifier,
+  definitiveNumberForm: DefinitiveNumberForm
+) extends Node {
 }
 

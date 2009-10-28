@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ChoiceValue() extends Node {
+case class ChoiceValue(
+  identifier: Identifier,
+  value: Value
+) extends Node {
 }
 
