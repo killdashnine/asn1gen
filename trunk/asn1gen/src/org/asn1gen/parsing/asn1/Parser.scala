@@ -211,7 +211,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     | booleanType
     | characterStringType
     | choiceType
-    | embeddedPDVType
+    | embeddedPdvType
     | enumeratedType
     | externalType
     | instanceOfType
@@ -230,12 +230,12 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { kind => BuiltinType(kind) }
   
   def referencedType =
-    ( definedType
-    | usefulType
-    | selectionType
-    | typeFromObject
-    | valueSetFromObjects
-    ) ^^ { _ => ReferencedType() } // TODO
+    ( definedType ^^ { dt => ReferencedDefinedType(dt) }
+    | usefulType ^^ { ut => ReferencedUsefulType(ut) }
+    | selectionType ^^ { st => ReferencedSelectionType(st) }
+    | typeFromObject ^^ { tfo => ReferencedTypeFromObject(tfo) }
+    | valueSetFromObjects ^^ { vsfo => ReferencedValueSetFromObjects(vsfo) }
+    )
   
   // ASN1D 9.1.2<4>
   def valueAssignment =
@@ -247,33 +247,33 @@ class Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 9.1.2<5>
   def value: Parser[Value] =
-    ( builtinValue
-    | referencedValue
-    ) ^^ { _ => Value() }
+    ( builtinValue ^^ { bv => Value_BuiltinValue(bv) }
+    | referencedValue ^^ { rv => Value_ReferencedValue(rv) }
+    )
   
   // ASN1D 9.1.2<6>
   def builtinValue: Parser[BuiltinValue] =
-    ( bitStringValue
-    | booleanValue
-    | characterStringValue
-    | choiceValue
-    | embeddedPDVValue
-    | enumeratedValue
-    | externalValue
-    | instanceOfValue
-    | integerValue
-    | nullValue
-    | objectClassFieldValue
-    | objectIdentifierValue
-    | octetStringValue
-    | realValue
-    | relativeOidValue
-    | sequenceValue
-    | sequenceOfValue
-    | setValue
-    | setOfValue
-    | taggedValue
-    ) ^^ { _ => BuiltinValue() }
+    ( bitStringValue ^^ { bsv => BuiltinValue_BitStringValue(bsv) }
+    | booleanValue ^^ { bv => BuiltinValue_BooleanValue(bv) }
+    | characterStringValue ^^ { csv => BuiltinValue_CharacterStringValue(csv) }
+    | choiceValue ^^ { cv => BuiltinValue_ChoiceValue(cv) }
+    | embeddedPdvValue ^^ { epv => BuiltinValue_EmbeddedPdvValue(epv) }
+    | enumeratedValue ^^ { ev => BuiltinValue_EnumeratedValue(ev) }
+    | externalValue ^^ { ev => BuiltinValue_ExternalValue(ev) }
+    | instanceOfValue ^^ { iov => BuiltinValue_InstanceOfValue(iov) }
+    | integerValue ^^ { iv => BuiltinValue_IntegerValue(iv) }
+    | nullValue ^^ { nv => BuiltinValue_NullValue(nv) }
+    | objectClassFieldValue ^^ { ocfv => BuiltinValue_ObjectClassFieldValue(ocfv) }
+    | objectIdentifierValue ^^ { oiv => BuiltinValue_ObjectIdentifierValue(oiv) }
+    | octetStringValue ^^ { osv => BuiltinValue_OctetStringValue(osv) }
+    | realValue ^^ { rv => BuiltinValue_RealValue(rv) }
+    | relativeOidValue ^^ { rov => BuiltinValue_RelativeOidValue(rov) }
+    | sequenceValue ^^ { sv => BuiltinValue_SequenceValue(sv) }
+    | sequenceOfValue ^^ { sov => BuiltinValue_SequenceOfValue(sov) }
+    | setValue ^^ { sv => BuiltinValue_SetValue(sv) }
+    | setOfValue ^^ { sov => BuiltinValue_SetOfValue(sov) }
+    | taggedValue ^^ { tv => BuiltinValue_TaggedValue(tv) }
+    )
   
   def referencedValue =
     ( definedValue
@@ -1449,14 +1449,14 @@ class Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { sv => ExternalValue(sv) }
 
   // ASN1D 14.2.2<1>
-  def embeddedPDVType =
+  def embeddedPdvType =
     ( kw("EMBEDDED") ~ kw("PDV")
-    ) ^^ { _ => EmbeddedPDVType() } // TODO
+    ) ^^ { _ => EmbeddedPdvType() } // TODO
 
   // ASN1D 14.2.2<5>
-  def embeddedPDVValue =
+  def embeddedPdvValue =
     ( sequenceValue
-    ) ^^ { sv => EmbeddedPDVValue(sv) }
+    ) ^^ { sv => EmbeddedPdvValue(sv) }
 
   // ASN1D 14.3.2<1>
   def unrestrictedCharacterStringType =

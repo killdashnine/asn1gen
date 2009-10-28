@@ -67,8 +67,8 @@ trait Asn1Nodes {
   type ElementSetSpecs = org.asn1gen.parsing.asn1.ast.ElementSetSpecs
   type Elements = org.asn1gen.parsing.asn1.ast.Elements
   type Elems = org.asn1gen.parsing.asn1.ast.Elems
-  type EmbeddedPDVType = org.asn1gen.parsing.asn1.ast.EmbeddedPDVType
-  type EmbeddedPDVValue = org.asn1gen.parsing.asn1.ast.EmbeddedPDVValue
+  type EmbeddedPdvType = org.asn1gen.parsing.asn1.ast.EmbeddedPdvType
+  type EmbeddedPdvValue = org.asn1gen.parsing.asn1.ast.EmbeddedPdvValue
   type EnumeratedType = org.asn1gen.parsing.asn1.ast.EnumeratedType
   type EnumeratedValue = org.asn1gen.parsing.asn1.ast.EnumeratedValue
   type Enumeration = org.asn1gen.parsing.asn1.ast.Enumeration
