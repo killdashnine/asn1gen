@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class EnumeratedValue() extends Node {
+case class EnumeratedValue(
+  identifier: Identifier
+) extends Node {
 }
 

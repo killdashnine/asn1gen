@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class CharacterStringList() extends Node {
+case class CharacterStringList(
+  charsDefns: List[CharsDefn]
+) extends Node {
 }
 

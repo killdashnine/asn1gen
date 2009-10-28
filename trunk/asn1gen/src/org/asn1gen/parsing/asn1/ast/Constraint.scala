@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class Constraint() extends Node {
+case class Constraint(
+  constraintSpec: ConstraintSpec,
+  exceptionSpec: ExceptionSpec
+) extends Node {
 }
-

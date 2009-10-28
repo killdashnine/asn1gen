@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ExtensionAdditionList() extends Node {
+case class ExtensionAdditionList(
+  extensionAdditions: List[ExtensionAddition]
+) extends Node {
 }
 

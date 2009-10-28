@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class EnumeratedType() extends Node with BuiltinTypeKind {
+case class EnumeratedType(
+  enumerations: Enumerations
+) extends Node with BuiltinTypeKind {
 }
 
