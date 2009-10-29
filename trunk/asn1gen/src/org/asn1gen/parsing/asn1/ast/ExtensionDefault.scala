@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ExtensionDefault() extends Node {
+case class ExtensionDefault(
+  set: Boolean
+) extends Node {
 }
 

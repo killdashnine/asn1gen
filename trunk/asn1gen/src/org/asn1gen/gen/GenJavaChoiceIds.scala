@@ -13,7 +13,7 @@ class GenJavaChoiceIds(out: IndentWriter) {
           ModuleReference(moduleName),
           DefinitiveIdentifier(_)),
         TagDefault(),
-        ExtensionDefault(),
+        ExtensionDefault(_),
         ModuleBody(_, _, assignmentList))
       => {
         out.println("package " + moduleName +";")

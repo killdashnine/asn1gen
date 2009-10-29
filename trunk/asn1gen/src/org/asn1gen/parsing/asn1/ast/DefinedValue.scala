@@ -1,4 +1,10 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class DefinedValue() extends Node with NamedNumberValue with ReferencedValueKind {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class DefinedValue() extends Node
+  with NamedNumberValue
+  with ReferencedValueKind
+  with AssignedIdentifierKind
+{
 }

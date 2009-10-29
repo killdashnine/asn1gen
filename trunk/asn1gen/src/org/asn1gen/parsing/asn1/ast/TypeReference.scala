@@ -1,6 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class TypeReference(chars : String) extends Node {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class TypeReference(chars : String) extends Node with ReferenceKind with DefinedTypeKind {
   def name = chars
   def asModuleReference = ModuleReference(chars)
 }
