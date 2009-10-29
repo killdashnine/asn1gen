@@ -9,7 +9,7 @@ object GenJavaTags {
       case ModuleDefinition(
             ModuleIdentifier(
               ModuleReference("ModuleName"),
-              DefinitiveIdentifier()),
+              DefinitiveIdentifier(_)),
             TagDefault(),
             ExtensionDefault(),
             ModuleBody(_, _, assignmentList))

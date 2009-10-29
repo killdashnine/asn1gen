@@ -1,5 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ReferencedValue() extends Node {
+case class ReferencedValue(
+  kind: ReferencedValueKind
+) extends Node {
 }
-

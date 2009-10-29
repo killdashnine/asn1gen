@@ -18,7 +18,7 @@ package test.org.asn1gen.parsing.asn1 {
           ModuleDefinition(
             ModuleIdentifier(
               ModuleReference("ModuleName"),
-              DefinitiveIdentifier()),
+              DefinitiveIdentifier(_)),
             TagDefault(),
             ExtensionDefault(),
             ModuleBody(_, _, _)), _) =>
@@ -32,7 +32,7 @@ package test.org.asn1gen.parsing.asn1 {
           ModuleDefinition(
             ModuleIdentifier(
               ModuleReference("ModuleName"),
-              DefinitiveIdentifier()),
+              DefinitiveIdentifier(_)),
             TagDefault(),
             ExtensionDefault(),
             ModuleBody(_, _, _)), _) =>
@@ -46,7 +46,7 @@ package test.org.asn1gen.parsing.asn1 {
           md@ModuleDefinition(
             ModuleIdentifier(
               ModuleReference("ModuleName"),
-              DefinitiveIdentifier()),
+              DefinitiveIdentifier(_)),
             TagDefault(),
             ExtensionDefault(),
             ModuleBody(

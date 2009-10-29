@@ -278,7 +278,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   def referencedValue =
     ( definedValue
     | valueFromObject
-    ) ^^ { _ => ReferencedValue() }
+    ) ^^ { kind => ReferencedValue(kind) }
 
   def taggedValue =
     ( value
@@ -344,7 +344,10 @@ class Parser extends TokenParsers with ImplicitConversions {
     ( op("{")
     ~ definitiveObjectIdComponent.+
     ~ op("}")
-    ).? ^^ { _ => DefinitiveIdentifier() } /// TODO: populate
+    ).? ^^ {
+      case Some(_ ~ doic ~ _) => DefinitiveIdentifier(Some(doic))
+      case None => DefinitiveIdentifier(None)
+    }
   
   // ASN1D 9.2.2<5>
   // Not implemented

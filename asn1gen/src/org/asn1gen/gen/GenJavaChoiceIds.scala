@@ -11,7 +11,7 @@ class GenJavaChoiceIds(out: IndentWriter) {
       case moduleDefinition@ModuleDefinition(
         ModuleIdentifier(
           ModuleReference(moduleName),
-          DefinitiveIdentifier()),
+          DefinitiveIdentifier(_)),
         TagDefault(),
         ExtensionDefault(),
         ModuleBody(_, _, assignmentList))
