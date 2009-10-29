@@ -354,11 +354,10 @@ class Parser extends TokenParsers with ImplicitConversions {
     
   // ASN1D 9.2.2<6>
   def definitiveObjectIdComponent =
-    ( failure("remove me")
-    | nameForm
+    ( nameForm
     | definitiveNumberForm
     | definitiveNameAndNumberForm
-    ) ^^ { _ => DefinitiveObjectIdComponent() }
+    ) ^^ { kind => DefinitiveObjectIdComponent(kind) }
   
   def definitiveNumberForm =
     ( number
