@@ -379,9 +379,12 @@ class Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 9.2.2<8>
   def extensionDefault =
-    ( kw("EXTENSIBILITY") ~ kw("IMPLIED")
-    | empty
-    ) ^^ { _ => ExtensionDefault() }
+    ( ( kw("EXTENSIBILITY")
+      ~ kw("IMPLIED")
+      ) ^^ { _ => ExtensionDefault(true) }
+    | ( empty
+      ) ^^ { _ => ExtensionDefault(false) }
+    )
   
   // ASN1D 9.2.2<8-11>
   // Not implemented
@@ -400,7 +403,10 @@ class Parser extends TokenParsers with ImplicitConversions {
     ( kw("EXPORTS")
     ~ symbolsExported
     ~ op(";")
-    ).? ^^ { _ => Exports() }
+    ).? ^^ {
+      case Some(_ ~ se ~ _) => Exports(Some(se))
+      case _ => Exports(None)
+    }
   
   def symbolsExported =
     ( repsep(symbol, op(","))
@@ -414,7 +420,10 @@ class Parser extends TokenParsers with ImplicitConversions {
     ( kw("IMPORTS")
     ~ symbolsImported
     ~ op(";")
-    ).? ^^ { _ => Imports() }
+    ).? ^^ {
+      case Some(_ ~ si ~ _) => Imports(Some(si))
+      case _ => Imports(None)
+    }
 
   def symbolsImported =
     ( symbolsFromModule.*
@@ -434,16 +443,16 @@ class Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 9.2.2<27>
   def assignedIdentifier =
-    ( objectIdentifierValue
-    | definedValue
-    | empty
-    ) ^^ { _ => AssignedIdentifier() }
+    ( objectIdentifierValue ^^ { oiv => AssignedIdentifier(oiv) }
+    | definedValue ^^ { dv => AssignedIdentifier(dv) }
+    | empty ^^ { _ => AssignedIdentifier(Missing()) }
+    )
 
   // ASN1D 9.2.2<30>
   def symbol =
     ( reference
     | parameterizedReference
-    ) ^^ { _ => Symbol() }
+    ) ^^ { kind => Symbol(kind) }
 
   def reference =
     ( typeReference
@@ -451,12 +460,14 @@ class Parser extends TokenParsers with ImplicitConversions {
     | objectClassReference
     | objectReference
     | objectSetReference
-    ) ^^ { _ => Reference() }
+    ) ^^ { kind => Reference(kind) }
   
   def parameterizedReference =
-    ( reference
-    | reference ~ op("{") ~ op("}")
-    ) ^^ { _ => ParameterizedReference() }
+    ( ( reference
+      ) ^^ { r => ParameterizedReference(r, false) }
+    | ( reference ~ op("{") ~ op("}")
+      ) ^^ { case r ~ _ ~ _ => ParameterizedReference(r, true) }
+    )
   
   // ASN1D 9.3.2<1>
   def definedType =
@@ -464,7 +475,7 @@ class Parser extends TokenParsers with ImplicitConversions {
     | typeReference
     | parameterizedType
     | parameterizedValueSetType
-    ) ^^ { _ => DefinedType() }
+    ) ^^ { kind => DefinedType(kind) }
 
   // ASN1D 9.3.2<3>
   def externalTypeReference =
@@ -653,9 +664,9 @@ class Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 10.5.2<8>
   def specialRealValue =
-    ( kw("PLUS-INFINITY")
-    | kw("MINUS-INFINITY")
-    ) ^^ { _ => SpecialRealValue() }
+    ( kw("PLUS-INFINITY") ^^ { _ => SpecialRealValue(true) }
+    | kw("MINUS-INFINITY") ^^ { _ => SpecialRealValue(false) }
+    )
   
   // ASN1D 10.6.2<1>
   def bitStringType =

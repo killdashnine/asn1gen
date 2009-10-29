@@ -4,4 +4,3 @@ case class SymbolsImported(
   symbolsFromModuleList: List[SymbolsFromModule]
 ) extends Node {
 }
-

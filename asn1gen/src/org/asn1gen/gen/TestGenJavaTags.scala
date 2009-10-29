@@ -11,7 +11,7 @@ object GenJavaTags {
               ModuleReference("ModuleName"),
               DefinitiveIdentifier(_)),
             TagDefault(),
-            ExtensionDefault(),
+            ExtensionDefault(_),
             ModuleBody(_, _, assignmentList))
       => {
         out.println("package mypackage;")
