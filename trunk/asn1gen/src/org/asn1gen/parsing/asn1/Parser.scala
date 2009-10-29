@@ -1451,7 +1451,7 @@ class Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 14.2.2<1>
   def embeddedPdvType =
     ( kw("EMBEDDED") ~ kw("PDV")
-    ) ^^ { _ => EmbeddedPdvType() } // TODO
+    ) ^^ { _ => EmbeddedPdvType() }
 
   // ASN1D 14.2.2<5>
   def embeddedPdvValue =
