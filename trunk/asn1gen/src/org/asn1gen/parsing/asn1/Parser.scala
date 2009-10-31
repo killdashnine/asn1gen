@@ -243,7 +243,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ~ type_
     ~ op("::=")
     ~ value
-    ) ^^ { case vr ~ t ~ _ ~ v => ValueAssignment(vr, t, v) } // TODO
+    ) ^^ { case vr ~ t ~ _ ~ v => ValueAssignment(vr, t, v) }
   
   // ASN1D 9.1.2<5>
   def value: Parser[Value] =
@@ -289,7 +289,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ~ type_
     ~ op("::=")
     ~ valueSet
-    ) ^^ { case tr ~ t ~ _ ~ vs => ValueSetTypeAssignment(tr, t, vs) } // TODO
+    ) ^^ { case tr ~ t ~ _ ~ vs => ValueSetTypeAssignment(tr, t, vs) }
 
   // ASN1D 9.1.2<7-9>
   // Not implemented
@@ -299,21 +299,21 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( objectClassReference
     ~ op("::=")
     ~ objectClass
-    ) ^^ { case ocr ~ _ ~ oc => ObjectClassAssignment(ocr, oc) } // TODO
+    ) ^^ { case ocr ~ _ ~ oc => ObjectClassAssignment(ocr, oc) }
   
   def objectAssignment =
     ( objectReference
     ~ definedObjectClass
     ~ op("::=")
     ~ object_
-    ) ^^ { case or ~ doc ~ _ ~ o => ObjectAssignment(or, doc, o) } // TODO
+    ) ^^ { case or ~ doc ~ _ ~ o => ObjectAssignment(or, doc, o) }
   
   def objectSetAssignment =
     ( objectSetReference
     ~ definedObjectClass
     ~ op("::=")
     ~ objectSet
-    ) ^^ { case osr ~ doc ~ _ ~ os => ObjectSetAssignment(osr, doc, os) } // TODO
+    ) ^^ { case osr ~ doc ~ _ ~ os => ObjectSetAssignment(osr, doc, os) }
   
   def root =
     ( moduleDefinition
@@ -559,14 +559,12 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 10.3.2<1>
   def integerType =
     ( kw("INTEGER")
-    ~ ( op("{")
-      ~ rep1sep(namedNumber, op(","))
-      ~ op("}")
+    ~ ( ( op("{")
+        ~ rep1sep(namedNumber, op(","))
+        ~ op("}")
+        ) ^^ { case _ ~ nns ~ _ => nns }
       ).?
-    ) ^^ {
-      case _ ~ None => IntegerType(Nil)
-      case _ ~ Some(_ ~ namedNumbers ~ _) => IntegerType(namedNumbers)
-    }
+    ) ^^ { case _ ~ nns => IntegerType(nns) }
   
   // ASN1D 10.3.2<6>
   def namedNumber =
@@ -574,16 +572,12 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
       ~ op("(")
       ~ signedNumber
       ~ op(")")
-      ) ^^ { case id ~ _ ~ sn ~ _ =>
-        NamedNumber(id, sn)
-      }
+      ) ^^ { case id ~ _ ~ sn ~ _ => NamedNumber(id, sn) }
     | ( identifier
       ~ op("(")
       ~ definedValue
       ~ op(")")
-      ) ^^ { case id ~ _ ~ dv ~ _ =>
-        NamedNumber(id, dv)
-      }
+      ) ^^ { case id ~ _ ~ dv ~ _ => NamedNumber(id, dv) }
     )
   
   // ASN1D 10.3.2<11>
@@ -598,7 +592,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ~ op("{")
     ~ enumerations
     ~ op("}")
-    ) ^^ { case _ ~ _ ~ e ~ _ => EnumeratedType(e) } // TODO
+    ) ^^ { case _ ~ _ ~ e ~ _ => EnumeratedType(e) }
   
   // ASN1D 10.4.2<5>
   def enumerationsExtension2 =
@@ -708,7 +702,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def octetStringType =
     ( kw("OCTET")
     ~ kw("STRING")
-    ) ^^ { _ => OctetStringType() } // TODO
+    ) ^^ { _ => OctetStringType() }
   
   // ASN1D 10.7.2<4>
   def octetStringValue =
@@ -720,7 +714,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def objectIdentifierType =
     ( kw("OBJECT")
     ~ kw("IDENTIFIER")
-    ) ^^ { _ => ObjectIdentifierType() } // TODO
+    ) ^^ { _ => ObjectIdentifierType() }
   
   // ASN1D 10.8.2<3>
   def objectIdentifierValue =
