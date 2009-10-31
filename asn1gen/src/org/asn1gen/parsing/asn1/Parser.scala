@@ -568,17 +568,11 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 10.3.2<6>
   def namedNumber =
-    ( ( identifier
-      ~ op("(")
-      ~ signedNumber
-      ~ op(")")
-      ) ^^ { case id ~ _ ~ sn ~ _ => NamedNumber(id, sn) }
-    | ( identifier
-      ~ op("(")
-      ~ definedValue
-      ~ op(")")
-      ) ^^ { case id ~ _ ~ dv ~ _ => NamedNumber(id, dv) }
-    )
+    ( identifier
+    ~ op("(")
+    ~ (signedNumber | definedValue)
+    ~ op(")")
+    ) ^^ { case id ~ _ ~ value ~ _ => NamedNumber(id, value) }
   
   // ASN1D 10.3.2<11>
   def integerValue =

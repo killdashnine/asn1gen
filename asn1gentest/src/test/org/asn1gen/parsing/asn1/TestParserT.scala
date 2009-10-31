@@ -41,14 +41,14 @@ package test.org.asn1gen.parsing.asn1 {
                               DefaultTaggedType(
                                 Tag(DefaultClass(), ClassNumber(Number("0"))),
                                 Type_(
-                                  BuiltinType(IntegerType(List()))))))),
+                                  BuiltinType(IntegerType(None))))))),
                         NamedType(
                           Identifier("choice2"),
                           Type_(
                             BuiltinType(
                               DefaultTaggedType(
                                 Tag(DefaultClass(), ClassNumber(Number("1"))),
-                                Type_(BuiltinType(IntegerType(List())))))))))),
+                                Type_(BuiltinType(IntegerType(None)))))))))),
                     None,None,None))))
 ,
           _) => println(result)
@@ -75,7 +75,7 @@ package test.org.asn1gen.parsing.asn1 {
               RootAlternativeTypeList(
                 AlternativeTypeList(
                   List(
-                    NamedType(Identifier("integer"),Type_(BuiltinType(IntegerType(List())))),
+                    NamedType(Identifier("integer"),Type_(BuiltinType(IntegerType(None)))),
                     NamedType(Identifier("boolean"),Type_(BuiltinType(BooleanType())))))),
               None,
               None,
