@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class OctetStringValue() extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class OctetStringValue(
+  kind: OctetStringValueKind
+) extends Node with BuiltinValueKind {
+}

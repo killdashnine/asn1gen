@@ -17,12 +17,12 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
     | ampIdentifier
     | operator
     ) ^^ {
-      case t : Asn1Token => t.prevComment = lastComment; t
+      case t: Asn1Token => t.prevComment = lastComment; t
       case t => t 
     }
 
   // see `whitespace in `Scanners'
-  override def whitespace : Parser[CommentLit] =
+  override def whitespace: Parser[CommentLit] =
     ( whitespaceChar ^^ { m => CommentLit("") }
     | oneLineComment
     | multiLineComment
@@ -92,7 +92,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
       val d = new Array[String](delimiters.size)
       delimiters.copyToArray(d,0)
       scala.util.Sorting.quickSort(d) 
-      _delim = d.toList.reverse.map(parseDelim).reduceRight[Parser[Token]](_ | _) // no offence :-)      
+      _delim = d.toList.reverse.map(parseDelim).reduceRight[Parser[Token]](_ | _)
     }
     
     _delim
@@ -102,24 +102,24 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
 
   private def lift2[T](f: String => T)(p: ~[Char, List[Char]]): T = lift(f)(p._1 :: p._2)
 
-  def char(c : scala.collection.IndexedSeqView[Char,IndexedSeq[Char]]) = elem(
+  def char(c: scala.collection.IndexedSeqView[Char,IndexedSeq[Char]]) = elem(
     "'" + c.first + "' to '" + c.last + "' ", c.contains(_))
-  def upper : Parser[Elem] = elem("uppercase letter", c => 'A' <= c && c <= 'Z')
-  def lower : Parser[Elem] = elem("lowercase letter", c => 'a' <= c && c <= 'z')
-  def hyphen : Parser[Elem] = elem("hyphen", _ == '-')
-  def lf : Parser[Elem] = elem("linefeed", _ == '\n')
-  def cr : Parser[Elem] = elem("carriage return", _ == '\r')
+  def upper: Parser[Elem] = elem("uppercase letter", c => 'A' <= c && c <= 'Z')
+  def lower: Parser[Elem] = elem("lowercase letter", c => 'a' <= c && c <= 'z')
+  def hyphen: Parser[Elem] = elem("hyphen", _ == '-')
+  def lf: Parser[Elem] = elem("linefeed", _ == '\n')
+  def cr: Parser[Elem] = elem("carriage return", _ == '\r')
   def endln = ((cr ~ lf) | cr | lf)
-  def anychar : Parser[Elem] = elem("any character", c => true)
+  def anychar: Parser[Elem] = elem("any character", c => true)
   def space = elem("space", _ == ' ')
   def tab = elem("space", _ == '\t')
   def slash = elem("space", _ == '/')
   def asterisk = elem("space", _ == '*')
   def dquote = elem("single quote", _ == '"')
   def squote = elem("single quote", _ == '\'')
-  def char(c : Char) = elem("'" + c + "'", _ == c)
+  def char(c: Char) = elem("'" + c + "'", _ == c)
   def bin_digit = elem("0", _.isBinDigit)
-  def not_char(c : Char) = elem("not " + c.toString, _ != c)
+  def not_char(c: Char) = elem("not " + c.toString, _ != c)
   def upper_hex_digit = elem("hexadecimal digit", c => c.isUpperHexDigit)
   def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
   def ampersand = elem("ampersand", _ == '&') ^^ { _ => Operator("&") }
@@ -142,7 +142,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
   def oneLineCommentMarker = hyphen ~ hyphen
   
   // ASN1D 8.3.2<3>
-  def oneLineCommentRemainder : Parser[String] =
+  def oneLineCommentRemainder: Parser[String] =
     ( oneLineCommentMarker ^^ { case m => "" }
     | endln ^^ { case m => "" }
     | (anychar ~ oneLineCommentRemainder) ^^ { case c ~ cs => c + cs }
@@ -294,12 +294,12 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
       
   // 11.6
   
-  var lastComment : String = ""
+  var lastComment: String = ""
   
   def multiLineCommentBegin = slash ~ asterisk
   def multiLineCommentEnd = asterisk ~ slash
   
-  def multiLineCommentRemainder : Parser[CommentLit] =
+  def multiLineCommentRemainder: Parser[CommentLit] =
     ( multiLineCommentEnd ^^ { m => CommentLit("") }
     | ( multiLineComment.?
       ~ anychar
@@ -310,7 +310,7 @@ class Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras
       }
     )
   
-  def multiLineComment : Parser[CommentLit] =
+  def multiLineComment: Parser[CommentLit] =
     multiLineCommentBegin ~> multiLineCommentRemainder ^^ { comment =>
       lastComment = comment.comment
       comment

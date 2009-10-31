@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class UnrestrictedCharacterStringType() extends Node {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class UnrestrictedCharacterStringType() extends Node with CharacterStringTypeKind {
 }
 

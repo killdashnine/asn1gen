@@ -1,5 +1,9 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class CharacterStringType() extends Node with BuiltinTypeKind {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class CharacterStringType(
+  kind: CharacterStringTypeKind
+) extends Node with BuiltinTypeKind {
 }
 

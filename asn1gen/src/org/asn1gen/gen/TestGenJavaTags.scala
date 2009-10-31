@@ -45,7 +45,7 @@ object GenJavaTags {
       case AlternativeTypeLists(
         RootAlternativeTypeList(AlternativeTypeList(namedTypes)), _, _, _)
       => {
-        namedTypes foreach { namedType : NamedType =>
+        namedTypes foreach { namedType: NamedType =>
           generate(namedType, out)
         }
       }

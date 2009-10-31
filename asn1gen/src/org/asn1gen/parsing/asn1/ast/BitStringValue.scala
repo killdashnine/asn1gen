@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class BitStringValue() extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class BitStringValue(
+  kind: BitStringValueKind
+) extends Node with BuiltinValueKind {
+}

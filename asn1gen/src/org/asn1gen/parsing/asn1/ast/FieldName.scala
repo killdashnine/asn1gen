@@ -1,5 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class FieldName() extends Node {
+case class FieldName(
+  primitiveFieldNames: List[PrimitiveFieldName]
+) extends Node {
 }
-

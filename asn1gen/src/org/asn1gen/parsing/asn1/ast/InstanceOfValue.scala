@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class InstanceOfValue(value: Value) extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class InstanceOfValue(
+  value: Value
+) extends Node with BuiltinValueKind {
+}

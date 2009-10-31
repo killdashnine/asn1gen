@@ -1,8 +1,9 @@
 package org.asn1gen.parsing.asn1.ast
 
+import org.asn1gen.parsing.asn1.ast.kind._
+
 case class OpenTypeFieldVal(
   type_ : Type_,
   value: Value
-) extends Node {
+) extends Node with ObjectClassFieldValueKind {
 }
-

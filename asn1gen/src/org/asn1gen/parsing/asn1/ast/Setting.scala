@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class Setting() extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class Setting(
+  kind: SettingKind
+) extends Node {
+}

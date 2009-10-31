@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ReferencedType() extends Node with TypeKind {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class ReferencedType(
+  kind: ReferencedTypeKind
+) extends Node with TypeKind {
+}
