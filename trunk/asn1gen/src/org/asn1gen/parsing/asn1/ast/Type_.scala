@@ -1,5 +1,11 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class Type_(kind: TypeKind) extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class Type_(
+  kind: TypeKind
+) extends Node
+  with GovernorKind
+  with SettingKind
+  with ActualParameterKind {
+}

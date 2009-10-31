@@ -1,7 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
+import org.asn1gen.parsing.asn1.ast.kind._
+
 case class EmbeddedPdvValue(
   sequenceValue: SequenceValue
-) extends Node {
+) extends Node with BuiltinValueKind {
 }
-

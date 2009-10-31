@@ -9,7 +9,7 @@ import scala.util.parsing.syntax.Tokens
  */
 trait Asn1Tokens extends Tokens {
   abstract class Asn1Token extends Token {
-    var prevComment : String = ""
+    var prevComment: String = ""
   }
   
   case class Operator(chars: String) extends Asn1Token {

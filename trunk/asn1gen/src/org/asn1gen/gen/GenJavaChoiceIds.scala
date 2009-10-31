@@ -69,7 +69,7 @@ class GenJavaChoiceIds(out: IndentWriter) {
         Type_(
           BuiltinType(
             DefaultTaggedType(
-              Tag(_, LiteralClassNumber(Number(tagNumber))),
+              Tag(_, ClassNumber(Number(tagNumber))),
               _))))
       => {
         out.println("public static int " + name + " = " + tagNumber + ";")

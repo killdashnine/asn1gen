@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ObjectClass() extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class ObjectClass(
+  kind: ObjectClassKind
+) extends Node {
+}

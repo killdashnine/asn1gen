@@ -1,5 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class Literal() extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class Literal() extends Node with RequiredTokenKind {
+}

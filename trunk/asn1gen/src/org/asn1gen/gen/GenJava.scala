@@ -73,7 +73,7 @@ class GenJava(out: IndentWriter) {
         Type_(
           BuiltinType(
             DefaultTaggedType(
-              Tag(_, LiteralClassNumber(Number(tagNumber))),
+              Tag(_, ClassNumber(Number(tagNumber))),
               _))))
       => {
         out.println()

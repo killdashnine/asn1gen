@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ParameterizedAssignment() extends Node with AssignmentKind {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class ParameterizedAssignment(
+  kind: ParameterizedAssignmentKind
+) extends Node with AssignmentKind {
+}

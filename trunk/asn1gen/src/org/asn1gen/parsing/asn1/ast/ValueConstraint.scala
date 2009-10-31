@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ValueConstraint() extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class ValueConstraint(
+  kind: ValueConstraintKind
+) extends Node {
+}

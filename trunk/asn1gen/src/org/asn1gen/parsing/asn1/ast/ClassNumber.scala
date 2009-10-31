@@ -1,4 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ClassNumber() extends Node {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class ClassNumber(
+  kind: ClassNumberKind
+) extends Node {
 }

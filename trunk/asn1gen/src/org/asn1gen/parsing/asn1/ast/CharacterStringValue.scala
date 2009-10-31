@@ -1,5 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class CharacterStringValue() extends Node {
-}
+import org.asn1gen.parsing.asn1.ast.kind._
 
+case class CharacterStringValue(
+  kind: CharacterStringValueKind
+) extends Node with BuiltinValueKind {
+}

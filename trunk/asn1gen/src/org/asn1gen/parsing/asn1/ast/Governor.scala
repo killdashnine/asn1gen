@@ -1,5 +1,9 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class Governor() extends Node {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class Governor(
+  kind: GovernorKind
+) extends Node with ParamGovernorKind {
 }
 
