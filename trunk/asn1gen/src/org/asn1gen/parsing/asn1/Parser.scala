@@ -671,30 +671,24 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 10.6.2<1>
   def bitStringType =
-    ( ( kw("BIT")
-      ~ kw("STRING")
-      )
-    | ( kw("BIT")
-      ~ kw("STRING")
-      ~ op("{")
-      ~ rep1sep(namedBit, op(","))
-      ~ op("}")
-      )
-    ) ^^ { _ => BitStringType() } // TODO
+    ( kw("BIT")
+    ~ kw("STRING")
+    ~ ( ( op("{")
+        ~ rep1sep(namedBit, op(","))
+        ~ op("}")
+        ) ^^ { case _ ~ nbs ~ _ => nbs }
+      ).?
+    ) ^^ { case _ ~ _ ~ nbs => BitStringType(nbs) }
   
   // ASN1D 10.6.2<6>
   def namedBit =
-    ( ( identifier
-      ~ op("(")
-      ~ number
-      ~ op(")")
+    ( identifier
+    ~ op("(")
+    ~ ( number
+      | definedValue
       )
-    | ( identifier
-      ~ op("(")
-      ~ definedValue
-      ~ op(")")
-      )
-    ) ^^ { _ => NamedBit() }
+    ~ op(")")
+    ) ^^ { case i ~ _ ~ kind ~ _ => NamedBit(i, kind) }
   
   // ASN1D 10.6.2<13>
   def bitStringValue =

@@ -1,4 +1,8 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class BitStringType() extends Node with BuiltinTypeKind {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class BitStringType(
+  namedBits: Option[List[NamedBit]]
+) extends Node with BuiltinTypeKind {
 }
