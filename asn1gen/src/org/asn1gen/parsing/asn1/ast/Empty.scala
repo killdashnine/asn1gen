@@ -5,5 +5,6 @@ import org.asn1gen.parsing.asn1.ast.kind._
 case class Empty()
   extends Node
   with AssignedIdentifierKind
-  with ValueConstraintKind {
+  with ValueConstraintKind
+  with WithSyntaxSpecKind {
 }

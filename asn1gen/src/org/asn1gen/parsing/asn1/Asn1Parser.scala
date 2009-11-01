@@ -1558,10 +1558,11 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { case osfr ~ doc ~ osos => ObjectSetFieldSpec(osfr, doc, osos) }
   
   // ASN1D 15.2.2<29>
-  def objectSetOptionalitySpec =
-    ( kw("OPTIONAL") | kw("DEFAULT") ~ objectSet
-    | empty
-    ) ^^ { _ => ObjectSetOptionalitySpec() }
+  def objectSetOptionalitySpec : Parser[ObjectSetOptionalitySpec] =
+    ( kw("OPTIONAL") ^^ { _ => OptionalObjectSetOptionalitySpec() }
+    | kw("DEFAULT") ~ objectSet ^^ { case _ ~ d => DefaultObjectSetOptionalitySpec(d) }
+    | empty ^^ { _ => NoObjectSetOptionalitySpec() }
+    )
   
   // ASN1D 15.2.2<33>
   def fieldName =
@@ -1608,9 +1609,9 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 15.3.2<1>
   def withSyntaxSpec =
-    ( kw("WITH") ~ kw("SYNTAX") ~ syntaxList
+    ( kw("WITH") ~> kw("SYNTAX") ~> syntaxList
     | empty
-    ) ^^ { _ => WithSyntaxSpec() }
+    ) ^^ { kind => WithSyntaxSpec(kind) }
 
   // ASN1D 15.3.2<2>
   def syntaxList =
