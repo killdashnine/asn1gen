@@ -36,7 +36,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   def op(chars: String) = elem("operator " + chars) {case lexical.Operator(`chars`) => Operator(chars)}
   def kw(chars: String) = elem("keyword " + chars) {case lexical.Keyword(`chars`) => Keyword(chars)}
-  def empty = success("")
+  def empty = success("") ^^ { _ => Empty() }
 
   // ASN1D 8.3.2<1-2>
   def bstring = elem("bstring") {
@@ -445,7 +445,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def assignedIdentifier =
     ( objectIdentifierValue
     | definedValue
-    | empty ^^ { _ => Missing() }
+    | empty
     ) ^^ { kind => AssignedIdentifier(kind) }
 
   // ASN1D 9.2.2<30>
@@ -1295,7 +1295,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { case vc ~ pc => ComponentConstraint(vc, pc) }
   def valueConstraint =
     ( constraint
-    | empty ^^ { _ => Missing() }
+    | empty
     ) ^^ { kind => ValueConstraint(kind) }
   
   // ASN1D 13.9.2<14>
