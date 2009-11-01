@@ -1,12 +1,12 @@
 import _root_.org.junit._
 import _root_.org.junit.Assert._
 import _root_.junit.framework.TestCase
-import _root_.org.asn1gen.parsing.asn1.Lexer
+import _root_.org.asn1gen.parsing.asn1.Asn1Lexer
 import _root_.scala.util.parsing.input._
 
 package test.org.asn1gen.parsing.asn1 {
   class TestLexer extends TestCase {
-    val lexer = new Lexer()
+    val lexer = new Asn1Lexer()
     
     @Test def test_bstring_1() {
       def charseq = new CharSequenceReader("''b")

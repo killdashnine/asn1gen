@@ -8,7 +8,7 @@ import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.parsing.syntax._
 
 class Asn1Parser extends TokenParsers with ImplicitConversions {
-  type Tokens = Lexer
+  type Tokens = Asn1Lexer
   
   val lexical = new Tokens
   lexical.reserved +=
