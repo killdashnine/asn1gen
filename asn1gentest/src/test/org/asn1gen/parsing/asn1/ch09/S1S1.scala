@@ -16,10 +16,10 @@ package test.org.asn1gen.parsing.asn1.ch09 {
     import TheParser._
     
     @Test def test_1() {
-      val text = """" +
+      val text = """
       		TypeReference ::= CHOICE { integer INTEGER, boolean BOOLEAN }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -29,7 +29,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
       val text = """
       		value-reference TypeReference ::= integer:12
       		"""
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -52,7 +52,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
           lighter Lighter-state ::= on
           kettle Kettle-state ::= lighter
       		"""
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -62,7 +62,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
       val text = """
           PrimeNumbers INTEGER ::= { 2 | 3 | 5 | 7 | 11 | 13 }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
