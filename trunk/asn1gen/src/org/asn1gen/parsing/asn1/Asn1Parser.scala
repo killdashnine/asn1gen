@@ -22,7 +22,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     , "MAX", "MIN", "MINUS-INFINITY"
     , "NULL", "NumericString"
     , "OBJECT", "ObjectDescriptor", "OCTET", "OF", "OPTIONAL"
-    , "PATTERN", "PDV", "PLUS-INFINITY", "PRESENT", "PrintableString", "PRIVATE REAL"
+    , "PATTERN", "PDV", "PLUS-INFINITY", "PRESENT", "PrintableString", "PRIVATE", "REAL"
     , "RELATIVE-OID"
     , "SEQUENCE", "SET", "SIZE", "STRING", "SYNTAX"
     , "T61String", "TAGS", "TeletexString", "TRUE", "TYPE-IDENTIFIER"
@@ -621,9 +621,10 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( rep1sep(enumerationItem, op(","))
     ) ^^ { eis => Enumeration(eis) }
   
+  // refactored
   def enumerationItem =
-    ( identifier
-    | namedNumber
+    ( namedNumber
+    | identifier
     ) ^^ { kind => EnumerationItem(kind) }
   
   // ASN1D 10.4.2<13>
@@ -1199,12 +1200,13 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( lowerEndPoint ~ op("..") ~ upperEndPoint
     ) ^^ { case lep ~ _ ~ uep => ValueRange(lep, uep) }
 
-  // ASN1D 13.4.2<3>
+  // ASN1D 13.4.2<3> refactored
   def lowerEndPoint =
-    ( lowerEndValue | lowerEndValue ~ op("<")
+    ( lowerEndValue ~ op("<").?
     ) ^^ { _ => LowerEndPoint() }
+  // refactored
   def upperEndPoint =
-    ( upperEndValue | op("<") ~ upperEndValue
+    ( op("<").? ~ upperEndValue
     ) ^^ { _ => UpperEndPoint() }
   
   // ASN1D 13.4.2<4>
@@ -1242,8 +1244,10 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 13.8.2<1>
   def innerTypeConstraints =
-    ( kw("WITH") ~ kw("COMPONENT") ~ singleTypeConstraint
-    | kw("WITH") ~ kw("COMPONENTS") ~ multipleTypeConstraints
+    ( kw("WITH")
+    ~ ( kw("COMPONENT") ~ singleTypeConstraint
+      | kw("COMPONENTS") ~ multipleTypeConstraints
+      )
     ) ^^ { _ => InnerTypeConstraints() }
   
   // ASN1D 13.8.2<3>
@@ -1279,7 +1283,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( rep1sep(namedConstraint, op(","))
     ) ^^ { namedConstraints => TypeConstraints(namedConstraints) }
 
-  // ASN1D 13.9.2<10>
+  // ASN1D 13.9.2<10> refactored
   def namedConstraint =
     ( identifier
     ~ componentConstraint

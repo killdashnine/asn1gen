@@ -65,7 +65,7 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     | literal(")")
     | literal(",")
     | literal(".")
-    | literal(":")      
+    | literal(":")
     | literal(";")
     | literal("<")
     | literal("[")
@@ -74,6 +74,7 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     | literal("{")
     | literal("|")
     | literal("}")
+    | literal("-")
     ) ^^ { cs => Operator(cs) }
 
   /** The set of reserved identifiers: these will be returned as `Keyword's */

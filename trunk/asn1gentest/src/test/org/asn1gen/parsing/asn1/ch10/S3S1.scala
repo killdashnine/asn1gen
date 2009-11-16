@@ -16,12 +16,12 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     import TheParser._
     
     @Test def test_1() {
-      val text = """" +
+      val text = """
           zero INTEGER ::= 0
           australian-population INTEGER ::= 20000000
           fridge-temperature INTEGER ::= -18 -- in Centigrade scale
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -31,7 +31,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           Interval ::= INTEGER (123..456)
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -47,7 +47,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
 
           disk-is-full ErrorCode ::= disk-full
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -57,7 +57,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           ok ErrorCode ::= 0
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -67,7 +67,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """" +
           disk-is-full ErrorCode ::= 1 -- disk full
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -83,7 +83,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
             file-exists(4)
           }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -93,7 +93,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           Centigrade ::= INTEGER { freezing(0), boiling(100) }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
