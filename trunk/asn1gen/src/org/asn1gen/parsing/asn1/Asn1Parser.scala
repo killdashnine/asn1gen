@@ -24,7 +24,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     , "OBJECT", "ObjectDescriptor", "OCTET", "OF", "OPTIONAL"
     , "PATTERN", "PDV", "PLUS-INFINITY", "PRESENT", "PrintableString", "PRIVATE REAL"
     , "RELATIVE-OID"
-    , "SEQUENCE", "SET SIZE", "STRING", "SYNTAX"
+    , "SEQUENCE", "SET", "SIZE", "STRING", "SYNTAX"
     , "T61String", "TAGS", "TeletexString", "TRUE", "TYPE-IDENTIFIER"
     , "UNION", "UNIQUE", "UNIVERSAL", "UniversalString", "UTCTime", "UTF8String"
     , "VideotexString", "VisibleString"
@@ -352,11 +352,11 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 9.2.2<5>
   // Not implemented
     
-  // ASN1D 9.2.2<6>
+  // ASN1D 9.2.2<6> refactored
   def definitiveObjectIdComponent =
-    ( nameForm
+    ( definitiveNameAndNumberForm
     | definitiveNumberForm
-    | definitiveNameAndNumberForm
+    | nameForm
     ) ^^ { kind => DefinitiveObjectIdComponent(kind) }
   
   def definitiveNumberForm =
@@ -448,10 +448,10 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     | empty
     ) ^^ { kind => AssignedIdentifier(kind) }
 
-  // ASN1D 9.2.2<30>
+  // ASN1D 9.2.2<30> // refactored
   def symbol =
-    ( reference
-    | parameterizedReference
+    ( parameterizedReference
+    | reference
     ) ^^ { kind => Symbol(kind) }
 
   def reference =
@@ -463,18 +463,16 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { kind => Reference(kind) }
   
   def parameterizedReference =
-    ( ( reference
-      ) ^^ { r => ParameterizedReference(r, false) }
-    | ( reference ~ op("{") ~ op("}")
-      ) ^^ { case r ~ _ ~ _ => ParameterizedReference(r, true) }
-    )
+    ( reference
+    ~ (op("{") ~ op("}")).?
+    ) ^^ { case r ~ b => ParameterizedReference(r, b.isDefined) }
   
-  // ASN1D 9.3.2<1>
+  // ASN1D 9.3.2<1> refactored
   def definedType =
-    ( externalTypeReference
-    | typeReference
-    | parameterizedType
+    ( parameterizedType
     | parameterizedValueSetType
+    | externalTypeReference
+    | typeReference
     ) ^^ { kind => DefinedType(kind) }
 
   // ASN1D 9.3.2<3>
@@ -712,22 +710,18 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 10.8.2<3>
   def objectIdentifierValue =
-    ( ( op("{")
+    ( op("{")
+    ~ ( definedValue.?
       ~ objIdComponents.+
-      ~ op("}")
       )
-    | ( op("{")
-      ~ definedValue
-      ~ objIdComponents.+
-      ~ op("}")
-      )
+    ~ op("}")
     ) ^^ { _ => ObjectIdentifierValue() }
   
-  // ASN1D 10.8.2<5>
+  // ASN1D 10.8.2<5> refactored
   def objIdComponents =
-    ( nameForm
+    ( nameAndNumberForm
+    | nameForm
     | numberForm
-    | nameAndNumberForm
     | definedValue
     ) ^^ { kind => ObjIdComponents(kind) }
   
@@ -999,11 +993,12 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( rep1sep(componentType, op(","))
     ) ^^ { cts => ComponentTypeList(cts) }
   
-  // ASN1D 12.2.2<13>
+  // ASN1D 12.2.2<13> refactored
   def componentType =
     ( namedType
-    | namedType ~ kw("OPTIONAL")
-    | namedType ~ kw("DEFAULT") ~ value
+    ~ ( kw("OPTIONAL")
+      | kw("DEFAULT") ~ value
+      ).?
     | kw("COMPONENTS") ~ kw("OF") ~ type_
     ) ^^ { _ => ComponentType() }
   
