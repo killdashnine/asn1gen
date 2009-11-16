@@ -40,7 +40,8 @@ class GenJavaChoiceIds(out: IndentWriter) {
           Type_(
             BuiltinType(
               ChoiceType(
-                AlternativeTypeLists(rootAlternativeTypeList, _, _, _))))))
+                AlternativeTypeLists(rootAlternativeTypeList, _, _, _))),
+            _)))
       => {
         out.println("public class " + name + " {")
         out.indent(2) {
@@ -70,7 +71,8 @@ class GenJavaChoiceIds(out: IndentWriter) {
           BuiltinType(
             DefaultTaggedType(
               Tag(_, ClassNumber(Number(tagNumber))),
-              _))))
+              _)),
+          _))
       => {
         out.println("public static int " + name + " = " + tagNumber + ";")
       }

@@ -40,7 +40,8 @@ class GenJava(out: IndentWriter) {
           Type_(
             BuiltinType(
               ChoiceType(
-                AlternativeTypeLists(rootAlternativeTypeList, _, _, _))))))
+                AlternativeTypeLists(rootAlternativeTypeList, _, _, _))),
+            _)))
       => {
         out.println("public class " + name + " {")
         out.indent(2) {
@@ -74,7 +75,8 @@ class GenJava(out: IndentWriter) {
           BuiltinType(
             DefaultTaggedType(
               Tag(_, ClassNumber(Number(tagNumber))),
-              _))))
+              _)),
+          _))
       => {
         out.println()
         out.println("@ChoiceId")
@@ -101,7 +103,8 @@ class GenJava(out: IndentWriter) {
           BuiltinType(
             DefaultTaggedType(
               _,
-              type_))))
+              type_)),
+          _))
       => {
         val getter = "get" + name.first.toUpperCase + name.substring(1)
         out.println()

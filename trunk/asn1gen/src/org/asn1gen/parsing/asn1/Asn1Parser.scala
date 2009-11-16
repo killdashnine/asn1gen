@@ -201,10 +201,12 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { case n ~ _ ~ t => TypeAssignment(n, t) } | failure("type assignment")
   
   def type_ : Parser[Type_] =
-    ( builtinType
-    | referencedType
-    | constrainedType
-    ) ^^ { kind => Type_(kind) }
+    ( ( builtinType
+      | referencedType
+      | constrainedType
+      )
+    ~ constraint.* // refactored from constrainedType
+    ) ^^ { case kind ~ constraints => Type_(kind, constraints) }
   
   def builtinType =
     ( bitStringType
@@ -1172,7 +1174,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 13.1.2<1>
   def constrainedType =
-    ( type_ ~ constraint
+    ( failure("refactor to type_") ~ type_ ~ constraint
     | typeWithConstraint
     ) ^^ { _ => ConstrainedType() } // TODO
 
@@ -1308,11 +1310,14 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     | kw("CONTAINING") ~ type_ ~ kw("ENCODED") ~ kw("BY") ~ value
     ) ^^ { _ => ContentsConstraint() }
   
-  // ASN1D 13.11.2<1>
+  // ASN1D 13.11.2<1> refactored
   def elementSetSpecs: Parser[ElementSetSpecs] =
     ( rootElementSetSpec
-    | rootElementSetSpec ~ op(",") ~ op("...")
-    | rootElementSetSpec ~ op(",") ~ op("...") ~ op(",") ~ additionalElementSetSpec
+    ~ ( op(",") ~ op("...")
+      ~ ( op(",")
+        ~ additionalElementSetSpec
+        ).?
+      ).?
     ) ^^ { _ => ElementSetSpecs() }
   
   // ASN1D 13.11.2<2>
@@ -1329,31 +1334,25 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     | kw("ALL") ~ exclusions
     ) ^^ { _ => ElementSetSpec() }
 
-  // ASN1D 13.11.2<10>
+  // ASN1D 13.11.2<10> refactored
   def unions: Parser[Unions] =
-    ( intersections
-    | uElems ~ unionMark ~ intersections
+    ( repsep(intersections, unionMark)
     ) ^^ { _ => Unions() }
 
   // ASN1D 13.11.2<11>
-  def uElems =
-    ( unions
-    ) ^^ { _ => UElems() }
+  // uElems refactored out
   def unionMark =
     ( op("|")
     | kw("UNION")
     ) ^^ { _ => UnionMark() }
  
-  // ASN1D 13.11.2<12>
+  // ASN1D 13.11.2<12> refactored
   def intersections: Parser[Intersections] =
-    ( intersectionElements
-    | iElems ~ intersectionMark ~ intersectionElements
+    ( repsep(intersectionElements, intersectionMark)
     ) ^^ { _ => Intersections() }
   
   // ASN1D 13.11.2<13>
-  def iElems =
-    ( intersections
-    ) ^^ { _ => IElems() }
+  // iElems refactored out
   def intersectionMark =
     ( op("^")
     | kw("INTERSECTION")
@@ -1798,10 +1797,11 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( type_
     ) ^^ { t => TypeConstraint(t) }
 
-  // ASN1D 15.9<6>
+  // ASN1D 15.9<6> refactored
   def instanceOfValue =
-    ( value
-    ) ^^ { v => InstanceOfValue(v) }
+    ( failure("refactored to fail to prevent recursion")
+    ~ value
+    ) ^^ { case _ ~ v => InstanceOfValue(v) }
   
   // ASN1D 15.9.2<1>
   def usefulObjectClassReference =
