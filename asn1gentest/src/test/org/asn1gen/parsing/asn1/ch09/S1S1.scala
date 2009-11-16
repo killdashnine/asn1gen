@@ -101,8 +101,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
     @Test def test_3_5() {
       val text = """
           Lighter-state ::= ENUMERATED {
-            on(0), off(1),
-            out-of-order(2)
+            on(0), off(1), out-of-order(2)
           }
           """
       parse(assignmentList, text) match {
@@ -114,8 +113,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
     @Test def test_3_6() {
       val text = """
           Kettle-state ::= ENUMERATED {
-            on(0), off(1),
-            out-of-order(2)
+            on(0), off(1), out-of-order(2)
           }
           """
       parse(assignmentList, text) match {
@@ -140,8 +138,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
     @Test def test_3_6_1_1() {
       val text = """
           ENUMERATED {
-            on(0), off(1),
-            out-of-order(2)
+            on(0), off(1), out-of-order(2)
           }
           """
       parse(builtinType, text) match {
@@ -166,8 +163,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
     @Test def test_3_6_1_1x2() {
       val text = """
           ENUMERATED {
-            on(0), off(1),
-            out-of-order(2)
+            on(0), off(1), out-of-order(2)
           }
           """
       parse(constrainedType, text) match {
@@ -179,11 +175,50 @@ package test.org.asn1gen.parsing.asn1.ch09 {
     @Test def test_3_6_1_1_1() {
       val text = """
           ENUMERATED {
-            on(0), off(1),
-            out-of-order(2)
+            on(0), off(1), out-of-order(2)
           }
           """
       parse(enumeratedType, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_3_6_1_1_1_1() {
+      val text = """
+          on(0), off(1), out-of-order(2)
+          """
+      parse(enumerations, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_3_6_1_1_1_1_1() {
+      val text = """
+          on(0), off(1), out-of-order(2)
+          """
+      parse(rootEnumeration, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_3_6_1_1_1_1_1_1() {
+      val text = """
+          on(0), off(1), out-of-order(2)
+          """
+      parse(enumeration, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_3_6_1_1_1_1_1_1_1() {
+      val text = """
+          on(0)
+          """
+      parse(enumerationItem, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

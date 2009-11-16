@@ -26,7 +26,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
             ...
           }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -43,7 +43,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
 
           default-direction Direction ::= north
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -53,7 +53,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           Direction ::= ENUMERATED { north, south, east, west }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -63,7 +63,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           Direction ::= ENUMERATED { north, south, east, west, ... }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -76,7 +76,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
             ..., up, down
           }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -86,7 +86,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           A ::= ENUMERATED { a, b(3), ..., c(1) }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -96,7 +96,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           A ::= ENUMERATED { a, b, ..., c(2) }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -106,7 +106,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           A ::= ENUMERATED { a, b, ..., c }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -116,7 +116,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           ENUMERATED { a, b, ..., c(3), d }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -126,7 +126,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           ChoiceOfNull ::= CHOICE { e1 NULL, e2 NULL, e3 NULL }
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

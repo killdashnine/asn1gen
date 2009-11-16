@@ -16,7 +16,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
     import TheParser._
     
     @Test def test_1() {
-      val text = """" +
+      val text = """
           T1 ::= [0] SET {
             name INTEGER,
             age PrintableString,
@@ -31,7 +31,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
 
           Male ::= BOOLEAN
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -63,57 +63,7 @@ package test.org.asn1gen.parsing.asn1.ch09 {
             age INTEGER
           }
           """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_4() {
-      val text = """
-          
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_5() {
-      val text = """" +
-          
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_6() {
-      val text = """
-          
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_7() {
-      val text = """
-          
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_8() {
-      val text = """
-          
-          """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

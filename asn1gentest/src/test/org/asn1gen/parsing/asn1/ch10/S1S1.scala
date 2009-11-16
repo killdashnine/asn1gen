@@ -16,10 +16,10 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     import TheParser._
     
     @Test def test_1() {
-      val text = """" +
+      val text = """
           Adult ::= BOOLEAN
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -28,9 +28,9 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     @Test def test_2() {
       val text = """
           is-adult Adult ::= TRUE
-          is-child Adult::= FALSE
+          is-child Adult ::= FALSE
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -40,7 +40,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
       val text = """
           Married ::= BOOLEAN
           """
-      parse(type_, text) match {
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
