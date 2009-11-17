@@ -711,11 +711,13 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ~ kw("IDENTIFIER")
     ) ^^ { _ => ObjectIdentifierType() }
   
-  // ASN1D 10.8.2<3>
+  // ASN1D 10.8.2<3> refactored
   def objectIdentifierValue =
     ( op("{")
-    ~ ( definedValue.?
-      ~ objIdComponents.+
+    ~ ( objIdComponents.+
+      | ( definedValue
+        ~ objIdComponents.+
+        )
       )
     ~ op("}")
     ) ^^ { _ => ObjectIdentifierValue() }
