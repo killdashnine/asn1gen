@@ -16,7 +16,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     import TheParser._
     
     @Test def test_01() {
-      val text = """" +
+      val text = """
           IO-error ::= ENUMERATED {
             file-not-found(1),
             access-denied(2),
@@ -70,7 +70,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     }
     
     @Test def test_05() {
-      val text = """" +
+      val text = """
           Direction ::= ENUMERATED {
             north, south, east, west,
             ..., up, down
@@ -114,7 +114,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_09() {
       val text = """
-          ENUMERATED { a, b, ..., c(3), d }
+          A ::= ENUMERATED { a, b, ..., c(3), d }
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()

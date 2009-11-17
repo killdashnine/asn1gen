@@ -65,7 +65,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     }
     
     @Test def test_5() {
-      val text = """" +
+      val text = """
           LinkedList ::= SEQUENCE OF Data
           """
       parse(assignmentList, text) match {

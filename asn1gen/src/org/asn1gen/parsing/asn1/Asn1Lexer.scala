@@ -13,6 +13,9 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
   // see `token' in `Scanners'
   override def token: Parser[Token] =
     ( number
+    | bstring
+    | hstring
+    | cstring
     | identifier
     | ampIdentifier
     | operator
@@ -119,7 +122,7 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
   def dquote = elem("single quote", _ == '"')
   def squote = elem("single quote", _ == '\'')
   def char(c: Char) = elem("'" + c + "'", _ == c)
-  def bin_digit = elem("0", _.isBinDigit)
+  def bin_digit = elem("binary digit", c => c == '0' || c == '1')
   def not_char(c: Char) = elem("not " + c.toString, _ != c)
   def upper_hex_digit = elem("hexadecimal digit", c => c.isUpperHexDigit)
   def before[T](p: => Parser[T]): Parser[Unit] = not(not(p))
@@ -134,7 +137,7 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     ( squote
     ~ bstring_char.*
     ~ squote
-    ~ char('b')
+    ~ char('B')
     ) ^^ { case _ ~ data ~ _ ~ _ =>
       BString(data.filter(_.isBinDigit).mkString)
     }
