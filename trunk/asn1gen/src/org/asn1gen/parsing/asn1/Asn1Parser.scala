@@ -283,8 +283,8 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { kind => ReferencedValue(kind) }
 
   def taggedValue =
-    ( value
-    ) ^^ { v => TaggedValue(v) }
+    ( failure("force fail to prevent recursion") ~ value
+    ) ^^ { case _ ~ v => TaggedValue(v) }
   
   def valueSetTypeAssignment =
     ( typeReference
@@ -1383,9 +1383,9 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 13.11.2<17>
   def subtypeElements =
-    ( singleValue
+    ( valueRange // Must come before (singleValue)
+    | singleValue
     | containedSubtype
-    | valueRange
     | permittedAlphabet
     | sizeConstraint
     | typeConstraint
@@ -1741,7 +1741,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 15.7.2<9>
   def objectClassFieldValue =
     ( openTypeFieldVal
-    | fixedTypeFieldVal
+    | failure("force fail to prevent infinite recursion") ~> fixedTypeFieldVal
     ) ^^ { kind => ObjectClassFieldValue(kind) }
 
   // ASN1D 15.7.2<11>

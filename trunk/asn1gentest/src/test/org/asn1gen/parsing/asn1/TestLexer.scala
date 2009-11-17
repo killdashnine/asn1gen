@@ -9,12 +9,12 @@ package test.org.asn1gen.parsing.asn1 {
     val lexer = new Asn1Lexer()
     
     @Test def test_bstring_1() {
-      def charseq = new CharSequenceReader("''b")
+      def charseq = new CharSequenceReader("''B")
       assertEquals("", lexer.bstring(charseq).get.string)
     }
     
     @Test def test_bstring_2() {
-      def charseq = new CharSequenceReader("' 1 0 1\r\n 0  1\t01'b")
+      def charseq = new CharSequenceReader("' 1 0 1\r\n 0  1\t01'B")
       assertEquals("1010101", lexer.bstring(charseq).get.string)
     }
     

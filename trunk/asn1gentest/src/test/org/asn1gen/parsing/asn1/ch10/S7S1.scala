@@ -6,7 +6,7 @@ import _root_.org.asn1gen.parsing.asn1.ast._
 import _root_.scala.util.parsing.input._
 
 package test.org.asn1gen.parsing.asn1.ch10 {
-  class TestS3S1 extends TestCase {
+  class TestS7S1 extends TestCase {
     
     object TheParser extends Asn1Parser {
       def parse[N](root: Parser[N], input: String) =
@@ -17,9 +17,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_1() {
       val text = """
-          zero INTEGER ::= 0
-          australian-population INTEGER ::= 20000000
-          fridge-temperature INTEGER ::= -18 -- in Centigrade scale
+          
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
@@ -29,7 +27,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_2() {
       val text = """
-          Interval ::= INTEGER (123..456)
+          
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
@@ -39,13 +37,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_3() {
       val text = """
-          ErrorCode ::= INTEGER {
-            disk-full(1),
-            no-disk(-1),
-            disk-not-formatted(2)
-          }
-
-          disk-is-full ErrorCode ::= disk-full
+          
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
@@ -55,7 +47,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_4() {
       val text = """
-          ok ErrorCode ::= 0
+          
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
@@ -65,7 +57,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_5() {
       val text = """
-          disk-is-full ErrorCode ::= 1 -- disk full
+          
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
@@ -75,13 +67,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_6() {
       val text = """
-          IO-error ::= INTEGER {
-            file-not-found(0),
-            access-denied(1),
-            disk-full(2),
-            file-not-shared(3),
-            file-exists(4)
-          }
+          
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
@@ -91,7 +77,17 @@ package test.org.asn1gen.parsing.asn1.ch10 {
     
     @Test def test_7() {
       val text = """
-          Centigrade ::= INTEGER { freezing(0), boiling(100) }
+          
+          """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_8() {
+      val text = """
+          
           """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
