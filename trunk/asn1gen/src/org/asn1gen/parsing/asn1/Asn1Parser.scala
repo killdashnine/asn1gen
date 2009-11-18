@@ -15,10 +15,13 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( "ABSENT", "ABSTRACT-SYNTAX", "ALL", "APPLICATION", "AUTOMATIC"
     , "BEGIN", "BIT", "BMPString", "BOOLEAN", "BY"
     , "CHARACTER", "CHOICE", "CLASS", "COMPONENT", "COMPONENTS", "CONSTRAINED", "CONTAINING"
-    , "DEFAULT", "DEFINITIONS", "EMBEDDED", "ENCODED", "END", "ENUMERATED", "EXCEPT", "EXPLICIT", "EXPORTS", "EXTENSIBILITY", "EXTERNAL"
+    , "DEFAULT", "DEFINITIONS"
+    , "EMBEDDED", "ENCODED", "END", "ENUMERATED", "EXCEPT", "EXPLICIT"
+    , "EXPORTS", "EXTENSIBILITY", "EXTERNAL"
     , "FALSE", "FROM"
     , "GeneralizedTime", "GeneralString", "GraphicString"
-    , "IA5String", "IDENTIFIER", "IMPLICIT", "IMPLIED", "IMPORTS", "INCLUDES", "INSTANCE", "INTEGER", "INTERSECTION", "ISO646String"
+    , "IA5String", "IDENTIFIER", "IMPLICIT", "IMPLIED", "IMPORTS", "INCLUDES", "INSTANCE"
+    , "INTEGER", "INTERSECTION", "ISO646String"
     , "MAX", "MIN", "MINUS-INFINITY"
     , "NULL", "NumericString"
     , "OBJECT", "ObjectDescriptor", "OCTET", "OF", "OPTIONAL"
@@ -1334,10 +1337,10 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( elementSetSpec
     ) ^^ { ess => AdditionalElementSetSpec(ess) }
   
-  // ASN1D 13.11.2<9>
+  // ASN1D 13.11.2<9> refactored
   def elementSetSpec: Parser[ElementSetSpec] =
-    ( unions
-    | kw("ALL") ~ exclusions
+    ( kw("ALL") ~ exclusions
+    | unions
     ) ^^ { _ => ElementSetSpec() }
 
   // ASN1D 13.11.2<10> refactored
