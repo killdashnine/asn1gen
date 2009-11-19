@@ -118,6 +118,72 @@ package test.org.asn1gen.parsing.asn1.ch12 {
       }
     }
     
+    @Test def test_6_1() {
+      val text = """
+        T ::= SEQUENCE {
+          a INTEGER,
+          b CHOICE {
+            i INTEGER,
+            n NULL
+          },
+          c REAL
+        }
+      """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_6_1_1() {
+      val text = """
+        SEQUENCE {
+          a INTEGER,
+          b CHOICE {
+            i INTEGER,
+            n NULL
+          },
+          c REAL
+        }
+      """
+      parse(type_, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_6_1_1_1() {
+      val text = """
+        SEQUENCE {
+          a INTEGER,
+          b CHOICE {
+            i INTEGER,
+            n NULL
+          },
+          c REAL
+        }
+      """
+      parse(sequenceType, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_6_1_1_1_1() {
+      val text = """
+        a INTEGER,
+        b CHOICE {
+          i INTEGER,
+          n NULL
+        },
+        c REAL
+      """
+      parse(componentTypeLists, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
     @Test def test_7() {
       val text = """
           M DEFINITIONS ::=
