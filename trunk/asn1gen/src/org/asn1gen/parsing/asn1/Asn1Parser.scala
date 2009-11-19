@@ -934,43 +934,37 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 12.2.2<1>
   def sequenceType =
-    ( ( kw("SEQUENCE")
-      ~ op("{")
+    ( kw("SEQUENCE")
+    ~ op("{")
+    ~ ( ( extensionAndException
+        ~ optionalExtensionMarker
+        ) ^^ { _ => ExtensionSequenceType() } // TODO
+      | ( componentTypeLists
+        ) ^^ { ctl => ComponentSequenceType(ctl) }
+      | ( empty
+        ) ^^ { _ => EmptySequenceType() }
+      )
       ~ op("}")
-      ) ^^ { _ => EmptySequenceType() }
-    | ( kw("SEQUENCE")
-      ~ op("{")
-      ~ extensionAndException
-      ~ optionalExtensionMarker
-      ~ op("}")
-      ) ^^ { _ => ExtensionSequenceType() } // TODO
-    | ( kw("SEQUENCE")
-      ~ op("{")
-      ~ componentTypeLists
-      ~ op("}")
-      ) ^^ { case _ ~ _ ~ ctl ~ _ => ComponentSequenceType(ctl) }
     ) ^^ { _ => SequenceType() }
   
-  // ASN1D 12.2.2<4>
+  // ASN1D 12.2.2<4> refactored new
+  def componentTypeListsExtension =
+    ( extensionAndException
+    ~ extensionsAdditions
+    ~ optionalExtensionMarker
+    )
+
+  // refactored
   def componentTypeLists =
-    ( rootComponentTypeList
-    | ( rootComponentTypeList
-      ~ op(",")
-      ~ extensionAndException
-      ~ extensionsAdditions
-      ~ optionalExtensionMarker
+    ( ( rootComponentTypeList
+      ~ ( op(",")
+        ~ componentTypeListsExtension
+        ~ ( op(",")
+          ~ rootComponentTypeList
+          ).?
+        ).?
       )
-    | ( rootComponentTypeList
-      ~ op(",")
-      ~ extensionAndException
-      ~ extensionsAdditions
-      ~ optionalExtensionMarker
-      ~ op(",")
-      ~ rootComponentTypeList
-      )
-    | ( extensionAndException
-      ~ extensionsAdditions
-      ~ optionalExtensionMarker
+    | ( componentTypeListsExtension
       ~ op(",")
       ~ rootComponentTypeList
       )
@@ -1099,15 +1093,18 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 12.6.2<3>
   def alternativeTypeLists =
-    ( ( rootAlternativeTypeList
-      ) ^^ { ratl => AlternativeTypeLists(ratl, None, None, None) }
-    | ( rootAlternativeTypeList
-      ~ op(",")
+    ( rootAlternativeTypeList
+    ~ ( op(",")
       ~ extensionAndException
       ~ extensionAdditionAlternatives
       ~ optionalExtensionMarker
-      ) ^^ { case ratl ~ _ ~ eae ~ eaa ~ oem => AlternativeTypeLists(ratl, Some(eae), Some(eaa), Some(oem)) }
-    )
+      ).?
+    ) ^^ {
+      case ratl ~ Some(_ ~ eae ~ eaa ~ oem) =>
+        AlternativeTypeLists(ratl, Some(eae), Some(eaa), Some(oem))
+      case ratl ~ None =>
+        AlternativeTypeLists(ratl, None, None, None)
+    }
   
   // ASN1D 12.6.2<4>
   def rootAlternativeTypeList =
@@ -1152,8 +1149,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 12.9.2<1>
   def extensionAndException =
-    ( op("...")
-    | op("...") ~ exceptionSpec
+    ( op("...") ~ exceptionSpec.?
     ) ^^ { _ => ExtensionAndException() } // TODO
 
   def optionalExtensionMarker =
