@@ -73,9 +73,8 @@ class GenJava(out: IndentWriter) {
         Identifier(name),
         Type_(
           BuiltinType(
-            DefaultTaggedType(
-              Tag(_, ClassNumber(Number(tagNumber))),
-              _)),
+            TaggedType(
+              Tag(_, ClassNumber(Number(tagNumber))), _, _)),
           _))
       => {
         out.println()
@@ -101,9 +100,7 @@ class GenJava(out: IndentWriter) {
         Identifier(name),
         Type_(
           BuiltinType(
-            DefaultTaggedType(
-              _,
-              type_)),
+            TaggedType(_, _, type_)),
           _))
       => {
         val getter = "get" + name.first.toUpperCase + name.substring(1)

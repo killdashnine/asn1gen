@@ -54,7 +54,7 @@ object GenJavaTags {
   
   def generate(namedType: NamedType, out: PrintWriter): Unit = {
     namedType match {
-      case NamedType(id, Type_(BuiltinType(TaggedType(Tag(_, number), _)), _)) =>
+      case NamedType(id, Type_(BuiltinType(TaggedType(Tag(_, number), _, _)), _)) =>
         out.println("/* " + id + " " + number + "*/")
     }
   }

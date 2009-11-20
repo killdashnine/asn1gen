@@ -6,5 +6,6 @@ case class Empty()
   extends Node
   with AssignedIdentifierKind
   with ValueConstraintKind
-  with WithSyntaxSpecKind {
+  with WithSyntaxSpecKind
+  with TaggedKind {
 }

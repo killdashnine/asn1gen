@@ -890,18 +890,13 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 12.1.4<1>
   def taggedType =
-    ( ( tag
-      ~ type_
-      ) ^^ { case tag ~ t => DefaultTaggedType(tag, t) }
-    | ( tag
-      ~ kw("IMPLICIT")
-      ~ type_
-      ) ^^ { case tag ~ _ ~ t => ImplicitTaggedType(tag, t) }
-    | ( tag
-      ~ kw("EXPLICIT")
-      ~ type_
-      ) ^^ { case tag ~ _ ~ t => ExplicitTaggedType(tag, t) }
-    )
+    ( tag
+    ~ ( kw("IMPLICIT") ^^ { _ => Implicit() }
+      | kw("EXPLICIT") ^^ { _ => Explicit() }
+      | empty
+      )
+    ~ type_
+    ) ^^ { case tag ~ taggedKind ~ t => TaggedType(tag, taggedKind, t) }
   
   def tag =
     ( op("[")
@@ -986,8 +981,9 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( rep1sep(extensionAddition, op(","))
     ) ^^ { eas => ExtensionAdditionList(eas) }
   def extensionAddition =
-    ( componentType ~ extensionAdditionGroup
-    ) ^^ { case ct ~ eag => ExtensionAddition(ct, eag) }
+    ( componentType
+    | extensionAdditionGroup
+    ) ^^ { case kind => ExtensionAddition(kind) }
   def extensionAdditionGroup =
     ( op("[[") ~ componentTypeList ~ op("]]")
     ) ^^ { case _ ~ ctl ~ _ => ExtensionAdditionGroup(ctl) }
@@ -1023,9 +1019,11 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 12.3.2<1>
   def setType =
-    ( kw("SET") ~ op("{") ~ op("}")
-    | kw("SET") ~ op("{") ~ extensionAndException ~ optionalExtensionMarker ~ op("}")
-    | kw("SET") ~ op("{") ~ componentTypeLists ~ op("}")
+    ( kw("SET") ~ op("{")
+    ~ ( extensionAndException ~ optionalExtensionMarker
+      | componentTypeLists
+      )
+    ~ op("}")
     ) ^^ { _ => SetType() } // TODO
 
   // ASN1D 12.3.2<4>
