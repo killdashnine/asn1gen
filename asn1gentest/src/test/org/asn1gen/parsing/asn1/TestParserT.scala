@@ -38,8 +38,9 @@ package test.org.asn1gen.parsing.asn1 {
                           Identifier("choice1"),
                           Type_(
                             BuiltinType(
-                              DefaultTaggedType(
+                              TaggedType(
                                 Tag(DefaultClass(), ClassNumber(Number("0"))),
+                                _,
                                 Type_(
                                   BuiltinType(IntegerType(None)), _))),
                             _)),
@@ -47,8 +48,9 @@ package test.org.asn1gen.parsing.asn1 {
                           Identifier("choice2"),
                           Type_(
                             BuiltinType(
-                              DefaultTaggedType(
+                              TaggedType(
                                 Tag(DefaultClass(), ClassNumber(Number("1"))),
+                                _,
                                 Type_(BuiltinType(IntegerType(None)), _))),
                             _))))),
                     None,None,None))),

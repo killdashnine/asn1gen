@@ -272,7 +272,7 @@ package test.org.asn1gen.parsing.asn1.ch12 {
     
     @Test def test_05() {
       val text = """
-        T ::= SEQUENCE { a  A, b B, ..., ..., cC}
+        T ::= SEQUENCE { a  A, b B, ..., ..., c C}
       """
       parse(assignmentList, text) match {
         case Success(_, _) => ()
@@ -303,7 +303,7 @@ package test.org.asn1gen.parsing.asn1.ch12 {
           ...,
           [[d D, e E]],
           ...,
-          cC
+          c C
         }
       """
       parse(assignmentList, text) match {
@@ -319,10 +319,83 @@ package test.org.asn1gen.parsing.asn1.ch12 {
           ...,
           [[d D, e E]],
           ...,
-          cC
+          c C
         }
       """
       parse(type_, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_07_1_1() {
+      val text = """
+        SEQUENCE {
+          a A, b B,
+          ...,
+          [[d D, e E]],
+          ...,
+          c C
+        }
+      """
+      parse(sequenceType, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_07_1_1_1() {
+      val text = """
+        a A, b B,
+        ...,
+        [[d D, e E]],
+        ...,
+        c C
+      """
+      parse(componentTypeLists, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_07_1_1_1_1() {
+      val text = """
+        ...,
+        [[d D, e E]],
+        ...
+      """
+      parse(componentTypeListsExtension, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_07_1_1_1_1_1() {
+      val text = """
+        ,
+        [[d D, e E]]
+      """
+      parse(extensionsAdditions, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_07_1_1_1_1_1_1() {
+      val text = """
+        [[d D, e E]]
+      """
+      parse(extensionAdditionList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_07_1_1_1_1_1_1_1() {
+      val text = """
+        [[d D, e E]]
+      """
+      parse(extensionAddition, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -374,54 +447,6 @@ package test.org.asn1gen.parsing.asn1.ch12 {
     
     @Test def test_09() {
       val text = """
-        Person ::= SET {
-          surname [0] IA5String,
-          first-name [1] IA5String,
-          contact CHOICE {
-            phone-number [2] NumericString,
-            e-mail-address [3] NumericString,
-            ...,
-            imaginary [IMAGINARY 0] T
-          },
-          info CHOICE {
-            age [4] INTEGER,
-            ...,
-            imaginary [IMAGINARY 0] T
-          }
-        }
-      """
-      parse(assignmentList, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_09_1() {
-      val text = """
-        SET {
-          surname [0] IA5String,
-          first-name [1] IA5String,
-          contact CHOICE {
-            phone-number [2] NumericString,
-            e-mail-address [3] NumericString,
-            ...,
-            imaginary [IMAGINARY 0] T
-          },
-          info CHOICE {
-            age [4] INTEGER,
-            ...,
-            imaginary [IMAGINARY 0] T
-          }
-        }
-      """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_10() {
-      val text = """
         MasterSlaveDeterminationReject ::= SEQUENCE {
           cause CHOICE {
             identicalNumbers NULL,
@@ -436,7 +461,7 @@ package test.org.asn1gen.parsing.asn1.ch12 {
       }
     }
     
-    @Test def test_11() {
+    @Test def test_10() {
       val text = """
         ModuleName DEFINITIONS AUTOMATIC TAGS EXTENSIBILITY IMPLIED ::=
           BEGIN

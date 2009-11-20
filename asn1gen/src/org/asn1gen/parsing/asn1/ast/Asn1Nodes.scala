@@ -4,9 +4,8 @@ trait Asn1Nodes {
   type Node = org.asn1gen.parsing.asn1.ast.Node
   
   // Traits
-  type DefaultTaggedType = org.asn1gen.parsing.asn1.ast.DefaultTaggedType
-  type ExplicitTaggedType = org.asn1gen.parsing.asn1.ast.ExplicitTaggedType
-  type ImplicitTaggedType = org.asn1gen.parsing.asn1.ast.ImplicitTaggedType
+  type ExplicitTaggedType = org.asn1gen.parsing.asn1.ast.Explicit
+  type ImplicitTaggedType = org.asn1gen.parsing.asn1.ast.Implicit
   type NamedNumberValue = org.asn1gen.parsing.asn1.ast.NamedNumberValue
 
   // Concrete nodes
