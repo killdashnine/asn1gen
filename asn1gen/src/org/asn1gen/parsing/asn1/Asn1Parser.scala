@@ -1308,9 +1308,17 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D 13.10.2<1>
   def contentsConstraint =
-    ( kw("CONTAINING") ~ type_
-    | kw("ENCODED") ~ kw("BY") ~ value
-    | kw("CONTAINING") ~ type_ ~ kw("ENCODED") ~ kw("BY") ~ value
+    ( ( kw("CONTAINING")
+      ~ type_
+      ~ ( kw("ENCODED")
+        ~ kw("BY")
+        ~ value
+        ).?
+      )
+    | ( kw("ENCODED")
+      ~ kw("BY")
+      ~ value
+      )
     ) ^^ { _ => ContentsConstraint() }
   
   // ASN1D 13.11.2<1> refactored
@@ -1339,7 +1347,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 13.11.2<10> refactored
   def unions: Parser[Unions] =
-    ( repsep(intersections, unionMark)
+    ( rep1sep(intersections, unionMark)
     ) ^^ { _ => Unions() }
 
   // ASN1D 13.11.2<11>
@@ -1351,7 +1359,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
  
   // ASN1D 13.11.2<12> refactored
   def intersections: Parser[Intersections] =
-    ( repsep(intersectionElements, intersectionMark)
+    ( rep1sep(intersectionElements, intersectionMark)
     ) ^^ { _ => Intersections() }
   
   // ASN1D 13.11.2<13>
@@ -1398,7 +1406,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { case _ ~ cs ~ es ~ _ => Constraint(cs, es) }
 
   // ASN1D 13.12.2<5>
-  def constraintSpec =
+  def constraintSpec: Parser[ConstraintSpec] =
     ( elementSetSpecs
     | generalConstraint
     ) ^^ { kind => ConstraintSpec(kind) }
