@@ -6,7 +6,7 @@ import _root_.org.asn1gen.parsing.asn1.ast._
 import _root_.scala.util.parsing.input._
 
 package test.org.asn1gen.parsing.asn1.ch13 {
-  class TestS1S1 extends TestCase {
+  class TestS04S1 extends TestCase {
     
     object TheParser extends Asn1Parser {
       def parse[N](root: Parser[N], input: String) =
@@ -17,8 +17,9 @@ package test.org.asn1gen.parsing.asn1.ch13 {
     
     @Test def test_1() {
       val text = """
-          """
-      parse(type_, text) match {
+          FrenchWeekEnd ::= Day (WeekEnd)
+      """
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -26,8 +27,9 @@ package test.org.asn1gen.parsing.asn1.ch13 {
     
     @Test def test_2() {
       val text = """
-          """
-      parse(type_, text) match {
+        LongWeekEnd ::= Day (WeekEnd|monday)
+      """
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -35,8 +37,12 @@ package test.org.asn1gen.parsing.asn1.ch13 {
     
     @Test def test_3() {
       val text = """
-          """
-      parse(type_, text) match {
+        T1 ::= INTEGER {
+          trois(3), quatre(4)
+        }
+        T2 ::= INTEGER {one(1), two(2), three(3), four(4)}(T1)
+      """
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -44,8 +50,9 @@ package test.org.asn1gen.parsing.asn1.ch13 {
     
     @Test def test_4() {
       val text = """
-          """
-      parse(type_, text) match {
+        RussianName ::= Cyrillic (Level1)
+      """
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -53,35 +60,9 @@ package test.org.asn1gen.parsing.asn1.ch13 {
     
     @Test def test_5() {
       val text = """
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_6() {
-      val text = """
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_7() {
-      val text = """
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_8() {
-      val text = """
-          """
-      parse(type_, text) match {
+        FrenchWeekEnd ::= Day (INCLUDES WeekEnd)
+      """
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
