@@ -17,71 +17,69 @@ package test.org.asn1gen.parsing.asn1.ch15 {
     
     @Test def test_1() {
       val text = """
-          """
-      parse(type_, text) match {
+        FUNCTION ::= CLASS {
+          &ArgumentType,
+          &ResultType DEFAULT NULL,
+          &Errors ERROR OPTIONAL,
+          &code INTEGER UNIQUE
+        }
+      """
+      parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
     }
     
-    @Test def test_2() {
+    @Test def test_1_1() {
       val text = """
-          """
-      parse(type_, text) match {
+        FUNCTION ::= CLASS {
+          &ArgumentType,
+          &ResultType DEFAULT NULL,
+          &Errors ERROR OPTIONAL,
+          &code INTEGER UNIQUE
+        }
+      """
+      parse(objectClassAssignment, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
     }
     
-    @Test def test_3() {
+    @Test def test_1_1_1_1_1() {
       val text = """
-          """
-      parse(type_, text) match {
+        &ArgumentType
+      """
+      parse(fieldSpec, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
     }
     
-    @Test def test_4() {
+    @Test def test_1_1_1_1_2() {
       val text = """
-          """
-      parse(type_, text) match {
+        &ResultType DEFAULT NULL
+      """
+      parse(fieldSpec, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
     }
     
-    @Test def test_5() {
+    @Test def test_1_1_1_1_3() {
       val text = """
-          """
-      parse(type_, text) match {
+        &Errors ERROR OPTIONAL
+      """
+      parse(fieldSpec, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
     }
     
-    @Test def test_6() {
+    @Test def test_1_1_1_1_4() {
       val text = """
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_7() {
-      val text = """
-          """
-      parse(type_, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_8() {
-      val text = """
-          """
-      parse(type_, text) match {
+        &code INTEGER UNIQUE
+      """
+      parse(fieldSpec, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
