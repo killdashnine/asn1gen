@@ -37,7 +37,8 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def elem[U](kind: String)(f: PartialFunction[Elem, U]): Parser[U] =
     elem(kind, {_: Elem => true}) ^? (f, _ => "Expecting " + kind + ".")
 
-  def op(chars: String) = elem("operator " + chars) {case lexical.Operator(`chars`) => Operator(chars)}
+  def op(chars: String) =
+    accept("operator " + chars, {case lexical.Operator(`chars`) => Operator(chars)} )
   def kw(chars: String) = elem("keyword " + chars) {case lexical.Keyword(`chars`) => Keyword(chars)}
   def empty = success("") ^^ { _ => Empty() }
 
@@ -1479,14 +1480,15 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( kw("CLASS")
     ~ op("{")
     ~ rep1sep(fieldSpec, op(","))
+    ~ op("}")
     ~ withSyntaxSpec
-    ) ^^ { case _ ~ _ ~ fieldSpecs ~ wss => ObjectClassDefn(fieldSpecs, wss) }
+    ) ^^ { case _ ~ _ ~ fieldSpecs ~ _ ~ wss => ObjectClassDefn(fieldSpecs, wss) }
 
   def fieldSpec =
-    ( typeFieldSpec
-    | fixedTypeValueFieldSpec
+    ( fixedTypeValueFieldSpec
     | variableTypeValueFieldSpec
     | fixedTypeValueSetFieldSpec
+    | typeFieldSpec
     | variableTypeValueSetFieldSpec
     | objectFieldSpec
     | objectSetFieldSpec
