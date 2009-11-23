@@ -172,12 +172,10 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     }
 
   // ASN1D: 8.2.3<34-35>
-  def word = elem(
-    "type reference",
-    { case lexical.Identifier(n) => !n.exists{_.isLowerCase}}) ^^ {
-      case lexical.Identifier(n) => Word(n) 
-    }
-
+  def word =
+    ( typeReference
+    ) ^^ { case tr@TypeReference(id) => Word(id) }
+  
   // ASN1D: 8.2.3<36-37>
   // Not implemented
 
