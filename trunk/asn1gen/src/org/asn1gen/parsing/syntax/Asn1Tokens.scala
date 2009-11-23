@@ -15,11 +15,6 @@ trait Asn1Tokens extends Tokens {
   case class Operator(chars: String) extends Asn1Token {
   }
   
-  /** The class of keyword tokens */
-  case class Keyword(chars: String) extends Asn1Token {
-    override def toString = "`"+chars+"'"
-  }
-
   /** The class of numeric literal tokens */
   case class CommentLit(chars: String) extends Asn1Token {
     override def toString = chars
@@ -45,7 +40,7 @@ trait Asn1Tokens extends Tokens {
     override def toString = chars
   }
 
-  case class Identifier(chars: String) extends Asn1Token {
+  case class Identifier(chars: String, idReserved: Boolean, wordReserved: Boolean) extends Asn1Token {
     override def toString = "identifier "+chars
     def name = chars
   }

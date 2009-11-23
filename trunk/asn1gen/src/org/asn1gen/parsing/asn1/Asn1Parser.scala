@@ -19,7 +19,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     case lexical.Operator(`chars`) => Operator(chars)
   }
   def kw(chars: String) = elem("keyword " + chars) {
-    case lexical.Keyword(`chars`) => Keyword(chars)
+    case lexical.Identifier(`chars`, true, _) => Keyword(chars)
   }
   def empty = success("") ^^ { _ => Empty() }
 
@@ -52,7 +52,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D: 8.2.3<12-14>
   def identifier = elem("identifier") {
-    case lexical.Identifier(n) if n.first.isLowerCase => Identifier(n)
+    case lexical.Identifier(n, false, _) if n.first.isLowerCase => Identifier(n)
   }
   
   // ASN1D: 8.2.3<15-16>
@@ -118,7 +118,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
       case lexical.Identifier(n) => TypeReference(n) 
     }*/
   def typeReference = elem("type reference") {
-      case lexical.Identifier(n) if (n.first.isUpperCase) => TypeReference(n)
+      case lexical.Identifier(n, false, _) if (n.first.isUpperCase) => TypeReference(n)
     } | failure ("incorrect type reference")
 
   // ASN1D: 8.2.3<27>
@@ -142,7 +142,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D: 8.2.3<31>
   def valueReference = elem("value reference") {
-      case lexical.Identifier(n) if (n.first.isLowerCase) => ValueReference(n)
+      case lexical.Identifier(n, false, _) if (n.first.isLowerCase) => ValueReference(n)
     } | failure ("incorrect type reference")
 
   // ASN1D: 8.2.3<33>
