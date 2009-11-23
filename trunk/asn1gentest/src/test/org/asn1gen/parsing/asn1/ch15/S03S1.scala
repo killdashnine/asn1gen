@@ -216,6 +216,160 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       }
     }
     
+    @Test def test_1_1_1_2_1() {
+      val text = """
+        {
+          ARGUMENT TYPE &ArgumentType,
+          [SUPPORTED ARGUMENTS &SupportedArguments,]
+          [RESULT TYPE &ResultType, [RETURNS &result-if-error IN CASE OF ERROR,]]
+          [ERRORS &Errors,]
+          [MESSAGE ALPHABET &Alphabet,]
+          [ASSOCIATED FUNCTION &associated-function,]
+          CODE &code
+        }
+      """
+      parse(syntaxList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1() {
+      val text = """
+        ARGUMENT TYPE &ArgumentType,
+        [SUPPORTED ARGUMENTS &SupportedArguments,]
+        [RESULT TYPE &ResultType, [RETURNS &result-if-error IN CASE OF ERROR,]]
+        [ERRORS &Errors,]
+        [MESSAGE ALPHABET &Alphabet,]
+        [ASSOCIATED FUNCTION &associated-function,]
+        CODE &code
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_1() {
+      val text = """
+        ARGUMENT TYPE &ArgumentType,
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_1_1() {
+      val text = """
+        ARGUMENT
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_1_2() {
+      val text = """
+        TYPE
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_1_3() {
+      val text = """
+        &ArgumentType
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_1_3_1() {
+      val text = """
+        &ArgumentType
+      """
+      parse(requiredToken, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_1_3_1_2() {
+      val text = """
+        &ArgumentType
+      """
+      parse(primitiveFieldName, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_2() {
+      val text = """
+        [SUPPORTED ARGUMENTS &SupportedArguments,]
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3() {
+      val text = """
+        [RESULT TYPE &ResultType, [RETURNS &result-if-error IN CASE OF ERROR,]]
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_4() {
+      val text = """
+        [ERRORS &Errors,]
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_5() {
+      val text = """
+        [MESSAGE ALPHABET &Alphabet,]
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_6() {
+      val text = """
+        [ASSOCIATED FUNCTION &associated-function,]
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_7() {
+      val text = """
+        CODE &code
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
     @Test def test_1_2() {
       val text = """
         memory-fault ERROR ::= {-- object definition --}
