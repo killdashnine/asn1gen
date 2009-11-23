@@ -81,7 +81,30 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     ) ^^ { cs => Operator(cs) }
 
   /** The set of reserved identifiers: these will be returned as `Keyword's */
-  val reserved = new HashSet[String]
+  val reserved =
+    ( HashSet[String]
+      ( "ABSENT", "ABSTRACT-SYNTAX", "ALL", "APPLICATION", "AUTOMATIC"
+      , "BEGIN", "BIT", "BMPString", "BOOLEAN", "BY"
+      , "CHARACTER", "CHOICE", "CLASS", "COMPONENT", "COMPONENTS", "CONSTRAINED", "CONTAINING"
+      , "DEFAULT", "DEFINITIONS"
+      , "EMBEDDED", "ENCODED", "END", "ENUMERATED", "EXCEPT", "EXPLICIT"
+      , "EXPORTS", "EXTENSIBILITY", "EXTERNAL"
+      , "FALSE", "FROM"
+      , "GeneralizedTime", "GeneralString", "GraphicString"
+      , "IA5String", "IDENTIFIER", "IMPLICIT", "IMPLIED", "IMPORTS", "INCLUDES", "INSTANCE"
+      , "INTEGER", "INTERSECTION", "ISO646String"
+      , "MAX", "MIN", "MINUS-INFINITY"
+      , "NULL", "NumericString"
+      , "OBJECT", "ObjectDescriptor", "OCTET", "OF", "OPTIONAL"
+      , "PATTERN", "PDV", "PLUS-INFINITY", "PRESENT", "PrintableString", "PRIVATE", "REAL"
+      , "RELATIVE-OID"
+      , "SEQUENCE", "SET", "SIZE", "STRING", "SYNTAX"
+      , "T61String", "TAGS", "TeletexString", "TRUE", "TYPE-IDENTIFIER"
+      , "UNION", "UNIQUE", "UNIVERSAL", "UniversalString", "UTCTime", "UTF8String"
+      , "VideotexString", "VisibleString"
+      , "WITH"
+      )
+    )
 
   /** The set of delimiters (ordering does not matter) */
   val delimiters = new HashSet[String]
