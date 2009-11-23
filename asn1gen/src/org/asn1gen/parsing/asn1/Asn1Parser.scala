@@ -1488,8 +1488,8 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ( fixedTypeValueFieldSpec
     | variableTypeValueFieldSpec
     | fixedTypeValueSetFieldSpec
-    | typeFieldSpec
     | variableTypeValueSetFieldSpec
+    | typeFieldSpec // refactored
     | objectFieldSpec
     | objectSetFieldSpec
     ) ^^ { kind => FieldSpec(kind) }
