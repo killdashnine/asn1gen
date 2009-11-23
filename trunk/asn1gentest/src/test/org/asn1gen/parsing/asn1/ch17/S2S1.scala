@@ -179,6 +179,293 @@ package test.org.asn1gen.parsing.asn1.ch17 {
       }
     }
     
+    @Test def test_11_1() {
+      val text = """
+        MESSAGE-PARAMETERS ::= CLASS {
+          &max-priority-level INTEGER,
+          &max-message-buffer-size INTEGER,
+          &max-reference-buffer-size INTEGER
+        } WITH SYNTAX {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1() {
+      val text = """
+        CLASS {
+          &max-priority-level INTEGER,
+          &max-message-buffer-size INTEGER,
+          &max-reference-buffer-size INTEGER
+        } WITH SYNTAX {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(objectClass, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_1() {
+      val text = """
+        CLASS {
+          &max-priority-level INTEGER,
+          &max-message-buffer-size INTEGER,
+          &max-reference-buffer-size INTEGER
+        } WITH SYNTAX {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(parameterizedObjectClass, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_2() {
+      val text = """
+        CLASS {
+          &max-priority-level INTEGER,
+          &max-message-buffer-size INTEGER,
+          &max-reference-buffer-size INTEGER
+        } WITH SYNTAX {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(definedObjectClass, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3() {
+      val text = """
+        CLASS {
+          &max-priority-level INTEGER,
+          &max-message-buffer-size INTEGER,
+          &max-reference-buffer-size INTEGER
+        } WITH SYNTAX {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(objectClassDefn, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1() {
+      val text = """
+        CLASS {
+          &max-priority-level INTEGER,
+          &max-message-buffer-size INTEGER,
+          &max-reference-buffer-size INTEGER
+        } WITH SYNTAX {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(kw("CLASS")
+        ~ op("{")
+        ~ rep1sep(fieldSpec, op(","))
+        ~ op("}")
+        ~ withSyntaxSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_1() {
+      val text = """
+        CLASS {
+          &max-priority-level INTEGER,
+          &max-message-buffer-size INTEGER,
+          &max-reference-buffer-size INTEGER
+        }
+      """
+      parse(kw("CLASS")
+        ~ op("{")
+        ~ rep1sep(fieldSpec, op(","))
+        ~ op("}"), text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2() {
+      val text = """
+        WITH SYNTAX {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(withSyntaxSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1() {
+      val text = """
+        {
+          MAXIMUM PRIORITY &max-priority-level
+          MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+          MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+        }
+      """
+      parse(syntaxList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+        MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+        MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+        MAXIMUM MESSAGE BUFFER &max-message-buffer-size
+        MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1_1() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(requiredToken, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(primitiveFieldName, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_1() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(typeFieldReference, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_2() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(valueFieldReference, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_3() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(valueSetFieldReference, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_4() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(objectFieldReference, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_5() {
+      val text = """
+        MAXIMUM PRIORITY &max-priority-level
+      """
+      parse(objectSetFieldReference, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_2() {
+      val text = """
+        Message-PDU{MESSAGE-PARAMETERS:param} ::= SEQUENCE {
+          priority INTEGER (0..param.&max-priority-level!Exception:priority),
+          message UTF8String (SIZE(0..param.&max-message-buffer-size)!Exception:message),
+          comments UTF8String (SIZE(0..param.&max-reference-buffer-size)!Exception:comments)
+        }
+      """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_11_3() {
+      val text = """
+        Exception ::= ENUMERATED {
+          priority(0), message(1), comments(2), ...
+        }
+      """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
     @Test def test_12() {
       val text = """
         Forward{OPERATION:OperationSet} OPERATION ::= {
