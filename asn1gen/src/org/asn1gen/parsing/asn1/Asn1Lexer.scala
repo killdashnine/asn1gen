@@ -17,7 +17,6 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     | hstring
     | cstring
     | identifier
-    //| ampIdentifier
     | operator
     ) ^^ {
       case t: Asn1Token => t.prevComment = lastComment; t
@@ -292,11 +291,6 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     if (reserved contains name) Keyword(name) else Identifier(name)
   }
 
-  
-  def ampIdentifier = (char('&') ~> identifier_string) ^^ { name =>
-    if (reserved contains name) Keyword(name) else error("keyword not allowed")
-  }
-      
   // 11.6
   
   var lastComment: String = ""
