@@ -330,6 +330,126 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       }
     }
     
+    @Test def test_1_1_1_2_1_1_3_1() {
+      val text = """
+        [RESULT TYPE &ResultType, [RETURNS &result-if-error IN CASE OF ERROR,]]
+      """
+      parse(optionalGroup, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1() {
+      val text = """
+        RESULT TYPE &ResultType, [RETURNS &result-if-error IN CASE OF ERROR,]
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_1() {
+      val text = """
+        RESULT TYPE &ResultType,
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2() {
+      val text = """
+        [RETURNS &result-if-error IN CASE OF ERROR,]
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1() {
+      val text = """
+        RETURNS &result-if-error IN CASE OF ERROR,
+      """
+      parse(tokenOrGroupSpec.+, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1_1() {
+      val text = """
+        RETURNS
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1_2() {
+      val text = """
+        &result-if-error
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1_3() {
+      val text = """
+        IN
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1_4() {
+      val text = """
+        CASE
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1_5() {
+      val text = """
+        OF
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1_6() {
+      val text = """
+        ERROR
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_3_1_1_2_1_7() {
+      val text = """
+        ,
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
     @Test def test_1_1_1_2_1_1_4() {
       val text = """
         [ERRORS &Errors,]
