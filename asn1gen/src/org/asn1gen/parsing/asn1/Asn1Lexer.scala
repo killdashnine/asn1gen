@@ -81,7 +81,7 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     ) ^^ { cs => Operator(cs) }
 
   /** The set of reserved identifiers: these will be returned as `Keyword's */
-  val reserved =
+  val idReserved =
     ( HashSet[String]
       ( "ABSENT", "ABSTRACT-SYNTAX", "ALL", "APPLICATION", "AUTOMATIC"
       , "BEGIN", "BIT", "BMPString", "BOOLEAN", "BY"
@@ -105,25 +105,19 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
       , "WITH"
       )
     )
+  
+  val wordReserved =
+    ( HashSet[String]
+      ( "BIT", "BOOLEAN", "CHARACTER", "CHOICE"
+      , "EMBEDDED", "END", "ENUMERATED", "EXTERNAL", "FALSE"
+      , "INSTANCE", "INTEGER", "INTERSECTION", "MINUS-INFINITY", "NULL"
+      , "OBJECT", "OCTET", "PLUS-INFINITY", "REAL", "RELATIVE-OID"
+      , "SEQUENCE", "SET", "TRUE", "UNION"
+      )
+    )
 
   /** The set of delimiters (ordering does not matter) */
   val delimiters = new HashSet[String]
-
-  private var _delim: Parser[Token] = null
-  protected def delim: Parser[Token] = {
-    if (_delim eq null) { // construct parser for delimiters by |'ing together the parsers for the individual delimiters, 
-    // starting with the longest one (hence the sort + reverse) -- otherwise a delimiter D will never be matched if 
-    // there is another delimiter that is a prefix of D   
-      def parseDelim(s: String): Parser[Token] = accept(s.toList) ^^ { x => Keyword(s) }
-      
-      val d = new Array[String](delimiters.size)
-      delimiters.copyToArray(d,0)
-      scala.util.Sorting.quickSort(d) 
-      _delim = d.toList.reverse.map(parseDelim).reduceRight[Parser[Token]](_ | _)
-    }
-    
-    _delim
-  }
   
   private def lift[T](f: String => T)(xs: List[Char]): T = f(xs.mkString("", "", ""))
 
@@ -217,19 +211,6 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     ) ^^ { case _ ~ data ~ _ ~ _ =>
       HString(data.filter(_.isUpperHexDigit).mkString)
     }
-  
-  // ASN1D 8.3.2<12-15>
-  def identifer =
-    ( lower
-    ~ ( ( letter
-        | digit
-        | hyphen <~ before(letter | digit)
-        ).* ^^ { m => ("" /: m)(_ + _) }
-      ).?
-    ) ^^ { case c ~ cs =>
-      println()
-      Identifier("" + c + cs.getOrElse(""))
-    }
 
   // ASN1D 8.3.2<16>
   // Not implemented
@@ -311,7 +292,7 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
     }
   
   def identifier = identifier_string ^^ { name =>
-    if (reserved contains name) Keyword(name) else Identifier(name)
+    Identifier(name, idReserved contains name, wordReserved contains name)
   }
 
   // 11.6
