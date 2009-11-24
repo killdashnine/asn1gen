@@ -15,9 +15,15 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def elem[U](kind: String)(f: PartialFunction[Elem, U]): Parser[U] =
     elem(kind, {_: Elem => true}) ^? (f, _ => "Expecting " + kind + ".")
 
-  def op(chars: String) = elem("operator " + chars) {
+  def op(chars: String): Parser[Operator] = elem("operator " + chars) {
     case lexical.Operator(`chars`) => Operator(chars)
   }
+  def op(chars1: String, chars2: String): Parser[Operator] =
+    ( positioned(op(chars1))
+    ~ positioned(op(chars2))
+    ) ^^ { case o@(op1 ~ op2) if op1.pos.column + chars1.length == op2.pos.column && op1.pos.line == op2.pos.line =>
+      Operator(chars1 + chars2)
+    }
   def kw(chars: String) = elem("keyword " + chars) {
     case lexical.Identifier(`chars`, true, _) => Keyword(chars)
   }
@@ -81,7 +87,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D: 8.2.3<21>
   def objectReference =
-    ( lexical.Operator("&") ~> valueReference
+    ( valueReference
     ) ^^ { case ValueReference(n) => ObjectReference(n) }
 
   // ASN1D: 8.2.3<22>
@@ -965,7 +971,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     | extensionAdditionGroup
     ) ^^ { case kind => ExtensionAddition(kind) }
   def extensionAdditionGroup =
-    ( op("[[") ~ componentTypeList ~ op("]]")
+    ( op("[[") ~ componentTypeList ~ op("]", "]")
     ) ^^ { case _ ~ ctl ~ _ => ExtensionAdditionGroup(ctl) }
   def componentTypeList =
     ( rep1sep(componentType, op(","))
@@ -1105,7 +1111,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def extensionAdditionGroupAlternatives =
     ( op("[[")
     ~ alternativeTypeList
-    ~ op("]]")
+    ~ op("]", "]")
     ) ^^ { case _ ~ atl ~ _ => ExtensionAdditionGroupAlternatives(atl) }
 
   def alternativeTypeList =
@@ -1627,7 +1633,10 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def definedSyntax =
     ( op("{") ~ definedSyntaxToken.* ~ op("}")
     ) ^^ { case _ ~ dsts ~ _ => DefinedSyntax(dsts) }
-  def definedSyntaxToken = literal ^^ { _ => DefinedSyntaxToken() }
+  def definedSyntaxToken =
+    ( literal
+    | setting
+    ) ^^ { _ => DefinedSyntaxToken() }
   // See ASN1D 15.3.2<8>
   // See ASN1D 15.2.2<38>
   
