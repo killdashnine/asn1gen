@@ -1,6 +1,7 @@
 package org.asn1gen.parsing.syntax
 
 import scala.util.parsing.syntax.Tokens
+import scala.util.parsing.input.Positional
 
 /**
  * This component provides the standard `Token's for a simple, Scala-like language. 
@@ -8,7 +9,7 @@ import scala.util.parsing.syntax.Tokens
  * @author Martin Odersky, Adriaan Moors
  */
 trait Asn1Tokens extends Tokens {
-  abstract class Asn1Token extends Token {
+  abstract class Asn1Token extends Token with Positional {
     var prevComment: String = ""
   }
   

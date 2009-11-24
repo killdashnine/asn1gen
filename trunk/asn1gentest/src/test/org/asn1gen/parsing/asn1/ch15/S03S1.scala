@@ -482,7 +482,17 @@ package test.org.asn1gen.parsing.asn1.ch15 {
     
     @Test def test_1_1_1_2_1_1_7() {
       val text = """
-        CODE &code
+        CODE
+      """
+      parse(tokenOrGroupSpec, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_1_1_2_1_1_8() {
+      val text = """
+        &code
       """
       parse(tokenOrGroupSpec, text) match {
         case Success(_, _) => ()
@@ -513,6 +523,196 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       parse(assignmentList, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1() {
+      val text = """
+        addition-of-2-integers OTHER-FUNCTION ::= {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(assignment, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_1x() {
+      val text = """
+        addition-of-2-integers OTHER-FUNCTION ::= {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(typeAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected") 
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_3x() {
+      val text = """
+        addition-of-2-integers OTHER-FUNCTION ::= {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(valueSetTypeAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected") 
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_4x() {
+      val text = """
+        addition-of-2-integers OTHER-FUNCTION ::= {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(objectClassAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected") 
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_5() {
+      val text = """
+        addition-of-2-integers OTHER-FUNCTION ::= {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(objectAssignment, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_5_1() {
+      val text = """
+        {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(object_, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_5_1_1() {
+      val text = """
+        {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(objectDefn, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_5_1_1_1x() {
+      val text = """
+        {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(defaultSyntax, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_5_1_1_2() {
+      val text = """
+        {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(definedSyntax, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_5_1_1_2_1() {
+      val text = """
+        ARGUMENT TYPE Pair,
+        SUPPORTED ARGUMENTS {PosPair | NegPair},
+        RESULT TYPE INTEGER,
+        RETURNS 0 IN CASE OF ERROR,
+        CODE 1
+      """
+      parse(definedSyntaxToken.*, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_6x() {
+      val text = """
+        addition-of-2-integers OTHER-FUNCTION ::= {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(objectSetAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected") 
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_7x() {
+      val text = """
+        addition-of-2-integers OTHER-FUNCTION ::= {
+          ARGUMENT TYPE Pair,
+          SUPPORTED ARGUMENTS {PosPair | NegPair},
+          RESULT TYPE INTEGER,
+          RETURNS 0 IN CASE OF ERROR,
+          CODE 1
+        }
+      """
+      parse(parameterizedAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected") 
+        case x => ()
       }
     }
   }

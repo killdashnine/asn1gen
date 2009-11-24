@@ -12,12 +12,14 @@ import org.asn1gen.extra.Extras
 class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Extras {
   // see `token' in `Scanners'
   override def token: Parser[Token] =
-    ( number
-    | bstring
-    | hstring
-    | cstring
-    | identifier
-    | operator
+    ( positioned
+      ( number
+      | bstring
+      | hstring
+      | cstring
+      | identifier
+      | operator
+      )
     ) ^^ {
       case t: Asn1Token => t.prevComment = lastComment; t
       case t => t 
@@ -54,14 +56,14 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
         Failure("`"+s+"' expected but `"+in.first+"' found", in.drop(start - offset))
     }
   }
-
+  
   def operator =
     ( literal("...")
     | literal("::=")
     | literal("..")
     | literal("@.")
     | literal("[[")
-    | literal("]]")
+    //| literal("]]")
     | literal("!")
     | literal("(")
     | literal(")")
