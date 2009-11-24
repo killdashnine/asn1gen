@@ -37,6 +37,16 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       }
     }
     
+    @Test def test_2_1() {
+      val text = """
+        LessMatchingRules MATCHING-RULE ::= { MatchingRules EXCEPT caseIgnoreMatch }
+      """
+      parse(assignment, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+
     @Test def test_3() {
       val text = """
         ExtensibleMatchingRules MATCHING-RULE ::= {
