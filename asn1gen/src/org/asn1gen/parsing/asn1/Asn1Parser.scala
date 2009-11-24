@@ -1356,13 +1356,11 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { _ => IntersectionMark() }
   def intersectionElements =
     ( elements
-    | elems ~ exclusions
+    ~ exclusions.?
     ) ^^ { _ => IntersectionElements() }
   
   // ASN1D 13.11.2<14>
-  def elems =
-    ( elements
-    ) ^^ { _ => Elems() }
+
   def exclusions =
     ( kw("EXCEPT") ~ elements
     ) ^^ { case _ ~ e => Exclusions(e) }
@@ -1647,11 +1645,19 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 15.5.2<2>
   def objectSetSpec =
-    ( rootElementSetSpec
-    | rootElementSetSpec ~ op(",") ~ op("...")
-    | rootElementSetSpec ~ op(",") ~ op("...") ~ op(",") ~ additionalElementSetSpec
-    | op("...")
-    | op("...") ~ op(",") ~ additionalElementSetSpec
+    ( ( rootElementSetSpec
+      ~ ( op(",")
+        ~ op("...")
+        ~ ( op(",")
+          ~ additionalElementSetSpec
+          ).?
+        ).? 
+      )
+    | ( op("...")
+      ~ ( op(",")
+        ~ additionalElementSetSpec
+        ).?
+      )
     ) ^^ { _ => ObjectSetSpec() }
   
   // ASN1D 15.5.2<11>
