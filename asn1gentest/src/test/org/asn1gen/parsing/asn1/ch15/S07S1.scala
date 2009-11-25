@@ -40,6 +40,64 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       }
     }
     
+    @Test def test_1_1() {
+      val text = """
+        surname ATTRIBUTE ::= { -- family name
+          SUBTYPE OF name
+          WITH SYNTAX DirectoryString
+          ID id-at-surname
+        }
+      """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_2() {
+      val text = """
+        givenName ATTRIBUTE ::= { -- first name
+          SUBTYPE OF name
+          WITH SYNTAX DirectoryString
+          ID id-at-givenName
+        }
+      """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3() {
+      val text = """
+        countryName ATTRIBUTE ::= { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(assignmentList, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1() {
+      val text = """
+        { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(object_, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
     @Test def test_2() {
       val text = """
         SupportedAttributes ATTRIBUTE ::= {surname | givenName | countryName}
@@ -107,19 +165,6 @@ package test.org.asn1gen.parsing.asn1.ch15 {
         AttributeIdAndValue3 ::= SEQUENCE {
           ident ATTRIBUTE.&id({SupportedAttributes}),
           value ATTRIBUTE.&Type({SupportedAttributes}{@ident})
-        }
-      """
-      parse(assignmentList, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_8() {
-      val text = """
-        AttributeIdAndValue3 ::= SEQUENCE {
-          ident OBJECT IDENTIFIER,
-          value ANY DEFINED BY ident
         }
       """
       parse(assignmentList, text) match {

@@ -35,6 +35,126 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       }
     }
     
+    @Test def test_2_1() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(assignment, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_1x() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(typeAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_2() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(valueAssignment, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_2_1() {
+      val text = """
+        caseIgnoreMatch.&id
+      """
+      parse(value, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_2_1_1x() {
+      val text = """
+        caseIgnoreMatch.&id
+      """
+      parse(builtinValue, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_2_1_2() {
+      val text = """
+        caseIgnoreMatch.&id
+      """
+      parse(referencedValue, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_2_1_2_1() {
+      val text = """
+        caseIgnoreMatch.&id
+      """
+      parse(valueFromObject, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_2_1_3x() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(valueSetTypeAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_4x() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(objectClassAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_5x() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(objectAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_6x() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(objectSetAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_2_1_7x() {
+      val text = """
+        id-mr-caseIgnoreMatch OBJECT IDENTIFIER ::= caseIgnoreMatch.&id
+      """
+      parse(parameterizedAssignment, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
     @Test def test_3() {
       val text = """
         CLASS1 ::= CLASS { &obj CLASS2 }

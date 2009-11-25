@@ -7,60 +7,7 @@ import scala.util.parsing.combinator.lexical._
 import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.parsing.syntax._
 
-class Asn1Parser extends TokenParsers with ImplicitConversions {
-  type Tokens = Asn1Lexer
-  
-  val lexical = new Tokens
-  
-  def elem[U](kind: String)(f: PartialFunction[Elem, U]): Parser[U] =
-    elem(kind, {_: Elem => true}) ^? (f, _ => "Expecting " + kind + ".")
-
-  def op(chars: String): Parser[Operator] = elem("operator " + chars) {
-    case lexical.Operator(`chars`) => Operator(chars)
-  }
-  def op(chars1: String, chars2: String): Parser[Operator] =
-    ( positioned(op(chars1))
-    ~ positioned(op(chars2))
-    ) ^^ { case o@(op1 ~ op2) if op1.pos.column + chars1.length == op2.pos.column && op1.pos.line == op2.pos.line =>
-      Operator(chars1 + chars2)
-    }
-  def kw(chars: String) = elem("keyword " + chars) {
-    case lexical.Identifier(`chars`, true, _) => Keyword(chars)
-  }
-  def empty = success("") ^^ { _ => Empty() }
-
-  // ASN1D 8.3.2<1-2>
-  def bstring = elem("bstring") {
-    case lexical.BString(s) => BString(s)
-  }
-  
-  // ASN1D 8.3.2<3>
-  // TODO: unused
-  def comment = elem("comment") {
-    case lexical.CommentLit(n) => n
-  }
-  
-  // ASN1D: 8.2.3<4-5>
-  // TODO: not implemented
-  
-  // ASN1D: 8.2.3<6-8>
-  def cstring = elem("cstring") {
-    case lexical.CString(s) => CString(s)
-  }
-  
-  // ASN1D: 8.2.3<9>
-  // TODO: not implemented
-
-  // ASN1D: 8.2.3<10-11>
-  def hstring = elem("hstring") {
-    case lexical.HString(s) => HString(s)
-  }
-  
-  // ASN1D: 8.2.3<12-14>
-  def identifier = elem("identifier") {
-    case lexical.Identifier(n, false, _) if n.first.isLowerCase => Identifier(n)
-  }
-  
+class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D: 8.2.3<15-16>
   // TODO: not implemented
   
@@ -68,11 +15,6 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   def moduleReference =
     ( typeReference
     ) ^^ { case tr@TypeReference(_) => tr.asModuleReference }
-  
-  // ASN1D: 8.2.3<18>
-  def number = elem("number") {
-    case lexical.Number(s) => Number(s)
-  }
   
   // ASN1D: 8.2.3<19>
   def objectClassReference =
@@ -82,7 +24,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   // ASN1D: 8.2.3<20>
   // TODO: unsure if specification means there should be no space after '&'
   def objectFieldReference =
-    ( valueFieldReference
+    ( op("&") ~> valueFieldReference
     ) ^^ { vfr => ObjectFieldReference(vfr) }
   
   // ASN1D: 8.2.3<21>
@@ -92,7 +34,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D: 8.2.3<22>
   def objectSetFieldReference =
-    ( lexical.Operator("&") ~> objectSetReference
+    ( op("&") ~> objectSetReference
     ) ^^ { case ObjectSetReference(n) => ObjectSetFieldReference(n) }
 
   // ASN1D: 8.2.3<23>
@@ -103,7 +45,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   // ASN1D: 8.2.3<24>
   
   def signedNumber =
-    ( ( lexical.Operator("-") ~ number
+    ( ( op("-") ~ number
       ) ^? { case _ ~ number if number.chars != "0" =>
         SignedNumber(true, number)
       }
@@ -114,19 +56,9 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   
   // ASN1D: 8.2.3<25>
   def typeFieldReference =
-    ( lexical.Operator("&") ~> typeReference
+    ( op("&") ~> typeReference
     ) ^^ { case TypeReference(n) => TypeFieldReference(n) }
   
-  // ASN1D: 8.2.3<26>
-  /*def typeReference = elem(
-    "type reference",
-    { case lexical.Identifier(n) => n.first.isUpperCase}) ^^ {
-      case lexical.Identifier(n) => TypeReference(n) 
-    }*/
-  def typeReference = elem("type reference") {
-      case lexical.Identifier(n, false, _) if (n.first.isUpperCase) => TypeReference(n)
-    } | failure ("incorrect type reference")
-
   // ASN1D: 8.2.3<27>
   // Not implemented
 
@@ -141,28 +73,18 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D: 8.2.3<31>
   def valueFieldReference =
-    ( lexical.Operator("&") ~> valueReference
+    ( op("&") ~> valueReference
     ) ^^ {
       case ValueReference(n) => ValueFieldReference(n)
     }
 
-  // ASN1D: 8.2.3<31>
-  def valueReference = elem("value reference") {
-      case lexical.Identifier(n, false, _) if (n.first.isLowerCase) => ValueReference(n)
-    } | failure ("incorrect type reference")
-
   // ASN1D: 8.2.3<33>
   def valueSetFieldReference =
-    ( lexical.Operator("&") ~> typeReference
+    ( op("&") ~> typeReference
     ) ^^ {
       case TypeReference(n) => ValueSetFieldReference(n)
     }
 
-  // ASN1D: 8.2.3<34-35>
-  def word = elem("word") {
-      case lexical.Identifier(n, _, false) if (n.first.isUpperCase) => Word(n)
-    } | failure ("incorrect type reference")
-  
   // ASN1D: 8.2.3<36-37>
   // Not implemented
 
@@ -239,7 +161,7 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
   // ASN1D 9.1.2<5>
   def value: Parser[Value] =
     ( builtinValue
-    | referencedValue
+    ||| referencedValue
     ) ^^ { kind => Value(kind) }
   
   // ASN1D 9.1.2<6>
@@ -267,8 +189,8 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     ) ^^ { kind => BuiltinValue(kind) }
   
   def referencedValue =
-    ( definedValue
-    | valueFromObject
+    ( valueFromObject // refactored
+    | definedValue // refactored
     ) ^^ { kind => ReferencedValue(kind) }
 
   def taggedValue =
@@ -1391,8 +1313,8 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
 
   // ASN1D 13.12.2<5>
   def constraintSpec: Parser[ConstraintSpec] =
-    ( elementSetSpecs
-    | generalConstraint
+    ( generalConstraint
+    | elementSetSpecs
     ) ^^ { kind => ConstraintSpec(kind) }
 
   // ASN1D 13.12.2<6>
@@ -1769,8 +1691,8 @@ class Asn1Parser extends TokenParsers with ImplicitConversions {
     | contentsConstraint
     ) ^^ { kind => GeneralConstraint(kind) }
   def tableConstraint =
-    ( simpleTableConstraint
-    | componentRelationConstraint
+    ( componentRelationConstraint
+    | simpleTableConstraint
     ) ^^ { kind => TableConstraint(kind) }
   
   // ASN1D 15.7.2<17>
