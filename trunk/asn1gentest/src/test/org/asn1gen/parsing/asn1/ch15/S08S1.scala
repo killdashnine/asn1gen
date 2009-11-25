@@ -123,18 +123,5 @@ package test.org.asn1gen.parsing.asn1.ch15 {
         case x => fail("Parse failure: " + x)
       }
     }
-    
-    @Test def test_8() {
-      val text = """
-        AttributeIdAndValue3 ::= SEQUENCE {
-          ident OBJECT IDENTIFIER,
-          value ANY DEFINED BY ident
-        }
-      """
-      parse(assignmentList, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
   }
 }
