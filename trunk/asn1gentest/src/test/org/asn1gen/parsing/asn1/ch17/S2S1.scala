@@ -215,7 +215,7 @@ package test.org.asn1gen.parsing.asn1.ch17 {
       }
     }
     
-    @Test def test_11_1_1_1() {
+    @Test def test_11_1_1_1x() {
       val text = """
         CLASS {
           &max-priority-level INTEGER,
@@ -228,12 +228,12 @@ package test.org.asn1gen.parsing.asn1.ch17 {
         }
       """
       parse(parameterizedObjectClass, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
       }
     }
     
-    @Test def test_11_1_1_2() {
+    @Test def test_11_1_1_2x() {
       val text = """
         CLASS {
           &max-priority-level INTEGER,
@@ -246,8 +246,8 @@ package test.org.asn1gen.parsing.asn1.ch17 {
         }
       """
       parse(definedObjectClass, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
       }
     }
     
@@ -355,86 +355,6 @@ package test.org.asn1gen.parsing.asn1.ch17 {
         MAXIMUM REFERENCE BUFFER &max-reference-buffer-size
       """
       parse(tokenOrGroupSpec.+, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(tokenOrGroupSpec, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1_1() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(requiredToken, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(primitiveFieldName, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_1() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(typeFieldReference, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_2() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(valueFieldReference, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_3() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(valueSetFieldReference, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_4() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(objectFieldReference, text) match {
-        case Success(_, _) => ()
-        case x => fail("Parse failure: " + x)
-      }
-    }
-    
-    @Test def test_11_1_1_3_1_2_1_1_1_1_1_1_5() {
-      val text = """
-        MAXIMUM PRIORITY &max-priority-level
-      """
-      parse(objectSetFieldReference, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

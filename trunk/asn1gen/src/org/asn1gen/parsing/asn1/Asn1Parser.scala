@@ -1459,10 +1459,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<26>
   def objectOptionalitySpec =
-    ( kw("OPTIONAL")
-    | kw("DEFAULT") ~ object_
+    ( kw("OPTIONAL") ^^ { _ => Optional }
+    | kw("DEFAULT") ~> object_ ^^ { o => Default(o) }
     | empty
-    ) ^^ { _ => ObjectOptionalitySpec() }
+    ) ^^ { oos => ObjectOptionalitySpec(oos) }
   
   // ASN1D 15.2.2<28>
   def objectSetFieldSpec =
@@ -1471,10 +1471,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 15.2.2<29>
   def objectSetOptionalitySpec : Parser[ObjectSetOptionalitySpec] =
-    ( kw("OPTIONAL") ^^ { _ => OptionalObjectSetOptionalitySpec() }
-    | kw("DEFAULT") ~ objectSet ^^ { case _ ~ d => DefaultObjectSetOptionalitySpec(d) }
-    | empty ^^ { _ => NoObjectSetOptionalitySpec() }
-    )
+    ( kw("OPTIONAL") ^^ { _ => Optional }
+    | kw("DEFAULT") ~> objectSet ^^ { os => Default(os) }
+    | empty
+    ) ^^ { osos => ObjectSetOptionalitySpec(osos) }
   
   // ASN1D 15.2.2<33>
   def fieldName =
@@ -1545,18 +1545,18 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.3.2<8>
   def literal =
-    ( word
-    | op(",")
-    ) ^^ { _ => Literal() }
+    ( word ^^ { w => Some(w) }
+    | op(",") ^^ { _ => None }
+    ) ^^ { w => Literal(w) }
 
   // ASN1D 15.3.2<11>
   def definedSyntax =
     ( op("{") ~ definedSyntaxToken.* ~ op("}")
     ) ^^ { case _ ~ dsts ~ _ => DefinedSyntax(dsts) }
   def definedSyntaxToken =
-    ( literal
-    | setting
-    ) ^^ { _ => DefinedSyntaxToken() }
+    ( setting
+    | literal
+    ) ^^ { kind => DefinedSyntaxToken(kind) }
   // See ASN1D 15.3.2<8>
   // See ASN1D 15.2.2<38>
   
@@ -1569,23 +1569,26 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def objectSetSpec =
     ( ( rootElementSetSpec
       ~ ( op(",")
-        ~ op("...")
-        ~ ( op(",")
-          ~ additionalElementSetSpec
+        ~>op("...")
+        ~>( op(",")
+          ~>additionalElementSetSpec
           ).?
         ).? 
-      )
+      ) ^^ {
+        case re ~ Some(aess) => (Some(re), aess)
+        case re ~ None => (Some(re), None)
+      }
     | ( op("...")
-      ~ ( op(",")
-        ~ additionalElementSetSpec
+      ~>( op(",")
+        ~>additionalElementSetSpec
         ).?
-      )
-    ) ^^ { _ => ObjectSetSpec() }
+      ) ^^ { case aess => (None, aess) }
+    ) ^^ { case (re, aess) => ObjectSetSpec(re, aess) }
   
   // ASN1D 15.5.2<11>
   def valueSet =
-    ( op("{") ~ elementSetSpecs ~ op("}")
-    ) ^^ { case _ ~ ess ~ _ => ValueSet(ess) }
+    ( op("{") ~> elementSetSpecs <~ op("}")
+    ) ^^ { ess => ValueSet(ess) }
   // See ASN1D 13.12.2<6>
   
   // ASN1D 15.5.2<22>
@@ -1660,7 +1663,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 15.7.2<1>
   def objectClassFieldType =
     ( definedObjectClass ~ op(".") ~ fieldName
-    ) ^^ { case doc ~ _ ~ fn => ObjectClassFieldType(doc, fn) } // TODO
+    ) ^^ { case doc ~ _ ~ fn => ObjectClassFieldType(doc, fn) }
   // See ASN1D 15.2.2<33>
   
   // ASN1D 15.7.2<9>
@@ -1734,14 +1737,14 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 15.9.2<1>
   def usefulObjectClassReference =
-    ( kw("TYPE-IDENTIFIER")
-    | kw("ABSTRACT-SYNTAX")
-    ) ^^ { _ => UsefulObjectClassReference() }
+    ( kw("TYPE-IDENTIFIER") ^^ { _ => TypeIdentifier() }
+    | kw("ABSTRACT-SYNTAX") ^^ { _ => AbstractSyntax() }
+    ) ^^ { kind => UsefulObjectClassReference(kind) }
   
   // ASN1D 15.9.2<2>
   def instanceOfType =
     ( kw("INSTANCE") ~ kw("OF") ~ definedObjectClass
-    ) ^^ { case _ ~ _ ~ doc => InstanceOfType(doc) } // TODO
+    ) ^^ { case _ ~ _ ~ doc => InstanceOfType(doc) }
 
   // ASN1D 15.10.2<1>
   // See ASN1D 15.9.2<1>
@@ -1813,9 +1816,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( op("{") ~ rep1sep(parameter, op(",")) ~ op("}")
     ) ^^ { case _ ~ parameters ~ _ => ParameterList(parameters) }
   def parameter =
-    ( paramGovernor ~ op(":") ~ dummyReference
-    | dummyReference
-    ) ^^ { _ => Parameter() }
+    ( (paramGovernor <~ op(":")).?
+    ~ dummyReference
+    ) ^^ { case pg ~ dr => Parameter(pg, dr) }
   
   // ASN1D 17.2.2<12>
   def paramGovernor =
