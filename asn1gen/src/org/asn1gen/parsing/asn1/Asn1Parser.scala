@@ -902,9 +902,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 12.2.2<13> refactored
   def componentType =
     ( namedType
-    ~ ( kw("OPTIONAL")
-      | kw("DEFAULT") ~ value
-      ).?
+    ~ ( kw("OPTIONAL") ^^ { _ => Optional } 
+      | kw("DEFAULT") ~> value ^^ { _ => Default(value) }
+      | empty
+      )
     | kw("COMPONENTS") ~ kw("OF") ~ type_
     ) ^^ { _ => ComponentType() }
   
@@ -1404,10 +1405,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( typeFieldReference ~ typeOptionalitySpec
     ) ^^ { case tfr ~ tos => TypeFieldSpec(tfr, tos) }
   def typeOptionalitySpec =
-    ( kw("OPTIONAL")
-    | kw("DEFAULT") ~ type_
+    ( kw("OPTIONAL") ^^ { _ => Optional }
+    | kw("DEFAULT") ~> type_ ^^ { t => Default(t) }
     | empty
-    ) ^^ { _ => TypeOptionalitySpec() }
+    ) ^^ { value => TypeOptionalitySpec(value) }
   
   // ASN1D 15.2.2<6>
   def fixedTypeValueFieldSpec =
@@ -1425,10 +1426,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<10>
   def valueOptionalitySpec =
-    ( kw("OPTIONAL")
-    | kw("DEFAULT") ~ value
+    ( kw("OPTIONAL") ^^ { _ => Optional }
+    | kw("DEFAULT") ~> value ^^ { v => Default(v) }
     | empty
-    ) ^^ { _ => ValueOptionalitySpec() }
+    ) ^^ { value => ValueOptionalitySpec(value) }
   
   // ASN1D 15.2.2<13>
   def variableTypeValueFieldSpec =
@@ -1442,10 +1443,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<18>
   def valueSetOptionalitySpec =
-    ( kw("OPTIONAL")
-    | kw("DEFAULT") ~ valueSet
+    ( kw("OPTIONAL") ^^ { _ => Optional }
+    | kw("DEFAULT") ~> valueSet ^^ { v => Default(v) }
     | empty
-    ) ^^ { _ => ValueSetOptionalitySpec() }
+    ) ^^ { value => ValueSetOptionalitySpec(value) }
   
   // ASN1D 15.2.2<21>
   def variableTypeValueSetFieldSpec =
