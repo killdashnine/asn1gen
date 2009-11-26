@@ -1,5 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class TypeOptionalitySpec() extends Node {
+case class TypeOptionalitySpec(
+    value: OptionalDefault[Type_]
+) extends Node {
 }
-
