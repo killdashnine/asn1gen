@@ -98,6 +98,179 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       }
     }
     
+    @Test def test_1_3_1_1() {
+      val text = """
+        { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(objectDefn, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_2x() {
+      val text = """
+        { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(definedObject, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_1_3_1_3x() {
+      val text = """
+        { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(objectFromObject, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_1_3_1_4x() {
+      val text = """
+        { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(parameterizedObject, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_1_3_1_4_1x() {
+      val text = """
+        { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(defaultSyntax, text) match {
+        case Success(_, _) => fail("Parse failure expected")
+        case x => ()
+      }
+    }
+    
+    @Test def test_1_3_1_4_2() {
+      val text = """
+        { -- country
+          SUBTYPE OF name
+          WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+          SINGLE VALUE TRUE
+          ID id-at-countryName
+        }
+      """
+      parse(definedSyntax, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_4_2_1() {
+      val text = """
+        SUBTYPE OF name
+        WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+        SINGLE VALUE TRUE
+        ID id-at-countryName
+      """
+      parse(definedSyntaxToken.*, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_4_2_1_1() {
+      val text = """
+        SUBTYPE OF name
+      """
+      parse(definedSyntaxToken.*, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_4_2_1_2() {
+      val text = """
+        WITH SYNTAX PrintableString (SIZE (2)) -- [ISO3166] codes
+      """
+      parse(definedSyntaxToken.*, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_4_2_1_2_1() {
+      val text = """
+        WITH
+      """
+      parse(definedSyntaxToken, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_4_2_1_2_2() {
+      val text = """
+        SYNTAX
+      """
+      parse(definedSyntaxToken, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_4_2_1_2_3() {
+      val text = """
+        PrintableString (SIZE (2))
+      """
+      parse(definedSyntaxToken, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+        
+    @Test def test_1_3_1_4_2_1_3() {
+      val text = """
+        SINGLE VALUE TRUE
+      """
+      parse(definedSyntaxToken.*, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
+    @Test def test_1_3_1_4_2_1_4() {
+      val text = """
+        ID id-at-countryName
+      """
+      parse(definedSyntaxToken.*, text) match {
+        case Success(_, _) => ()
+        case x => fail("Parse failure: " + x)
+      }
+    }
+    
     @Test def test_2() {
       val text = """
         SupportedAttributes ATTRIBUTE ::= {surname | givenName | countryName}

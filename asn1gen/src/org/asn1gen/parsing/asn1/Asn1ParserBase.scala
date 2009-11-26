@@ -27,7 +27,7 @@ class Asn1ParserBase extends TokenParsers with ImplicitConversions {
   def kw(chars: String) = elem("keyword " + chars) {
     case lexical.Identifier(`chars`, true, _) => Keyword(chars)
   }
-  def empty = success("") ^^ { _ => Empty() }
+  def empty = success("") ^^ { _ => Empty }
 
   // ASN1D 8.3.2<1-2>
   def bstring = elem("bstring") {
