@@ -1190,11 +1190,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 13.9.2<14>
   def presenceConstraint =
-    ( kw("PRESENT")
-    | kw("ABSENT")
+    ( kwPresent
+    | kwAbsent
     | kwOptional
     | empty
-    ) ^^ { _ => PresenceConstraint() }
+    )
   
   // ASN1D 13.10.2<1>
   def contentsConstraint =
@@ -1873,6 +1873,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { v => Default(v) }
     
   // Keywords
+  def kwPresent = kw("PRESENT") ^^ { _ => Present }
+  def kwAbsent = kw("ABSENT") ^^ { _ => Absent }
   def kwApplication = kw("APPLICATION") ^^ { _ => Application }
   def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
   def kwBegin = kw("BEGIN")

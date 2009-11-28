@@ -6,6 +6,7 @@ object Empty
   extends Node
   with AssignedIdentifierKind
   with Class_
+  with PresenceConstraint
   with ValueConstraintKind
   with WithSyntaxSpecKind
   with TaggedKind
