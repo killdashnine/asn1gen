@@ -821,7 +821,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.2.2<1>
   def sequenceType =
-    ( kw("SEQUENCE")
+    ( kwSequence
     ~ op("{")
     ~ ( ( extensionAndException
         ~ optionalExtensionMarker
@@ -913,7 +913,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case eae ~ oem => SetTypeExtension(eae, oem) }
   
   def setType =
-    ( kw("SET") ~ op("{")
+    ( kwSet ~ op("{")
     ~ ( setTypeExtension
       | componentTypeLists
       )
@@ -941,17 +941,18 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.4.2<1>
   def sequenceOfType =
-    ( kw("SEQUENCE") ~ kw("OF") ~ type_
+    ( kwSequence ~ kw("OF") ~ type_
     ) ^^ { case _ ~ _ ~ t => SequenceOfType(t) } // TODO
 
   // ASN1D 12.4.2<3>
   def typeWithConstraint =
-    ( ( kw("SEQUENCE") ~ constraint
-      | kw("SEQUENCE") ~ sizeConstraint
-      | kw("SET") ~ constraint
-      | kw("SET") ~ sizeConstraint
+    ( ( kwSequence
+      | kwSet)
+    ~ ( constraint
+      | sizeConstraint
       )
-    ~ kw("OF") ~ type_
+    ~ kw("OF")
+    ~ type_
     ) ^^ { _ => TypeWithConstraint() }
   
   // ASN1D 12.4.2<5>
@@ -966,7 +967,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.5.2<1>
   def setOfType =
-    ( kw("SET") ~ kw("OF") ~ type_
+    ( kwSet ~ kw("OF") ~ type_
     ) ^^ { case (_ ~ _ ~ t) => SetOfType(t) } // TODO
 
   // ASN1D 12.5.2<3>
@@ -1894,5 +1895,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def kwOptional = kw("OPTIONAL") ^^ { _ => Optional }
   def kwPresent = kw("PRESENT") ^^ { _ => Present }
   def kwPrivate = kw("PRIVATE") ^^ { _ => Private }
+  def kwSequence = kw("SEQUENCE") ^^ { _ => Sequence }
+  def kwSet = kw("SET") ^^ { _ => Set }
   def kwUniversal = kw("UNIVERSAL") ^^ { _ => Universal }
 }
