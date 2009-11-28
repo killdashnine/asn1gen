@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ExtensionAndException() extends Node {
+case class ExtensionAndException(
+    exceptionSpec: Option[ExceptionSpec]
+) extends Node {
 }
 

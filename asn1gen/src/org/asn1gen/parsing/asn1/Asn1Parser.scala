@@ -1037,8 +1037,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.9.2<1>
   def extensionAndException =
-    ( op("...") ~ exceptionSpec.?
-    ) ^^ { _ => ExtensionAndException() } // TODO
+    ( op("...") ~> exceptionSpec.?
+    ) ^^ { es => ExtensionAndException(es) }
 
   def optionalExtensionMarker =
     ( op(",") ~ op("...")
