@@ -908,13 +908,17 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case i ~ v => NamedValue(i, v) }
 
   // ASN1D 12.3.2<1>
+  def setTypeExtension =
+    ( extensionAndException ~ optionalExtensionMarker
+    ) ^^ { case eae ~ oem => SetTypeExtension(eae, oem) }
+  
   def setType =
     ( kw("SET") ~ op("{")
-    ~ ( extensionAndException ~ optionalExtensionMarker
+    ~ ( setTypeExtension
       | componentTypeLists
       )
     ~ op("}")
-    ) ^^ { _ => SetType() } // TODO
+    ) ^^ { case _ ~ _ ~ kind ~ _ => SetType(kind) }
 
   // ASN1D 12.3.2<4>
   // See ASN1D 12.2.2<4>

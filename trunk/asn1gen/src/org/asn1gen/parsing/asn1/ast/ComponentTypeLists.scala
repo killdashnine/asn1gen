@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ComponentTypeLists() extends Node {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class ComponentTypeLists() extends Node with SetTypeKind {
 }
 
