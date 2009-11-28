@@ -946,10 +946,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.4.2<3>
   def typeWithConstraint =
-    ( kw("SEQUENCE") ~ constraint ~ kw("OF") ~ type_
-    | kw("SEQUENCE") ~ sizeConstraint ~ kw("OF") ~ type_
-    | kw("SET") ~ constraint ~ kw("OF") ~ type_
-    | kw("SET") ~ sizeConstraint ~ kw("OF") ~ type_
+    ( ( kw("SEQUENCE") ~ constraint
+      | kw("SEQUENCE") ~ sizeConstraint
+      | kw("SET") ~ constraint
+      | kw("SET") ~ sizeConstraint
+      )
+    ~ kw("OF") ~ type_
     ) ^^ { _ => TypeWithConstraint() }
   
   // ASN1D 12.4.2<5>
