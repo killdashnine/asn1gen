@@ -1044,10 +1044,6 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( op(",") ~ op("...") ^^ { _ => true }
     | empty ^^ { _ => false }
     ) ^^ { exists => OptionalExtensionMarker(exists) } // TODO
-
-  def extensionEndMarker =
-    ( op(",") ~ op("...")
-    ) ^^ { _ => ExtensionEndMarker() }
   
   // ASN1D 12.9.2<18>
   def exceptionSpec =
