@@ -1,5 +1,9 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class SetType() extends Node with BuiltinTypeKind {
+import org.asn1gen.parsing.asn1.ast.kind._
+
+case class SetType(
+  kind: SetTypeKind
+) extends Node with BuiltinTypeKind {
 }
 
