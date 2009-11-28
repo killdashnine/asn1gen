@@ -235,13 +235,13 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 9.2.2<1>
   def moduleDefinition =
     ( moduleIdentifier
-    ~ kw("DEFINITIONS")
+    ~ kwDefinitions
     ~ tagDefault
     ~ extensionDefault
     ~ op("::=")
-    ~ kw("BEGIN")
+    ~ kwBegin
     ~ moduleBody
-    ~ kw("END")
+    ~ kwEnd
     ) ^^ { case (mi ~ _ ~ td ~ ed ~ _ ~ _ ~ mb ~ _) =>
       ModuleDefinition(mi, td, ed, mb)
     }
@@ -292,8 +292,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 9.2.2<8>
   def extensionDefault =
-    ( ( kw("EXTENSIBILITY")
-      ~ kw("IMPLIED")
+    ( ( kwExtensibility
+      ~ kwImplied
       ) ^^ { _ => ExtensionDefault(true) }
     | ( empty
       ) ^^ { _ => ExtensionDefault(false) }
@@ -313,7 +313,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     }
   
   def exports =
-    ( kw("EXPORTS")
+    ( kwExports
     ~ symbolsExported
     ~ op(";")
     ).? ^^ {
@@ -330,13 +330,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     
   // ASN1D 9.2.2<16>
   def imports =
-    ( kw("IMPORTS")
-    ~ symbolsImported
-    ~ op(";")
-    ).? ^^ {
-      case Some(_ ~ si ~ _) => Imports(Some(si))
-      case _ => Imports(None)
-    }
+    ( kwImports ~> symbolsImported <~ op(";")
+    ).? ^^ { case si => Imports(si) }
 
   def symbolsImported =
     ( symbolsFromModule.*
@@ -344,7 +339,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   def symbolsFromModule =
     ( rep1sep(symbol, op(","))
-    ~ kw("FROM")
+    ~ kwFrom
     ~ globalModuleReference
     ) ^^ { case ss ~ _ ~ gmr => SymbolsFromModule(ss, gmr) }
   
@@ -470,10 +465,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 10.3.2<1>
   def integerType =
     ( kw("INTEGER")
-    ~ ( ( op("{")
-        ~ rep1sep(namedNumber, op(","))
-        ~ op("}")
-        ) ^^ { case _ ~ nns ~ _ => nns }
+    ~ ( op("{") ~> rep1sep(namedNumber, op(",")) <~ op("}")
       ).?
     ) ^^ { case _ ~ nns => IntegerType(nns) }
   
@@ -573,10 +565,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def bitStringType =
     ( kw("BIT")
     ~ kw("STRING")
-    ~ ( ( op("{")
-        ~ rep1sep(namedBit, op(","))
-        ~ op("}")
-        ) ^^ { case _ ~ nbs ~ _ => nbs }
+    ~ ( op("{") ~> rep1sep(namedBit, op(",")) <~ op("}")
       ).?
     ) ^^ { case _ ~ _ ~ nbs => BitStringType(nbs) }
   
@@ -623,15 +612,16 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { _ => ObjectIdentifierType() }
   
   // ASN1D 10.8.2<3> refactored
+  def objectIdentifierValueData =
+    ( ( objIdComponents.+
+      ) ^^ { oic => ObjectIdentifierValue(None, oic) }
+    | ( definedValue
+      ~ objIdComponents.+
+      ) ^^ { case dv ~ oic => ObjectIdentifierValue(Some(dv), oic) }
+    )
   def objectIdentifierValue =
-    ( op("{")
-    ~ ( objIdComponents.+
-      | ( definedValue
-        ~ objIdComponents.+
-        )
-      )
-    ~ op("}")
-    ) ^^ { _ => ObjectIdentifierValue() }
+    ( op("{") ~> objectIdentifierValueData <~ op("}")
+    )
   
   // ASN1D 10.8.2<5> refactored
   def objIdComponents =
@@ -661,14 +651,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 10.9.2<2>
   def relativeOidType =
     ( kw("RELATIVE-OID")
-    ) ^^ { _ => RelativeOidType() } // TODO
+    ) ^^ { _ => RelativeOidType() }
   
   // ASN1D 10.9.2<4>
   def relativeOidValue =
-    ( op("{")
-    ~ relativeOidComponents.+
-    ~ op("}")
-    ) ^^ { case _ ~ rocs ~ _ => RelativeOidValue(rocs) }
+    ( op("{") ~> relativeOidComponents.+ <~ op("}")
+    ) ^^ { rocs => RelativeOidValue(rocs) }
   
   def relativeOidComponents =
     ( numberForm
@@ -695,10 +683,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => RestrictedCharacterStringValue(kind) }
   
   def characterStringList =
-    ( op("{")
-    ~ rep1sep(charsDefn, op(","))
-    ~ op("}")
-    ) ^^ { case _ ~ cds ~ _ => CharacterStringList(cds) }
+    ( op("{") ~> rep1sep(charsDefn, op(",")) <~ op("}")
+    ) ^^ { cds => CharacterStringList(cds) }
   
   def charsDefn =
     ( cstring
@@ -799,10 +785,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 12.1.4<1>
   def taggedType =
     ( tag
-    ~ ( kw("IMPLICIT") ^^ { _ => Implicit() }
-      | kw("EXPLICIT") ^^ { _ => Explicit() }
-      | empty
-      )
+    ~ (kwImplicit | kwExplicit | empty)
     ~ type_
     ) ^^ { case tag ~ taggedKind ~ t => TaggedType(tag, taggedKind, t) }
   
@@ -829,11 +812,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 12.1.4<15>
   // See ASN1D 9.2.2<1>
   def tagDefault =
-    ( kw("EXPLICIT") ~ kw("TAGS")
-    | kw("IMPLICIT") ~ kw("TAGS")
-    | kw("AUTOMATIC") ~ kw("TAGS")
+    ( ( kwExplicit
+      | kwImplicit
+      | kwAutomatic
+      ) <~ kw("TAGS")
     | empty
-    ) ^^ { _ => TagDefault() }
+    ) ^^ { kind => TagDefault(kind) }
 
   // ASN1D 12.2.2<1>
   def sequenceType =
@@ -1885,4 +1869,17 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | object_
     | objectSet
     ) ^^ { kind => ActualParameter(kind) }
+
+  // Custom
+  def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
+  def kwImplicit = kw("IMPLICIT") ^^ { _ => Implicit }
+  def kwExplicit = kw("EXPLICIT") ^^ { _ => Explicit }
+  def kwDefinitions = kw("DEFINITIONS")
+  def kwBegin = kw("BEGIN")
+  def kwEnd = kw("END")
+  def kwExtensibility = kw("EXTENSIBILITY")
+  def kwImplied = kw("IMPLIED")
+  def kwExports = kw("EXPORTS")
+  def kwImports = kw("IMPORTS")
+  def kwFrom = kw("FROM")
 }

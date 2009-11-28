@@ -12,7 +12,7 @@ class GenJava(out: IndentWriter) {
         ModuleIdentifier(
           ModuleReference(moduleName),
           DefinitiveIdentifier(_)),
-        TagDefault(),
+        TagDefault(_),
         ExtensionDefault(_),
         ModuleBody(_, _, assignmentList))
       => {
