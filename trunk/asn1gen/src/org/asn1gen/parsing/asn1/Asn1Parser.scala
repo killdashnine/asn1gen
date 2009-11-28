@@ -803,9 +803,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 12.1.4<7>
   def class_ =
-    ( kw("UNIVERSAL") ^^ { _ => UniversalClass() }
-    | kw("APPLICATION") ^^ { _ => ApplicationClass() }
-    | kw("PRIVATE") ^^ { _ => PrivateClass() }
+    ( kwUniversal
+    | kwApplication
+    | kwPrivate
     | empty ^^ { _ => DefaultClass() }
     )
   
@@ -1868,6 +1868,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => ActualParameter(kind) }
 
   // Custom
+  def kwApplication = kw("APPLICATION") ^^ { _ => Application }
   def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
   def kwBegin = kw("BEGIN")
   def kwDefinitions = kw("DEFINITIONS")
@@ -1880,4 +1881,6 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def kwImplied = kw("IMPLIED")
   def kwImports = kw("IMPORTS")
   def kwOptional = kw("OPTIONAL") ^^ { _ => Optional }
+  def kwPrivate = kw("PRIVATE") ^^ { _ => Private }
+  def kwUniversal = kw("UNIVERSAL") ^^ { _ => Universal }
 }
