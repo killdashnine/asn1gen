@@ -1,5 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class OptionalExtensionMarker() extends Node {
+case class OptionalExtensionMarker(
+    exists: Boolean
+) extends Node {
 }
 

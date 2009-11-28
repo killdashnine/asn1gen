@@ -1041,9 +1041,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { es => ExtensionAndException(es) }
 
   def optionalExtensionMarker =
-    ( op(",") ~ op("...")
-    | empty
-    ) ^^ { _ => OptionalExtensionMarker() } // TODO
+    ( op(",") ~ op("...") ^^ { _ => true }
+    | empty ^^ { _ => false }
+    ) ^^ { exists => OptionalExtensionMarker(exists) } // TODO
 
   def extensionEndMarker =
     ( op(",") ~ op("...")
