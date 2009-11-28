@@ -6,10 +6,11 @@ object Empty
   extends Node
   with AssignedIdentifierKind
   with Class_
-  with PresenceConstraint
-  with ValueConstraintKind
-  with WithSyntaxSpecKind
-  with TaggedKind
+  with ExceptionSpecKind
   with OptionalDefault[Nothing]
-  with TagDefaultKind {
+  with PresenceConstraint
+  with TaggedKind
+  with TagDefaultKind
+  with ValueConstraintKind
+  with WithSyntaxSpecKind {
 }
