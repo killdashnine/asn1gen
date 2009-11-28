@@ -806,7 +806,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( kwUniversal
     | kwApplication
     | kwPrivate
-    | empty ^^ { _ => DefaultClass() }
+    | empty
     )
   
   // ASN1D 12.1.4<15>
