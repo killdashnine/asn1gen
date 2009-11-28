@@ -10,7 +10,7 @@ object GenJavaTags {
             ModuleIdentifier(
               ModuleReference("ModuleName"),
               DefinitiveIdentifier(_)),
-            TagDefault(),
+            TagDefault(_),
             ExtensionDefault(_),
             ModuleBody(_, _, assignmentList))
       => {

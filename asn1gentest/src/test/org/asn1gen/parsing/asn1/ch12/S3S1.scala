@@ -6,7 +6,7 @@ import _root_.org.asn1gen.parsing.asn1.ast._
 import _root_.scala.util.parsing.input._
 
 package test.org.asn1gen.parsing.asn1.ch12 {
-  class Test31S1 extends TestCase {
+  class TestS3S1 extends TestCase {
     
     object TheParser extends Asn1Parser {
       def parse[N](root: Parser[N], input: String) =

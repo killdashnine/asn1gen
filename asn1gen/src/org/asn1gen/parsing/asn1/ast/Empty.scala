@@ -8,5 +8,6 @@ object Empty
   with ValueConstraintKind
   with WithSyntaxSpecKind
   with TaggedKind
-  with OptionalDefault[Nothing] {
+  with OptionalDefault[Nothing]
+  with TagDefaultKind {
 }

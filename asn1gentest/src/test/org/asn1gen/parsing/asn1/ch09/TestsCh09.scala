@@ -1,4 +1,4 @@
-package test.org.asn1gen.parsing.asn1
+package test.org.asn1gen.parsing.asn1.ch09
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -11,5 +11,5 @@ import org.junit.runners.Suite;
     , classOf[test.org.asn1gen.parsing.asn1.ch09.TestS4S1]
     )
 )
-class Ch09 {
+class TestsCh09 {
 }

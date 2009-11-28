@@ -19,7 +19,7 @@ package test.org.asn1gen.parsing.asn1 {
             ModuleIdentifier(
               ModuleReference("ModuleName"),
               DefinitiveIdentifier(_)),
-            TagDefault(),
+            TagDefault(_),
             ExtensionDefault(_),
             ModuleBody(_, _, _)), _) =>
         case x => fail("Parse failed: " + x)
@@ -33,7 +33,7 @@ package test.org.asn1gen.parsing.asn1 {
             ModuleIdentifier(
               ModuleReference("ModuleName"),
               DefinitiveIdentifier(_)),
-            TagDefault(),
+            TagDefault(_),
             ExtensionDefault(_),
             ModuleBody(_, _, _)), _) =>
         case x => fail("Parse failed: " + x)
@@ -47,7 +47,7 @@ package test.org.asn1gen.parsing.asn1 {
             ModuleIdentifier(
               ModuleReference("ModuleName"),
               DefinitiveIdentifier(_)),
-            TagDefault(),
+            TagDefault(_),
             ExtensionDefault(_),
             ModuleBody(
               _,
