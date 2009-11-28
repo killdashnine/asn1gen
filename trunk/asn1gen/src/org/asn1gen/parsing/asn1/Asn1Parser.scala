@@ -1060,9 +1060,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 13.1.2<1>
   def constrainedType =
-    ( failure("refactor to type_") ~ type_ ~ constraint
-    | typeWithConstraint
-    ) ^^ { _ => ConstrainedType() } // TODO
+    ( /*failure("refactor to type_") ~ type_ ~ constraint
+    |*/ typeWithConstraint
+    ) ^^ { twc => ConstrainedType(twc) } // TODO
 
   // ASN1D 13.2.2<1>
   def singleValue =
@@ -1072,13 +1072,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 13.3.2<1>
   def containedSubtype =
     ( includes ~ type_
-    ) ^^ { case i ~ t => ContainedSubtype(i, t) }
+    ) ^^ { case i ~ t => ContainedSubtype(i.isDefined, t) }
 
   // ASN1D 13.3.7<7>
   def includes =
-    ( kw("INCLUDES")
-    | empty
-    ) ^^ { _ => Includes() }
+    ( kwIncludes.?
+    )
 
   // ASN1D 13.4.2<1>
   def valueRange =
@@ -1088,11 +1087,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 13.4.2<3> refactored
   def lowerEndPoint =
     ( lowerEndValue ~ op("<").?
-    ) ^^ { _ => LowerEndPoint() }
+    ) ^^ { case lev ~ exclusive => LowerEndPoint(exclusive.isDefined, lev) }
   // refactored
   def upperEndPoint =
     ( op("<").? ~ upperEndValue
-    ) ^^ { _ => UpperEndPoint() }
+    ) ^^ { case exclusive ~ uev => UpperEndPoint(exclusive.isDefined, uev) }
   
   // ASN1D 13.4.2<4>
   def lowerEndValue =
@@ -1869,7 +1868,6 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { v => Default(v) }
     
   // Keywords
-  def kwPresent = kw("PRESENT") ^^ { _ => Present }
   def kwAbsent = kw("ABSENT") ^^ { _ => Absent }
   def kwApplication = kw("APPLICATION") ^^ { _ => Application }
   def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
@@ -1881,10 +1879,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def kwExports = kw("EXPORTS")
   def kwExtensibility = kw("EXTENSIBILITY")
   def kwFrom = kw("FROM")
+  def kwIncludes = kw("INCLUDES")
   def kwImplicit = kw("IMPLICIT") ^^ { _ => Implicit }
   def kwImplied = kw("IMPLIED")
   def kwImports = kw("IMPORTS")
   def kwOptional = kw("OPTIONAL") ^^ { _ => Optional }
+  def kwPresent = kw("PRESENT") ^^ { _ => Present }
   def kwPrivate = kw("PRIVATE") ^^ { _ => Private }
   def kwUniversal = kw("UNIVERSAL") ^^ { _ => Universal }
 }
