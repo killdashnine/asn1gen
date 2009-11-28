@@ -39,7 +39,7 @@ package test.org.asn1gen.parsing.asn1 {
                           Type_(
                             BuiltinType(
                               TaggedType(
-                                Tag(DefaultClass(), ClassNumber(Number("0"))),
+                                Tag(Empty, ClassNumber(Number("0"))),
                                 _,
                                 Type_(
                                   BuiltinType(IntegerType(None)), _))),
@@ -49,7 +49,7 @@ package test.org.asn1gen.parsing.asn1 {
                           Type_(
                             BuiltinType(
                               TaggedType(
-                                Tag(DefaultClass(), ClassNumber(Number("1"))),
+                                Tag(Empty, ClassNumber(Number("1"))),
                                 _,
                                 Type_(BuiltinType(IntegerType(None)), _))),
                             _))))),

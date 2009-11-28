@@ -884,7 +884,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def componentType =
     ( namedType
     ~ ( kwOptional 
-      | kw("DEFAULT") ~> value ^^ { _ => Default(value) }
+      | default(value)
       | empty
       )
     | kw("COMPONENTS") ~ kw("OF") ~ type_
@@ -1387,7 +1387,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case tfr ~ tos => TypeFieldSpec(tfr, tos) }
   def typeOptionalitySpec =
     ( kwOptional
-    | kw("DEFAULT") ~> type_ ^^ { t => Default(t) }
+    | default(type_)
     | empty
     ) ^^ { value => TypeOptionalitySpec(value) }
   
@@ -1408,7 +1408,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 15.2.2<10>
   def valueOptionalitySpec =
     ( kwOptional
-    | kw("DEFAULT") ~> value ^^ { v => Default(v) }
+    | default(value)
     | empty
     ) ^^ { value => ValueOptionalitySpec(value) }
   
@@ -1425,7 +1425,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 15.2.2<18>
   def valueSetOptionalitySpec =
     ( kwOptional
-    | kw("DEFAULT") ~> valueSet ^^ { v => Default(v) }
+    | default(valueSet)
     | empty
     ) ^^ { value => ValueSetOptionalitySpec(value) }
   
@@ -1442,7 +1442,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 15.2.2<26>
   def objectOptionalitySpec =
     ( kwOptional
-    | kw("DEFAULT") ~> object_ ^^ { o => Default(o) }
+    | default(object_)
     | empty
     ) ^^ { oos => ObjectOptionalitySpec(oos) }
   
@@ -1454,7 +1454,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 15.2.2<29>
   def objectSetOptionalitySpec : Parser[ObjectSetOptionalitySpec] =
     ( kwOptional
-    | kw("DEFAULT") ~> objectSet ^^ { os => Default(os) }
+    | default(objectSet)
     | empty
     ) ^^ { osos => ObjectSetOptionalitySpec(osos) }
   
@@ -1868,9 +1868,15 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => ActualParameter(kind) }
 
   // Custom
+  def default[T](p: Parser[T]) =
+    ( kwDefault ~> p
+    ) ^^ { v => Default(v) }
+    
+  // Keywords
   def kwApplication = kw("APPLICATION") ^^ { _ => Application }
   def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
   def kwBegin = kw("BEGIN")
+  def kwDefault = kw("DEFAULT")
   def kwDefinitions = kw("DEFINITIONS")
   def kwEnd = kw("END")
   def kwExplicit = kw("EXPLICIT") ^^ { _ => Explicit }
