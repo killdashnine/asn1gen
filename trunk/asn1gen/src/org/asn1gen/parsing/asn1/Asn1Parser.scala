@@ -863,11 +863,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { ctl => RootComponentTypeList(ctl) }
   
   def extensionsAdditions =
-    ( ( op(",")
-      ~ extensionAdditionList
-      )
-    | empty
-    ) ^^ { _ => ExtensionsAdditions() }
+    ( op(",") ~> extensionAdditionList
+    ).? ^^ { eal => ExtensionsAdditions(eal) }
 
   def extensionAdditionList =
     ( rep1sep(extensionAddition, op(","))
@@ -877,8 +874,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | extensionAdditionGroup
     ) ^^ { case kind => ExtensionAddition(kind) }
   def extensionAdditionGroup =
-    ( op("[[") ~ componentTypeList ~ op("]", "]")
-    ) ^^ { case _ ~ ctl ~ _ => ExtensionAdditionGroup(ctl) }
+    ( op("[[") ~> componentTypeList <~ op("]", "]")
+    ) ^^ { ctl => ExtensionAdditionGroup(ctl) }
   def componentTypeList =
     ( rep1sep(componentType, op(","))
     ) ^^ { cts => ComponentTypeList(cts) }
