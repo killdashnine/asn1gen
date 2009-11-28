@@ -883,7 +883,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 12.2.2<13> refactored
   def componentType =
     ( namedType
-    ~ ( kw("OPTIONAL") ^^ { _ => Optional } 
+    ~ ( kwOptional 
       | kw("DEFAULT") ~> value ^^ { _ => Default(value) }
       | empty
       )
@@ -1192,7 +1192,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def presenceConstraint =
     ( kw("PRESENT")
     | kw("ABSENT")
-    | kw("OPTIONAL")
+    | kwOptional
     | empty
     ) ^^ { _ => PresenceConstraint() }
   
@@ -1386,7 +1386,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( typeFieldReference ~ typeOptionalitySpec
     ) ^^ { case tfr ~ tos => TypeFieldSpec(tfr, tos) }
   def typeOptionalitySpec =
-    ( kw("OPTIONAL") ^^ { _ => Optional }
+    ( kwOptional
     | kw("DEFAULT") ~> type_ ^^ { t => Default(t) }
     | empty
     ) ^^ { value => TypeOptionalitySpec(value) }
@@ -1407,7 +1407,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<10>
   def valueOptionalitySpec =
-    ( kw("OPTIONAL") ^^ { _ => Optional }
+    ( kwOptional
     | kw("DEFAULT") ~> value ^^ { v => Default(v) }
     | empty
     ) ^^ { value => ValueOptionalitySpec(value) }
@@ -1424,7 +1424,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<18>
   def valueSetOptionalitySpec =
-    ( kw("OPTIONAL") ^^ { _ => Optional }
+    ( kwOptional
     | kw("DEFAULT") ~> valueSet ^^ { v => Default(v) }
     | empty
     ) ^^ { value => ValueSetOptionalitySpec(value) }
@@ -1441,7 +1441,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<26>
   def objectOptionalitySpec =
-    ( kw("OPTIONAL") ^^ { _ => Optional }
+    ( kwOptional
     | kw("DEFAULT") ~> object_ ^^ { o => Default(o) }
     | empty
     ) ^^ { oos => ObjectOptionalitySpec(oos) }
@@ -1453,7 +1453,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 15.2.2<29>
   def objectSetOptionalitySpec : Parser[ObjectSetOptionalitySpec] =
-    ( kw("OPTIONAL") ^^ { _ => Optional }
+    ( kwOptional
     | kw("DEFAULT") ~> objectSet ^^ { os => Default(os) }
     | empty
     ) ^^ { osos => ObjectSetOptionalitySpec(osos) }
@@ -1869,14 +1869,15 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // Custom
   def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
-  def kwImplicit = kw("IMPLICIT") ^^ { _ => Implicit }
-  def kwExplicit = kw("EXPLICIT") ^^ { _ => Explicit }
-  def kwDefinitions = kw("DEFINITIONS")
   def kwBegin = kw("BEGIN")
+  def kwDefinitions = kw("DEFINITIONS")
   def kwEnd = kw("END")
-  def kwExtensibility = kw("EXTENSIBILITY")
-  def kwImplied = kw("IMPLIED")
+  def kwExplicit = kw("EXPLICIT") ^^ { _ => Explicit }
   def kwExports = kw("EXPORTS")
-  def kwImports = kw("IMPORTS")
+  def kwExtensibility = kw("EXTENSIBILITY")
   def kwFrom = kw("FROM")
+  def kwImplicit = kw("IMPLICIT") ^^ { _ => Implicit }
+  def kwImplied = kw("IMPLIED")
+  def kwImports = kw("IMPORTS")
+  def kwOptional = kw("OPTIONAL") ^^ { _ => Optional }
 }
