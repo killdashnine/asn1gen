@@ -1095,11 +1095,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 13.4.2<4>
   def lowerEndValue =
-    ( value | kw("MIN")
-    ) ^^ { _ => LowerEndValue() }
+    ( value | kwMin
+    ) ^^ { kind => LowerEndValue(kind) }
   def upperEndValue =
-    ( value | kw("MAX")
-    ) ^^ { _ => UpperEndValue() }
+    ( value | kwMax
+    ) ^^ { kind => UpperEndValue(kind) }
   
   // ASN1D 13.5.2<1>
   // See ASN1D 12.4.2<5>
@@ -1883,6 +1883,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def kwImplicit = kw("IMPLICIT") ^^ { _ => Implicit }
   def kwImplied = kw("IMPLIED")
   def kwImports = kw("IMPORTS")
+  def kwMax = kw("MAX") ^^ { _ => Max }
+  def kwMin = kw("MIN") ^^ { _ => Min }
   def kwOptional = kw("OPTIONAL") ^^ { _ => Optional }
   def kwPresent = kw("PRESENT") ^^ { _ => Present }
   def kwPrivate = kw("PRIVATE") ^^ { _ => Private }

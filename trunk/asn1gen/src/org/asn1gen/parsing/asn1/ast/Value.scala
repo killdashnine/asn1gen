@@ -4,5 +4,9 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class Value(
   kind: ValueKind
-) extends Node with SettingKind with ActualParameterKind {
+) extends Node
+  with SettingKind
+  with ActualParameterKind
+  with LowerEndValueKind
+  with UpperEndValueKind {
 }
