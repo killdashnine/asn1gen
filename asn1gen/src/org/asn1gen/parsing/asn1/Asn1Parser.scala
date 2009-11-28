@@ -1047,9 +1047,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 12.9.2<18>
   def exceptionSpec =
-    ( op("!") ~ exceptionIdentification
+    ( op("!") ~> exceptionIdentification
     | empty
-    ) ^^ { _ => ExceptionSpec() }
+    ) ^^ { kind => ExceptionSpec(kind) }
 
   // ASN1D 12.9.2<20>
   def exceptionIdentification =
