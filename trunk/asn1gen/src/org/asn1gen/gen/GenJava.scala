@@ -38,9 +38,8 @@ class GenJava(out: IndentWriter) {
         TypeAssignment(
           TypeReference(name),
           Type_(
-            BuiltinType(
-              ChoiceType(
-                AlternativeTypeLists(rootAlternativeTypeList, _, _, _))),
+            ChoiceType(
+              AlternativeTypeLists(rootAlternativeTypeList, _, _, _)),
             _)))
       => {
         out.println("public class " + name + " {")
@@ -72,9 +71,8 @@ class GenJava(out: IndentWriter) {
       case NamedType(
         Identifier(name),
         Type_(
-          BuiltinType(
-            TaggedType(
-              Tag(_, ClassNumber(Number(tagNumber))), _, _)),
+          TaggedType(
+            Tag(_, ClassNumber(Number(tagNumber))), _, _),
           _))
       => {
         out.println()
@@ -99,8 +97,7 @@ class GenJava(out: IndentWriter) {
       case NamedType(
         Identifier(name),
         Type_(
-          BuiltinType(
-            TaggedType(_, _, type_)),
+          TaggedType(_, _, type_),
           _))
       => {
         val getter = "get" + name.first.toUpperCase + name.substring(1)

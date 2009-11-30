@@ -36,7 +36,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_builtinType_1() {
       parse(builtinType, "NULL") match {
         case Success(
-          result@BuiltinType(_),
+          result: BuiltinType,
           _) =>
         case x => fail("Parse 'builtinType' failure: " + x)
       }
@@ -45,7 +45,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_builtinType_2() {
       parse(builtinType, "INTEGER { a(1), b(2), c(3) }") match {
         case Success(
-          result@BuiltinType(_),
+          result: BuiltinType,
           _) =>
         case x => fail("Parse 'builtinType' failure: " + x)
       }
@@ -54,7 +54,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_builtinType_3() {
       parse(builtinType, "CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
         case Success(
-          result@BuiltinType(_),
+          result: BuiltinType,
           _) =>
         case x => fail("Parse 'type_' failure: " + x)
       }
