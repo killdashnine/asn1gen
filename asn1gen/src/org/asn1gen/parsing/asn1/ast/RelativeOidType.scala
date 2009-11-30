@@ -1,5 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class RelativeOidType() extends Node with BuiltinTypeKind {
+case class RelativeOidType() extends Node with BuiltinType {
 }
 

@@ -140,7 +140,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | setOfType
     | setType
     | taggedType
-    ) ^^ { kind => BuiltinType(kind) }
+    )
   
   def referencedType =
     ( definedType

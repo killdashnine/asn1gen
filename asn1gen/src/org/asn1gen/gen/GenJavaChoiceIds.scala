@@ -38,9 +38,8 @@ class GenJavaChoiceIds(out: IndentWriter) {
         TypeAssignment(
           TypeReference(name),
           Type_(
-            BuiltinType(
-              ChoiceType(
-                AlternativeTypeLists(rootAlternativeTypeList, _, _, _))),
+            ChoiceType(
+              AlternativeTypeLists(rootAlternativeTypeList, _, _, _)),
             _)))
       => {
         out.println("public class " + name + " {")
@@ -68,10 +67,9 @@ class GenJavaChoiceIds(out: IndentWriter) {
       case NamedType(
         Identifier(name),
         Type_(
-          BuiltinType(
-            TaggedType(
-              Tag(_, ClassNumber(Number(tagNumber))),
-              _, _)),
+          TaggedType(
+            Tag(_, ClassNumber(Number(tagNumber))),
+            _, _),
           _))
       => {
         out.println("public static int " + name + " = " + tagNumber + ";")
