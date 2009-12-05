@@ -1054,11 +1054,15 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => ExceptionSpec(kind) }
 
   // ASN1D 12.9.2<20>
+  def exceptionIdentificationTypeAndValue =
+    ( type_ ~ op(":") ~ value
+    ) ^^ { case t ~ _ ~ v => ExceptionIdentificationTypeAndValue(t, v) }
+
   def exceptionIdentification =
     ( signedNumber
     | definedValue
-    | type_ ~ op(":") ~ value
-    ) ^^ { _ => ExceptionIdentification() }
+    | exceptionIdentificationTypeAndValue
+    )
   
   // ASN1D 13.1.2<1>
   def constrainedType =
