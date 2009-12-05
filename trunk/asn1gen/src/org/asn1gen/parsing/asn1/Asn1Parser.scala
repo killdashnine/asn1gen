@@ -806,12 +806,14 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => TagDefault(kind) }
 
   // ASN1D 12.2.2<1>
+  def extensionSequenceTypeSpec =
+    ( extensionAndException
+    ~ optionalExtensionMarker
+    ) ^^ { case ea ~ oem => ExtensionSequenceTypeSpec(ea, oem) }
+  
   def sequenceTypeSpec =
-    ( ( extensionAndException
-      ~ optionalExtensionMarker
-      ) ^^ { case ea ~ oem => ExtensionSequenceType(ea, oem) }
-    | ( componentTypeLists
-      ) ^^ { ctl => ComponentSequenceType(ctl) }
+    ( extensionSequenceTypeSpec
+    | componentTypeLists
     | empty
     )
 	
