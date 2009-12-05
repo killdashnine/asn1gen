@@ -868,14 +868,22 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { cts => ComponentTypeList(cts) }
   
   // ASN1D 12.2.2<13> refactored
-  def componentType =
+  def namedComponentType =
     ( namedType
     ~ ( kwOptional 
       | default(value)
       | empty
       )
-    | kw("COMPONENTS") ~ kw("OF") ~ type_
-    ) ^^ { _ => ComponentType() }
+    ) ^^ { case nt ~ od => NamedComponentType(nt, od) }
+    
+  def basicComponentType =
+    ( kw("COMPONENTS") ~> kw("OF") ~> type_
+    ) ^^ { t => BasicComponentType(t) }
+    
+  def componentType =
+    ( namedComponentType
+    | basicComponentType
+    )
   
   // ASN1D 12.2.2<24>
   def namedType =
