@@ -91,7 +91,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_typeAssignment_3() {
       parse(typeAssignment, "Pair ::= SEQUENCE { x INTEGER, y INTEGER }") match {
         case Success(
-          result@TypeAssignment(TypeReference("Pair"), Type_(SequenceType(), _)),
+          result@TypeAssignment(TypeReference("Pair"), Type_(SequenceType(_), _)),
           _) =>
         case x => fail("Parse 'type' failure: " + x)
       }
