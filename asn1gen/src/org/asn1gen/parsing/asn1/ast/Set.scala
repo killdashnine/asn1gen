@@ -1,4 +1,4 @@
 package org.asn1gen.parsing.asn1.ast
 
-object Set {
+object Set extends SequenceOrSet {
 }
