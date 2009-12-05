@@ -9,6 +9,7 @@ object Empty
   with ExceptionSpecKind
   with OptionalDefault[Nothing]
   with PresenceConstraint
+  with SequenceTypeSpec
   with TaggedKind
   with TagDefaultKind
   with ValueConstraintKind

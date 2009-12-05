@@ -806,19 +806,18 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => TagDefault(kind) }
 
   // ASN1D 12.2.2<1>
+  def sequenceTypeSpec =
+    ( ( extensionAndException
+      ~ optionalExtensionMarker
+      ) ^^ { case ea ~ oem => ExtensionSequenceType(ea, oem) }
+    | ( componentTypeLists
+      ) ^^ { ctl => ComponentSequenceType(ctl) }
+    | empty
+    )
+	
   def sequenceType =
-    ( kwSequence
-    ~ op("{")
-    ~ ( ( extensionAndException
-        ~ optionalExtensionMarker
-        ) ^^ { _ => ExtensionSequenceType() } // TODO
-      | ( componentTypeLists
-        ) ^^ { ctl => ComponentSequenceType(ctl) }
-      | ( empty
-        ) ^^ { _ => EmptySequenceType() }
-      )
-      ~ op("}")
-    ) ^^ { _ => SequenceType() }
+    ( kwSequence ~> op("{") ~> sequenceTypeSpec <~ op("}")
+    ) ^^ { spec => SequenceType(spec) }
   
   // ASN1D 12.2.2<4> refactored new
   def componentTypeListsExtension =
