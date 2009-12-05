@@ -1003,7 +1003,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def extensionAdditionAlternatives =
     ( op(",") ~> extensionAdditionAlternativesList
     | empty
-    ) ^^ { _ => ExtensionAdditionAlternatives() } // TODO
+    )
 
   def extensionAdditionAlternativesList =
     ( rep1sep(extensionAdditionAlternative, op(","))

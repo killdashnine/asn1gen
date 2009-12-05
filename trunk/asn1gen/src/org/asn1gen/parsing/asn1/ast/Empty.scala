@@ -7,6 +7,7 @@ object Empty
   with AssignedIdentifierKind
   with Class_
   with ExceptionSpecKind
+  with ExtensionAdditionAlternatives
   with OptionalDefault[Nothing]
   with PresenceConstraint
   with SequenceTypeSpec
