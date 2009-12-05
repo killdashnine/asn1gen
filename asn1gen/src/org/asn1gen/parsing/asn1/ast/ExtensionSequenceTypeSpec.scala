@@ -1,6 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class ExtensionSequenceType(
+case class ExtensionSequenceTypeSpec(
   extensionAndException: ExtensionAndException,
   optionalExtensionMarker: OptionalExtensionMarker
 ) extends SequenceTypeSpec {
