@@ -948,7 +948,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
       )
     ~ kw("OF")
     ~ type_
-    ) ^^ { _ => TypeWithConstraint() }
+    ) ^^ { case ct ~ c ~ _ ~ t => TypeWithConstraint(ct, c, t) }
   
   // ASN1D 12.4.2<5>
   def sizeConstraint =
