@@ -1135,10 +1135,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 13.8.2<1>
   def innerTypeConstraints =
     ( kw("WITH")
-    ~ ( kw("COMPONENT") ~ singleTypeConstraint
-      | kw("COMPONENTS") ~ multipleTypeConstraints
+    ~>( kw("COMPONENT") ~> singleTypeConstraint
+      | kw("COMPONENTS") ~> multipleTypeConstraints
       )
-    ) ^^ { _ => InnerTypeConstraints() }
+    )
   
   // ASN1D 13.8.2<3>
   def singleTypeConstraint =
