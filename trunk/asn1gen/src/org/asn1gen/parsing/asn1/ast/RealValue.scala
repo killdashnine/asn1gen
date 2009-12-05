@@ -4,5 +4,5 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class RealValue(
   kind: RealValueKind
-) extends Node with BuiltinValueKind {
+) extends Node with BuiltinValue {
 }

@@ -186,7 +186,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | setValue
     | setOfValue
     | taggedValue
-    ) ^^ { kind => BuiltinValue(kind) }
+    )
   
   def referencedValue =
     ( valueFromObject // refactored
@@ -445,26 +445,23 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 10.1.2
   def booleanType =
-    ( kw("BOOLEAN")
-    ) ^^ { _ => BooleanType() }
-  
-  def booleanValue =
-    ( kw("TRUE") ^^ { _ => BooleanValue(true) }
-    | kw("FALSE") ^^ { _ => BooleanValue(false) }
+    ( kwBoolean
     )
+  
+  def booleanValue = kwTrue | kwFalse
   
   // ASN1D 10.2.2
   def nullType =
-    ( kw("NULL")
-    ) ^^ { _ => NullType() }
+    ( kwNull
+    )
   
   def nullValue =
-    ( kw("NULL")
-    ) ^^ { _ => NullValue() }
+    ( kwNull
+    )
   
   // ASN1D 10.3.2<1>
   def integerType =
-    ( kw("INTEGER")
+    ( kwInteger
     ~ ( op("{") ~> rep1sep(namedNumber, op(",")) <~ op("}")
       ).?
     ) ^^ { case _ ~ nns => IntegerType(nns) }
@@ -485,7 +482,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 10.4.2<1>
   def enumeratedType =
-    ( kw("ENUMERATED")
+    ( kwEnumerated
     ~ op("{")
     ~ enumerations
     ~ op("}")
@@ -540,9 +537,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { i => EnumeratedValue(i) }
   
   // ASN1D 10.5.2<1>
-  def realType =
-    ( kw("REAL")
-    ) ^^ { _ => RealType() }
+  def realType = kwReal
   
   // ASN1D 10.5.2<5>
   def realValue =
@@ -556,10 +551,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => NumericRealValue(kind) }
   
   // ASN1D 10.5.2<8>
-  def specialRealValue =
-    ( kw("PLUS-INFINITY") ^^ { _ => SpecialRealValue(true) }
-    | kw("MINUS-INFINITY") ^^ { _ => SpecialRealValue(false) }
-    )
+  def specialRealValue = kwPlusInfinity | kwMinusInfinity
   
   // ASN1D 10.6.2<1>
   def bitStringType =
@@ -597,7 +589,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def octetStringType =
     ( kw("OCTET")
     ~ kw("STRING")
-    ) ^^ { _ => OctetStringType() }
+    ) ^^ { _ => OctetStringType }
   
   // ASN1D 10.7.2<4>
   def octetStringValue =
@@ -609,7 +601,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def objectIdentifierType =
     ( kw("OBJECT")
     ~ kw("IDENTIFIER")
-    ) ^^ { _ => ObjectIdentifierType() }
+    ) ^^ { _ => ObjectIdentifierType }
   
   // ASN1D 10.8.2<3> refactored
   def objectIdentifierValueData =
@@ -649,9 +641,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case i ~ _ ~ n ~ _ => NameAndNumberForm(i, n) }
   
   // ASN1D 10.9.2<2>
-  def relativeOidType =
-    ( kw("RELATIVE-OID")
-    ) ^^ { _ => RelativeOidType() }
+  def relativeOidType = kwRelativeOid
   
   // ASN1D 10.9.2<4>
   def relativeOidValue =
@@ -770,11 +760,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { n => TableRow(n) }
   
   // ASN1D 11.15.2
-  def usefulType =
-    ( kw("GeneralizedTime")
-    | kw("UTCTime")
-    | kw("ObjectDescriptor")
-    ) ^^ { case Keyword(kw) => UsefulType(kw) }
+  def usefulType = kwGeneralizedTime | kwUTCTime | kwObjectDescriptor
   
   // ASN1D 11.16.2<1>
   // See ASN1D 11.15.2<1>
@@ -1006,7 +992,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( alternativeTypeList
     ) ^^ { atl => RootAlternativeTypeList(atl) }
   def extensionAdditionAlternatives =
-    ( op(",") ~ extensionAdditionAlternativesList
+    ( op(",") ~> extensionAdditionAlternativesList
     | empty
     ) ^^ { _ => ExtensionAdditionAlternatives() } // TODO
 
@@ -1240,30 +1226,30 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 13.11.2<10> refactored
   def unions: Parser[Unions] =
     ( rep1sep(intersections, unionMark)
-    ) ^^ { _ => Unions() }
+    ) ^^ { i => Unions(i) }
 
   // ASN1D 13.11.2<11>
   // uElems refactored out
   def unionMark =
     ( op("|")
     | kw("UNION")
-    ) ^^ { _ => UnionMark() }
+    ) ^^ { _ => UnionMark }
  
   // ASN1D 13.11.2<12> refactored
   def intersections: Parser[Intersections] =
     ( rep1sep(intersectionElements, intersectionMark)
-    ) ^^ { _ => Intersections() }
+    ) ^^ { ie => Intersections(ie) }
   
   // ASN1D 13.11.2<13>
   // iElems refactored out
   def intersectionMark =
     ( op("^")
     | kw("INTERSECTION")
-    ) ^^ { _ => IntersectionMark() }
+    ) ^^ { _ => IntersectionMark }
   def intersectionElements =
     ( elements
     ~ exclusions.?
-    ) ^^ { _ => IntersectionElements() }
+    ) ^^ { case el ~ ex => IntersectionElements(el, ex) }
   
   // ASN1D 13.11.2<14>
 
@@ -1315,10 +1301,13 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 13.13.2<3>
   def userDefinedConstraintParameter	=
-    ( governor ~ op(":") ~ value
-    | governor ~ op(":") ~ valueSet
-    | governor ~ op(":") ~ object_
-    | governor ~ op(":") ~ objectSet
+    ( ( governor ~ op(":")
+      ~ ( value
+        | valueSet
+        | object_
+        | objectSet
+        )
+      )
     | type_
     | definedObjectClass
     ) ^^ { _ => UserDefinedConstraintParameter() }
@@ -1330,9 +1319,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => Governor(kind) }
 
   // ASN1D 14.1.2<1>
-  def externalType =
-    ( kw("EXTERNAL")
-    ) ^^ { _ => ExternalType() } // TODO
+  def externalType = kwExternal
 
   // ASN1D 14.1.2<7>
   def externalValue =
@@ -1342,7 +1329,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 14.2.2<1>
   def embeddedPdvType =
     ( kw("EMBEDDED") ~ kw("PDV")
-    ) ^^ { _ => EmbeddedPdvType() }
+    ) ^^ { _ => EmbeddedPdvType }
 
   // ASN1D 14.2.2<5>
   def embeddedPdvValue =
@@ -1352,7 +1339,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 14.3.2<1>
   def unrestrictedCharacterStringType =
     ( kw("CHARACTER") ~ kw("STRING")
-    ) ^^ { _ => UnrestrictedCharacterStringType() }
+    ) ^^ { _ => UnrestrictedCharacterStringType }
 
   // ASN1D 14.3.2<6>
   def unrestrictedCharacterStringValue =
@@ -1402,10 +1389,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case vfr ~ t ~ u ~ vos => FixedTypeValueFieldSpec(vfr, t, u, vos) }
 
   // ASN1D 15.2.2<7>
-  def unique =
-    ( kw("UNIQUE")
-    | empty
-    ) ^^ { _ => Unique() }
+  def unique = kwUnique.?
 
   // ASN1D 15.2.2<10>
   def valueOptionalitySpec =
@@ -1720,10 +1704,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case _ ~ v => InstanceOfValue(v) }
   
   // ASN1D 15.9.2<1>
-  def usefulObjectClassReference =
-    ( kw("TYPE-IDENTIFIER") ^^ { _ => TypeIdentifier() }
-    | kw("ABSTRACT-SYNTAX") ^^ { _ => AbstractSyntax() }
-    ) ^^ { kind => UsefulObjectClassReference(kind) }
+  def usefulObjectClassReference = kwTypeIdentifier | kwAbstractSyntax
   
   // ASN1D 15.9.2<2>
   def instanceOfType =
@@ -1876,26 +1857,43 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     
   // Keywords
   def kwAbsent = kw("ABSENT") ^^ { _ => Absent }
+  def kwAbstractSyntax = kw("ABSTRACT-SYNTAX") ^^ { _ => ABSTRACT_SYNTAX }
   def kwApplication = kw("APPLICATION") ^^ { _ => Application }
   def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
+  def kwBoolean = kw("BOOLEAN") ^^ { _ => BOOLEAN }
   def kwBegin = kw("BEGIN")
   def kwDefault = kw("DEFAULT")
   def kwDefinitions = kw("DEFINITIONS")
   def kwEnd = kw("END")
+  def kwEnumerated = kw("ENUMERATED") ^^ { _ => ENUMERATED }
   def kwExplicit = kw("EXPLICIT") ^^ { _ => Explicit }
   def kwExports = kw("EXPORTS")
+  def kwExternal = kw("EXTERNAL") ^^ { _ => EXTERNAL }
   def kwExtensibility = kw("EXTENSIBILITY")
+  def kwFalse = kw("FALSE") ^^ { _ => FALSE }
   def kwFrom = kw("FROM")
   def kwIncludes = kw("INCLUDES")
   def kwImplicit = kw("IMPLICIT") ^^ { _ => Implicit }
   def kwImplied = kw("IMPLIED")
   def kwImports = kw("IMPORTS")
+  def kwInteger = kw("INTEGER") ^^ { _ => INTEGER }
   def kwMax = kw("MAX") ^^ { _ => Max }
   def kwMin = kw("MIN") ^^ { _ => Min }
+  def kwMinusInfinity = kw("MINUS-INFINITY")  ^^ { _ => MINUS_INFINITY }
+  def kwNull = kw("NULL") ^^ { _ => NULL }
+  def kwGeneralizedTime = kw("GeneralizedTime") ^^ { _ => GeneralizedTime }
+  def kwObjectDescriptor = kw("ObjectDescriptor") ^^ { _ => ObjectDescriptor }
   def kwOptional = kw("OPTIONAL") ^^ { _ => Optional }
+  def kwPlusInfinity = kw("PLUS-INFINITY") ^^ { _ => PLUS_INFINITY }
   def kwPresent = kw("PRESENT") ^^ { _ => Present }
   def kwPrivate = kw("PRIVATE") ^^ { _ => Private }
+  def kwReal = kw("REAL") ^^ { _ => REAL }
+  def kwRelativeOid = kw("RELATIVE-OID") ^^ { _ => RelativeOidType }
   def kwSequence = kw("SEQUENCE") ^^ { _ => Sequence }
   def kwSet = kw("SET") ^^ { _ => Set }
+  def kwTrue = kw("TRUE") ^^ { _ => TRUE }
+  def kwTypeIdentifier = kw("TYPE-IDENTIFIER") ^^ { _ => TYPE_IDENTIFIER }
+  def kwUnique = kw("UNIQUE") ^^ { _ => UNIQUE }
   def kwUniversal = kw("UNIVERSAL") ^^ { _ => Universal }
+  def kwUTCTime = kw("UTCTime") ^^ { _ => UTCTime }
 }
