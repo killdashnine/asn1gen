@@ -4,5 +4,5 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class IntegerValue(
   kind: IntegerValueKind
-) extends Node with EnumerationItemKind with BuiltinValueKind {
+) extends Node with EnumerationItemKind with BuiltinValue {
 }

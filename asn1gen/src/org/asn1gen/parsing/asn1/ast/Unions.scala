@@ -1,5 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class Unions() extends Node {
+case class Unions(
+    intersectionsList: List[Intersections]
+) extends Node {
 }
-

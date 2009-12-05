@@ -77,7 +77,7 @@ package test.org.asn1gen.parsing.asn1 {
                 AlternativeTypeList(
                   List(
                     NamedType(Identifier("integer"),Type_(IntegerType(None), _)),
-                    NamedType(Identifier("boolean"),Type_(BooleanType(), _))))),
+                    NamedType(Identifier("boolean"),Type_(BOOLEAN, _))))),
               None,
               None,
               None)),
