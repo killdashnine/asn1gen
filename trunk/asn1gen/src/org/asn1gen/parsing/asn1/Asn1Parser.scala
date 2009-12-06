@@ -826,23 +826,26 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( extensionAndException
     ~ extensionsAdditions
     ~ optionalExtensionMarker
-    )
+    ) ^^ { case ee ~ ea ~ oem => ComponentTypeListsExtension(ee, ea, oem) }
 
   // refactored
   def componentTypeLists =
     ( ( rootComponentTypeList
       ~ ( op(",")
-        ~ componentTypeListsExtension
+        ~>componentTypeListsExtension
         ~ ( op(",")
-          ~ rootComponentTypeList
+          ~>rootComponentTypeList
           ).?
         ).?
-      )
+      ) ^^ {
+        case l1 ~ None => ComponentTypeLists(Some(l1), None, None)
+        case l1 ~ Some(e ~ l2) => ComponentTypeLists(Some(l1), Some(e), l2)
+      }
     | ( componentTypeListsExtension
       ~ op(",")
       ~ rootComponentTypeList
-      )
-    ) ^^ { _ => ComponentTypeLists() }
+      ) ^^ { case e ~ _ ~ l => ComponentTypeLists(None, Some(e), Some(l)) }
+    )
   
   // ASN1D 12.2.2<5>
   def rootComponentTypeList =
