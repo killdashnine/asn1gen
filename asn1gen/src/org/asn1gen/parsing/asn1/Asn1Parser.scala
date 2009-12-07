@@ -626,10 +626,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // See ASN1D 9.2.2<6>
   
   // ASN1D 10.8.6<8>
-  def numberForm =
+  def numberForm: Parser[NumberForm] =
     ( number
     | definedValue
-    ) ^^ { kind => NumberForm(kind) }
+    )
   
   // ASN1D 10.8.6<10>
   def nameAndNumberForm =

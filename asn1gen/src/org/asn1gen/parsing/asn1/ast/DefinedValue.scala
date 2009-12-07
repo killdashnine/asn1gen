@@ -9,7 +9,7 @@ trait DefinedValue
   with ExceptionIdentification
   with ObjIdComponents
   with NamedNumberValue
-  with NumberFormKind
+  with NumberForm
   with ReferencedValue
   with RelativeOidComponentsKind
   with NamedBitKind {
