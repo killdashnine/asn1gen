@@ -7,5 +7,8 @@ case class Quadruple(
   plane: Plane,
   row: Row,
   cell: Cell
-) extends Node with RelativeOidComponentsKind with CharsDefnKind with RestrictedCharacterStringValueKind {
+) extends Node
+  with RelativeOidComponentsKind
+  with CharsDefnKind
+  with RestrictedCharacterStringValue {
 }

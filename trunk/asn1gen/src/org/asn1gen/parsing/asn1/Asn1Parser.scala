@@ -664,12 +664,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // See ASN1D 10.8.6<10>
   
   // ASN1D 11.10.2<9>
-  def restrictedCharacterStringValue =
+  def restrictedCharacterStringValue: Parser[RestrictedCharacterStringValue] =
     ( cstring
     | characterStringList
     | quadruple
     | tuple
-    ) ^^ { kind => RestrictedCharacterStringValue(kind) }
+    )
   
   def characterStringList =
     ( op("{") ~> rep1sep(charsDefn, op(",")) <~ op("}")
@@ -710,21 +710,21 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | unrestrictedCharacterStringType
     ) ^^ { kind => CharacterStringType(kind) }
 
-  def restrictedCharacterStringType =
-    ( kw("BMPString")
-    | kw("GeneralString")
-    | kw("IA5String")
-    | kw("NumericString")
-    | kw("TeletexString")
-    | kw("UniversalString")
-    | kw("VideotexString")
-    | kw("GraphicString")
-    | kw("ISO646String")
-    | kw("PrintableString")
-    | kw("T61String")
-    | kw("UTF8String")
-    | kw("VisibleString")
-    ) ^^ { case Keyword(kw) => RestrictedCharacterStringType(kw) }
+  def restrictedCharacterStringType: Parser[RestrictedCharacterStringType] =
+    ( kwBMPString
+    | kwGeneralString
+    | kwIA5String
+    | kwNumericString
+    | kwTeletexString
+    | kwUniversalString
+    | kwVideotexString
+    | kwGraphicString
+    | kwISO646String
+    | kwPrintableString
+    | kwT61String
+    | kwUTF8String
+    | kwVisibleString
+    )
 
   // ASN1D 11.13<36>
   def characterStringValue =
@@ -1882,8 +1882,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def kwAbstractSyntax = kw("ABSTRACT-SYNTAX") ^^ { _ => ABSTRACT_SYNTAX }
   def kwApplication = kw("APPLICATION") ^^ { _ => Application }
   def kwAutomatic = kw("AUTOMATIC") ^^ { _ => Automatic }
-  def kwBoolean = kw("BOOLEAN") ^^ { _ => BOOLEAN }
   def kwBegin = kw("BEGIN")
+  def kwBMPString = kw("BMPString") ^^ { _ => BMPString }
+  def kwBoolean = kw("BOOLEAN") ^^ { _ => BOOLEAN }
   def kwDefault = kw("DEFAULT")
   def kwDefinitions = kw("DEFINITIONS")
   def kwEnd = kw("END")
@@ -1894,28 +1895,40 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def kwExtensibility = kw("EXTENSIBILITY")
   def kwFalse = kw("FALSE") ^^ { _ => FALSE }
   def kwFrom = kw("FROM")
+  def kwGeneralString = kw("GeneralString") ^^ { _ => GeneralString }
+  def kwGeneralizedTime = kw("GeneralizedTime") ^^ { _ => GeneralizedTime }
+  def kwGraphicString = kw("GraphicString") ^^ { _ => GraphicString }
+  def kwIA5String = kw("IA5String") ^^ { _ => IA5String }
   def kwIncludes = kw("INCLUDES")
   def kwImplicit = kw("IMPLICIT") ^^ { _ => Implicit }
   def kwImplied = kw("IMPLIED")
   def kwImports = kw("IMPORTS")
   def kwInteger = kw("INTEGER") ^^ { _ => INTEGER }
+  def kwISO646String = kw("ISO646String") ^^ { _ => ISO646String }
   def kwMax = kw("MAX") ^^ { _ => Max }
   def kwMin = kw("MIN") ^^ { _ => Min }
   def kwMinusInfinity = kw("MINUS-INFINITY")  ^^ { _ => MINUS_INFINITY }
   def kwNull = kw("NULL") ^^ { _ => NULL }
-  def kwGeneralizedTime = kw("GeneralizedTime") ^^ { _ => GeneralizedTime }
+  def kwNumericString = kw("NumericString") ^^ { _ => NumericString }
   def kwObjectDescriptor = kw("ObjectDescriptor") ^^ { _ => ObjectDescriptor }
   def kwOptional = kw("OPTIONAL") ^^ { _ => Optional }
   def kwPlusInfinity = kw("PLUS-INFINITY") ^^ { _ => PLUS_INFINITY }
   def kwPresent = kw("PRESENT") ^^ { _ => Present }
+  def kwPrintableString = kw("PrintableString") ^^ { _ => PrintableString }
   def kwPrivate = kw("PRIVATE") ^^ { _ => Private }
   def kwReal = kw("REAL") ^^ { _ => REAL }
   def kwRelativeOid = kw("RELATIVE-OID") ^^ { _ => RelativeOidType }
   def kwSequence = kw("SEQUENCE") ^^ { _ => Sequence }
   def kwSet = kw("SET") ^^ { _ => Set }
+  def kwT61String = kw("T61String") ^^ { _ => T61String }
+  def kwTeletexString = kw("TeletexString") ^^ { _ => TeletexString }
   def kwTrue = kw("TRUE") ^^ { _ => TRUE }
   def kwTypeIdentifier = kw("TYPE-IDENTIFIER") ^^ { _ => TYPE_IDENTIFIER }
+  def kwUTF8String = kw("UTF8String") ^^ { _ => UTF8String }
   def kwUnique = kw("UNIQUE") ^^ { _ => UNIQUE }
   def kwUniversal = kw("UNIVERSAL") ^^ { _ => Universal }
+  def kwUniversalString = kw("UniversalString") ^^ { _ => UniversalString }
+  def kwVideotexString = kw("VideotexString") ^^ { _ => VideotexString }
+  def kwVisibleString = kw("VisibleString") ^^ { _ => VisibleString }
   def kwUTCTime = kw("UTCTime") ^^ { _ => UTCTime }
 }
