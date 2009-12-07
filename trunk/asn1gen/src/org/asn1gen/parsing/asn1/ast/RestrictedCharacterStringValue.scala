@@ -1,6 +1,4 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
-trait RestrictedCharacterStringValue extends Node with CharacterStringValueKind {
+trait RestrictedCharacterStringValue extends Node with CharacterStringValue {
 }
