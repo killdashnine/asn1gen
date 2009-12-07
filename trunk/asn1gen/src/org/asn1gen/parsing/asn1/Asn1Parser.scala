@@ -571,11 +571,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case i ~ _ ~ kind ~ _ => NamedBit(i, kind) }
   
   // ASN1D 10.6.2<13>
-  def bitStringValue =
+  def bitStringValue: Parser[BitStringValue] =
     ( bstring
     | hstring
     | identifierList
-    ) ^^ { kind => BitStringValue(kind) }
+    )
   
   // ASN1D 10.6.2<16>
   def identifierList =

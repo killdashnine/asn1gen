@@ -6,7 +6,7 @@ case class HString(
   chars: String
 ) extends Node
   with OctetStringValueKind
-  with BitStringValueKind
+  with BitStringValue
 {
 }
 
