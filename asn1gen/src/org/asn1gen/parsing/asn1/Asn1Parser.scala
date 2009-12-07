@@ -796,13 +796,13 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 12.1.4<15>
   // See ASN1D 9.2.2<1>
-  def tagDefault =
+  def tagDefault: Parser[TagDefault] =
     ( ( kwExplicit
       | kwImplicit
       | kwAutomatic
       ) <~ kw("TAGS")
     | empty
-    ) ^^ { kind => TagDefault(kind) }
+    )
 
   // ASN1D 12.2.2<1>
   def extensionSequenceTypeSpec =
