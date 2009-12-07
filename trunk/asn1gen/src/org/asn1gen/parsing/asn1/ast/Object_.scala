@@ -5,7 +5,8 @@ import org.asn1gen.parsing.asn1.ast.kind._
 case class Object_(
   kind: ObjectKind
 ) extends Node
-  with SettingKind
+  with ActualParameterKind
+  with GovernorConstraintParameterValue
   with ObjectSetElementsKind
-  with ActualParameterKind {
+  with SettingKind {
 }

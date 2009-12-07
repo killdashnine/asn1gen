@@ -25,10 +25,9 @@ object GenJavaTags {
       case AssignmentList(list) => {
         list foreach { assignment: Assignment =>
           assignment match {
-            case Assignment(
-              TypeAssignment(
-                name,
-                Type_(ChoiceType(alternativeTypeLists), _)))
+            case TypeAssignment(
+              name,
+              Type_(ChoiceType(alternativeTypeLists), _))
             => {
               out.println("public class " + name + "{")
               generate(alternativeTypeLists, out)

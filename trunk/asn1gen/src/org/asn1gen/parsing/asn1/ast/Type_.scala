@@ -6,7 +6,8 @@ case class Type_(
   kind: TypeKind,
   constraints: List[Constraint]
 ) extends Node
+  with ActualParameterKind
   with GovernorKind
   with SettingKind
-  with ActualParameterKind {
+  with UserDefinedConstraintParameter {
 }

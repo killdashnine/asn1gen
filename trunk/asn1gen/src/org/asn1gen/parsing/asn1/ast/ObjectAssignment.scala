@@ -4,5 +4,5 @@ case class ObjectAssignment(
   objectReference: ObjectReference,
   definedObjectClass: DefinedObjectClass,
   object_ : Object_
-) extends Node with AssignmentKind {
+) extends Node with Assignment {
 }

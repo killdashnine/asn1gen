@@ -7,5 +7,6 @@ case class DefinedObjectClass(
 ) extends Node
   with GovernorKind
   with ObjectClassKind
-  with ActualParameterKind {
+  with ActualParameterKind
+  with UserDefinedConstraintParameter {
 }

@@ -101,7 +101,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | objectAssignment
     | objectSetAssignment
     | parameterizedAssignment
-    ) ^^ { assignmentKind => Assignment(assignmentKind) }
+    )
   
   // ASN1D: 9.1.2<3>
   
@@ -1203,27 +1203,28 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 13.10.2<1>
   def contentsConstraint =
     ( ( kw("CONTAINING")
-      ~ type_
+      ~>type_
       ~ ( kw("ENCODED")
-        ~ kw("BY")
-        ~ value
+        ~>kw("BY")
+        ~>value
         ).?
-      )
+      ) ^^ { case t ~ v => ContentsConstraint(Some(t), v) }
     | ( kw("ENCODED")
-      ~ kw("BY")
-      ~ value
-      )
-    ) ^^ { _ => ContentsConstraint() }
+      ~>kw("BY")
+      ~>value
+      ) ^^ { v => ContentsConstraint(None, Some(v)) }
+    )
   
   // ASN1D 13.11.2<1> refactored
   def elementSetSpecs: Parser[ElementSetSpecs] =
     ( rootElementSetSpec
-    ~ ( op(",") ~ op("...")
-      ~ ( op(",")
-        ~ additionalElementSetSpec
+    ~ ( op(",")
+      ~>op("...")
+      ~>( op(",")
+        ~>additionalElementSetSpec
         ).?
       ).?
-    ) ^^ { _ => ElementSetSpecs() }
+    ) ^^ { case ress ~ aess => ElementSetSpecs(ress, aess) }
   
   // ASN1D 13.11.2<2>
   def rootElementSetSpec =
@@ -1235,9 +1236,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 13.11.2<9> refactored
   def elementSetSpec: Parser[ElementSetSpec] =
-    ( kw("ALL") ~ exclusions
+    ( kw("ALL") ~> exclusions
     | unions
-    ) ^^ { _ => ElementSetSpec() }
+    )
 
   // ASN1D 13.11.2<10> refactored
   def unions: Parser[Unions] =
@@ -1277,8 +1278,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def elements =
     ( subtypeElements
     | objectSetElements
-    | op("(") ~ elementSetSpec ~ op(")")
-    ) ^^ { _ => Elements() }
+    | op("(") ~> elementSetSpec <~ op(")")
+    )
   
   // ASN1D 13.11.2<17>
   def subtypeElements =
@@ -1316,17 +1317,23 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case _ ~ _ ~ _ ~ parameters ~ _ => UserDefinedConstraint(parameters) }
   
   // ASN1D 13.13.2<3>
+  def governorConstraintParameterValue =
+    ( value
+    | valueSet
+    | object_
+    | objectSet
+    )
+
+  def governorConstraintParameter =
+    ( governor ~ op(":")
+    ~ governorConstraintParameterValue
+    ) ^^ { case g ~ _ ~ gcpv => GovernorConstraintParameter(g, gcpv) }
+
   def userDefinedConstraintParameter	=
-    ( ( governor ~ op(":")
-      ~ ( value
-        | valueSet
-        | object_
-        | objectSet
-        )
-      )
+    ( governorConstraintParameter
     | type_
     | definedObjectClass
-    ) ^^ { _ => UserDefinedConstraintParameter() }
+    )
   
   // ASN1D 13.13.2<7>
   def governor =
@@ -1384,7 +1391,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | typeFieldSpec // refactored
     | objectFieldSpec
     | objectSetFieldSpec
-    ) ^^ { kind => FieldSpec(kind) }
+    )
   
   // ASN1D 15.2.2<3>
   def typeFieldSpec =

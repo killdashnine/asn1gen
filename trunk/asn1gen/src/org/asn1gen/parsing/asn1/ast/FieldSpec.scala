@@ -1,8 +1,4 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
-case class FieldSpec(
-  kind: FieldSpecKind
-) extends Node with FieldSpecKind {
+trait FieldSpec {
 }

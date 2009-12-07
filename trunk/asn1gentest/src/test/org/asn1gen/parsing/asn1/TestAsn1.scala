@@ -54,7 +54,7 @@ package test.org.asn1gen.parsing.asn1 {
               _,
               AssignmentList(
                 List(
-                  Assignment(x))))), _) => println(md)
+                  x: Assignment)))), _) => println(md)
         case x => fail("Parse failed: " + x)
       }
     }
