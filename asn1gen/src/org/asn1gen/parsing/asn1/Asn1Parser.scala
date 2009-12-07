@@ -356,10 +356,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => AssignedIdentifier(kind) }
 
   // ASN1D 9.2.2<30> // refactored
-  def symbol =
+  def symbol: Parser[Symbol] =
     ( parameterizedReference
     | reference
-    ) ^^ { kind => Symbol(kind) }
+    )
 
   def reference: Parser[Reference] =
     ( typeReference
