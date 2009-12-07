@@ -7,7 +7,7 @@ trait DefinedValue
   with CharsDefnKind
   with ClassNumberKind
   with ExceptionIdentification
-  with ObjIdComponentsKind
+  with ObjIdComponents
   with NamedNumberValue
   with NumberFormKind
   with ReferencedValue

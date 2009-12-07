@@ -615,12 +615,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     )
   
   // ASN1D 10.8.2<5> refactored
-  def objIdComponents =
+  def objIdComponents: Parser[ObjIdComponents] =
     ( nameAndNumberForm
     | nameForm
     | numberForm
     | definedValue
-    ) ^^ { kind => ObjIdComponents(kind) }
+    )
   
   // ASN1D 10.8.2<6>
   // See ASN1D 9.2.2<6>
