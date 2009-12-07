@@ -591,10 +591,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { _ => OctetStringType }
   
   // ASN1D 10.7.2<4>
-  def octetStringValue =
+  def octetStringValue: Parser[OctetStringValue] =
     ( bstring
     | hstring
-    ) ^^ { kind => OctetStringValue(kind) }
+    )
   
   // ASN1D 10.8.2<1>
   def objectIdentifierType =
