@@ -12,7 +12,7 @@ case class DefinedValue(
     with ObjIdComponentsKind
     with NamedNumberValue
     with NumberFormKind
-    with ReferencedValueKind
+    with ReferencedValue
     with RelativeOidComponentsKind
     with NamedBitKind {
 }

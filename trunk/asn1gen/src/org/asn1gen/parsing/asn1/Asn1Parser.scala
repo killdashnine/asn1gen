@@ -160,8 +160,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 9.1.2<5>
   def value: Parser[Value] =
-    ( builtinValue
-    ||| referencedValue
+    ( builtinValue ||| referencedValue
     )
   
   // ASN1D 9.1.2<6>
@@ -188,10 +187,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | taggedValue
     )
   
-  def referencedValue =
+  def referencedValue: Parser[ReferencedValue] =
     ( valueFromObject // refactored
     | definedValue // refactored
-    ) ^^ { kind => ReferencedValue(kind) }
+    )
 
   def taggedValue =
     ( failure("force fail to prevent recursion") ~ value
