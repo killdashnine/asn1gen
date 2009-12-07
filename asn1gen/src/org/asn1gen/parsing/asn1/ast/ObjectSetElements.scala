@@ -4,5 +4,5 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class ObjectSetElements(
   kind: ObjectSetElementsKind
-) extends Node {
+) extends Node with Elements {
 }

@@ -34,13 +34,12 @@ class GenJava(out: IndentWriter) {
 
   def generate(assignment: Assignment): Unit = {
     assignment match {
-      case Assignment(
-        TypeAssignment(
-          TypeReference(name),
-          Type_(
-            ChoiceType(
-              AlternativeTypeLists(rootAlternativeTypeList, _, _, _)),
-            _)))
+      case TypeAssignment(
+        TypeReference(name),
+        Type_(
+          ChoiceType(
+            AlternativeTypeLists(rootAlternativeTypeList, _, _, _)),
+          _))
       => {
         out.println("public class " + name + " {")
         out.indent(2) {

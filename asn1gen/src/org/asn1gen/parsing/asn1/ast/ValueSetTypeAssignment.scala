@@ -4,6 +4,5 @@ case class ValueSetTypeAssignment(
   typeReference: TypeReference,
   type_ : Type_,
   valueSet: ValueSet
-) extends Node with AssignmentKind {
+) extends Node with Assignment {
 }
-

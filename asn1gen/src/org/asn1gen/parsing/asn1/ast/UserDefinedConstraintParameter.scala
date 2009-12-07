@@ -1,5 +1,4 @@
 package org.asn1gen.parsing.asn1.ast
 
-case class UserDefinedConstraintParameter() extends Node {
+trait UserDefinedConstraintParameter {
 }
-

@@ -4,5 +4,8 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class ObjectSet(
   objectSetSpec: ObjectSetSpec
-) extends Node with SettingKind with ActualParameterKind {
+) extends Node
+  with SettingKind
+  with ActualParameterKind
+  with GovernorConstraintParameterValue {
 }

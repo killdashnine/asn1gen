@@ -4,5 +4,5 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class SubtypeElements(
   kind: SubtypeElementsKind
-) extends Node {
+) extends Node with Elements {
 }

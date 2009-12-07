@@ -4,5 +4,5 @@ case class ObjectSetAssignment(
   objectSetReference: ObjectSetReference,
   definedObjectClass: DefinedObjectClass,
   objectSet: ObjectSet
-) extends Node with AssignmentKind {
+) extends Node with Assignment {
 }
