@@ -12,7 +12,7 @@ object Empty
   with PresenceConstraint
   with SequenceTypeSpec
   with TaggedKind
-  with TagDefaultKind
+  with TagDefault
   with ValueConstraintKind
   with WithSyntaxSpecKind {
 }
