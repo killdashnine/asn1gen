@@ -474,10 +474,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case id ~ _ ~ value ~ _ => NamedNumber(id, value) }
   
   // ASN1D 10.3.2<11>
-  def integerValue =
+  def integerValue: Parser[IntegerValue] =
     ( signedNumber
     | identifier
-    ) ^^ { kind => IntegerValue(kind) }
+    )
   
   // ASN1D 10.4.2<1>
   def enumeratedType =
