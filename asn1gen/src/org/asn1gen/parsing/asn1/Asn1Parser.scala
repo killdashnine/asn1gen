@@ -705,10 +705,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { n => Cell(n) }
   
   // ASN1D 11.13<1>
-  def characterStringType =
+  def characterStringType: Parser[CharacterStringType] =
     ( restrictedCharacterStringType
     | unrestrictedCharacterStringType
-    ) ^^ { kind => CharacterStringType(kind) }
+    )
 
   def restrictedCharacterStringType: Parser[RestrictedCharacterStringType] =
     ( kwBMPString
