@@ -730,7 +730,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def characterStringValue =
     ( restrictedCharacterStringValue
     | unrestrictedCharacterStringValue
-    ) ^^ { kind => CharacterStringValue(kind) }
+    )
   
   // See ASN1D 11.10.2<9>
   
