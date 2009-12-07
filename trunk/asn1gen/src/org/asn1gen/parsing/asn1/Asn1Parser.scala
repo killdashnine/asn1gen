@@ -909,13 +909,14 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( extensionAndException ~ optionalExtensionMarker
     ) ^^ { case eae ~ oem => SetTypeExtension(eae, oem) }
   
+  def setTypeSpec: Parser[SetTypeSpec] =
+    ( setTypeExtension
+    | componentTypeLists
+    )
+
   def setType =
-    ( kwSet ~ op("{")
-    ~ ( setTypeExtension
-      | componentTypeLists
-      )
-    ~ op("}")
-    ) ^^ { case _ ~ _ ~ kind ~ _ => SetType(kind) }
+    ( kwSet ~> op("{") ~> setTypeSpec <~ op("}")
+    ) ^^ { spec => SetType(spec) }
 
   // ASN1D 12.3.2<4>
   // See ASN1D 12.2.2<4>
