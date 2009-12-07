@@ -539,10 +539,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def realType = kwReal
   
   // ASN1D 10.5.2<5>
-  def realValue =
+  def realValue: Parser[RealValue] =
     ( numericRealValue
     | specialRealValue
-    ) ^^ { kind => RealValue(kind) }
+    )
   
   def numericRealValue =
     ( number ^? { case Number("0") => Number("0") }
