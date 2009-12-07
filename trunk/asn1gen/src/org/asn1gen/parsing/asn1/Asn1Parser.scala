@@ -521,10 +521,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { eis => Enumeration(eis) }
   
   // refactored
-  def enumerationItem =
+  def enumerationItem: Parser[EnumerationItem] =
     ( namedNumber
     | identifier
-    ) ^^ { kind => EnumerationItem(kind) }
+    )
   
   // ASN1D 10.4.2<13>
   // See 10.3.2<6>
