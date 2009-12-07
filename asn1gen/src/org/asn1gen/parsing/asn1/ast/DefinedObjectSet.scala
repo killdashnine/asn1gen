@@ -2,7 +2,7 @@ package org.asn1gen.parsing.asn1.ast
 
 import org.asn1gen.parsing.asn1.ast.kind._
 
-case class DefinedObjectSet(
-  kind: DefinedObjectSetKind
-) extends Node with ObjectSetElementsKind with ReferencedObjectsKind {
+trait DefinedObjectSet
+  extends ObjectSetElementsKind
+  with ReferencedObjectsKind {
 }
