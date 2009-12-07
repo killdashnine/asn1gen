@@ -13,6 +13,6 @@ object Empty
   with SequenceTypeSpec
   with TaggedKind
   with TagDefault
-  with ValueConstraintKind
+  with ValueConstraint
   with WithSyntaxSpecKind {
 }

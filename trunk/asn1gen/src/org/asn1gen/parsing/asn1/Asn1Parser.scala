@@ -1186,10 +1186,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( valueConstraint
     ~ presenceConstraint
     ) ^^ { case vc ~ pc => ComponentConstraint(vc, pc) }
-  def valueConstraint =
+  def valueConstraint: Parser[ValueConstraint] =
     ( constraint
     | empty
-    ) ^^ { kind => ValueConstraint(kind) }
+    )
   
   // ASN1D 13.9.2<14>
   def presenceConstraint =
