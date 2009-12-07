@@ -4,7 +4,7 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 object Empty
   extends Node
-  with AssignedIdentifierKind
+  with AssignedIdentifier
   with Class_
   with ExceptionSpecKind
   with ExtensionAdditionAlternatives

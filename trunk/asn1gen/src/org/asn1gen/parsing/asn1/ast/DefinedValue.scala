@@ -5,7 +5,7 @@ import org.asn1gen.parsing.asn1.ast.kind._
 case class DefinedValue(
   kind: DefinedValueKind
 ) extends Node
-    with AssignedIdentifierKind
+    with AssignedIdentifier
     with CharsDefnKind
     with ClassNumberKind
     with ExceptionIdentification

@@ -349,11 +349,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case mr ~ ai => GlobalModuleReference(mr, ai) }
   
   // ASN1D 9.2.2<27>
-  def assignedIdentifier =
+  def assignedIdentifier: Parser[AssignedIdentifier] =
     ( objectIdentifierValue
     | definedValue
     | empty
-    ) ^^ { kind => AssignedIdentifier(kind) }
+    )
 
   // ASN1D 9.2.2<30> // refactored
   def symbol: Parser[Symbol] =
