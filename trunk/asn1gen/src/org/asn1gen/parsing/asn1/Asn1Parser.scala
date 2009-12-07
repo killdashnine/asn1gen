@@ -361,13 +361,13 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | reference
     ) ^^ { kind => Symbol(kind) }
 
-  def reference =
+  def reference: Parser[Reference] =
     ( typeReference
     | valueReference
     | objectClassReference
     | objectReference
     | objectSetReference
-    ) ^^ { kind => Reference(kind) }
+    )
   
   def parameterizedReference =
     ( reference
