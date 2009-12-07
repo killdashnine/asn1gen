@@ -727,7 +727,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     )
 
   // ASN1D 11.13<36>
-  def characterStringValue =
+  def characterStringValue: Parser[CharacterStringValue] =
     ( restrictedCharacterStringValue
     | unrestrictedCharacterStringValue
     )
