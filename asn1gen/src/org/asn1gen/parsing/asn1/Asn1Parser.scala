@@ -375,12 +375,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case r ~ b => ParameterizedReference(r, b.isDefined) }
   
   // ASN1D 9.3.2<1> refactored
-  def definedType =
+  def definedType: Parser[DefinedType] =
     ( parameterizedType
     | parameterizedValueSetType
     | externalTypeReference
     | typeReference
-    ) ^^ { kind => DefinedType(kind) }
+    )
 
   // ASN1D 9.3.2<3>
   def externalTypeReference =

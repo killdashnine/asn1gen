@@ -5,5 +5,5 @@ import org.asn1gen.parsing.asn1.ast.kind._
 case class ExternalTypeReference(
   moduleReference: ModuleReference,
   typeReference: TypeReference
-) extends Node with DefinedTypeKind with SimpleDefinedTypeKind {
+) extends Node with DefinedType with SimpleDefinedTypeKind {
 }

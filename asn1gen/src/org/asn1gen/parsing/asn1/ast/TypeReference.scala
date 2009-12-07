@@ -6,7 +6,7 @@ case class TypeReference(
   chars: String
 ) extends Node
     with Reference
-    with DefinedTypeKind
+    with DefinedType
     with SimpleDefinedTypeKind {
   def name = chars
   def asModuleReference = ModuleReference(chars)
