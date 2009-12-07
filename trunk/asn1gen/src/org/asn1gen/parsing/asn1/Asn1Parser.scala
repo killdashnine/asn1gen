@@ -544,10 +544,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | specialRealValue
     )
   
-  def numericRealValue =
+  def numericRealValue: Parser[NumericRealValue] =
     ( number ^? { case Number("0") => Number("0") }
     | sequenceValue
-    ) ^^ { kind => NumericRealValue(kind) }
+    )
   
   // ASN1D 10.5.2<8>
   def specialRealValue = kwPlusInfinity | kwMinusInfinity
