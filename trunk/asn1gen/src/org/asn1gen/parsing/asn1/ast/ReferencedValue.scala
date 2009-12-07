@@ -7,5 +7,5 @@ case class ReferencedValue(
 ) extends Node
   with ObjectClassFieldValueKind
   with FixedTypeFieldValKind
-  with ValueKind {
+  with Value {
 }

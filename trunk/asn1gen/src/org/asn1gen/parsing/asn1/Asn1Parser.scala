@@ -162,7 +162,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def value: Parser[Value] =
     ( builtinValue
     ||| referencedValue
-    ) ^^ { kind => Value(kind) }
+    )
   
   // ASN1D 9.1.2<6>
   def builtinValue: Parser[BuiltinValue] =
