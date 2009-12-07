@@ -67,7 +67,7 @@ class GenJavaChoiceIds(out: IndentWriter) {
         Identifier(name),
         Type_(
           TaggedType(
-            Tag(_, ClassNumber(Number(tagNumber))),
+            Tag(_, Number(tagNumber)),
             _, _),
           _))
       => {

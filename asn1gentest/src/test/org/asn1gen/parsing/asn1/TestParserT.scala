@@ -37,7 +37,7 @@ package test.org.asn1gen.parsing.asn1 {
                         Identifier("choice1"),
                         Type_(
                           TaggedType(
-                            Tag(Empty, ClassNumber(Number("0"))),
+                            Tag(Empty, Number("0")),
                             _,
                             Type_(
                               IntegerType(None), _)),
@@ -46,7 +46,7 @@ package test.org.asn1gen.parsing.asn1 {
                         Identifier("choice2"),
                         Type_(
                           TaggedType(
-                            Tag(Empty, ClassNumber(Number("1"))),
+                            Tag(Empty, Number("1")),
                             _,
                             Type_(IntegerType(None), _)),
                           _))))),

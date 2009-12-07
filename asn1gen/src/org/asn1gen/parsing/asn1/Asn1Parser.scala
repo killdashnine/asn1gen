@@ -781,10 +781,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ~ op("]")
     ) ^^ { case _ ~ c ~ cn ~ _ => Tag(c, cn) }
   
-  def classNumber =
+  def classNumber: Parser[ClassNumber] =
     ( number
     | definedValue
-    ) ^^ { kind => ClassNumber(kind) }
+    )
   
   // ASN1D 12.1.4<7>
   def class_ =
