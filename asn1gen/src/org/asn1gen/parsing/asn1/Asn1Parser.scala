@@ -142,13 +142,13 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | taggedType
     )
   
-  def referencedType =
+  def referencedType: Parser[ReferencedType] =
     ( definedType
     | usefulType
     | selectionType
     | typeFromObject
     | valueSetFromObjects
-    ) ^^ { kind => ReferencedType(kind) }
+    )
   
   // ASN1D 9.1.2<4>
   def valueAssignment =
