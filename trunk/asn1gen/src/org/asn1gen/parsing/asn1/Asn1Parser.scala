@@ -431,10 +431,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case mr ~ _ ~ or => ExternalObjectReference(mr, or) }
   
   // ASN1D 9.3.2<24>
-  def definedObjectSet =
+  def definedObjectSet: Parser[DefinedObjectSet] =
     ( externalObjectSetReference
     | objectSetReference
-    ) ^^ { kind => DefinedObjectSet(kind) }
+    )
   
   def externalObjectSetReference =
     ( moduleReference
