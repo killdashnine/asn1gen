@@ -1,9 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 case class ExternalObjectClassReference(
   moduleReference: ModuleReference,
   objectClassReference: ObjectClassReference
-) extends Node with DefinedObjectClassKind {
+) extends Node with DefinedObjectClass {
 }
