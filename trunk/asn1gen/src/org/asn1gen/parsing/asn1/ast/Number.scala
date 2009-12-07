@@ -6,7 +6,7 @@ case class Number(
   chars: String
 ) extends Node
     with NumberForm
-    with ClassNumberKind
+    with ClassNumber
     with NumericRealValue
     with NamedBitKind {
   def negative = Number("-" + chars)
