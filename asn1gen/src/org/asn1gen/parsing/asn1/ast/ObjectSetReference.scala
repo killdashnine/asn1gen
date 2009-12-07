@@ -4,7 +4,6 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class ObjectSetReference(
   chars: String
-) extends Node with ReferenceKind with DefinedObjectSetKind {
+) extends Node with Reference with DefinedObjectSetKind {
   def name = chars
 }
-

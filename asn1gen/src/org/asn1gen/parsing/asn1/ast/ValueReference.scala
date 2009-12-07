@@ -4,6 +4,9 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class ValueReference (
   chars: String
-) extends Node with ReferenceKind with DefinedValueKind with SimpleDefinedValueKind {
+) extends Node
+    with Reference
+    with DefinedValueKind
+    with SimpleDefinedValueKind {
   def name = chars
 }
