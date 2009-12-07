@@ -265,11 +265,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // Not implemented
     
   // ASN1D 9.2.2<6> refactored
-  def definitiveObjectIdComponent =
+  def definitiveObjectIdComponent: Parser[DefinitiveObjectIdComponent] =
     ( definitiveNameAndNumberForm
     | definitiveNumberForm
     | nameForm
-    ) ^^ { kind => DefinitiveObjectIdComponent(kind) }
+    )
   
   def definitiveNumberForm =
     ( number
