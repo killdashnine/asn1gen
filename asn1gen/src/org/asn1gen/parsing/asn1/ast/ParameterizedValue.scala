@@ -1,9 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 case class ParameterizedValue(
   simpleDefinedValue: SimpleDefinedValue,
   actualParameterList: ActualParameterList
-) extends Node with DefinedValueKind {
+) extends Node with DefinedValue {
 }

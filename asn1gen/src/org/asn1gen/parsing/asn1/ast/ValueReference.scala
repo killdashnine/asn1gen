@@ -6,7 +6,7 @@ case class ValueReference (
   chars: String
 ) extends Node
     with Reference
-    with DefinedValueKind
+    with DefinedValue
     with SimpleDefinedValueKind {
   def name = chars
 }

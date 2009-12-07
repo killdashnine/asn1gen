@@ -390,11 +390,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case mr ~ _ ~ tr => ExternalTypeReference(mr, tr) }
   
   // ASN1D 9.3.2<8>
-  def definedValue =
+  def definedValue: Parser[DefinedValue] =
     ( externalValueReference
     | valueReference
     | parameterizedValue
-    ) ^^ { kind => DefinedValue(kind) }
+    )
   
   // ASN1D 9.3.2<10>
   def externalValueReference =
