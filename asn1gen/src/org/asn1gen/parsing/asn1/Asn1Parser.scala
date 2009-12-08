@@ -847,9 +847,9 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     )
   
   // ASN1D 12.2.2<5>
-  def rootComponentTypeList =
+  def rootComponentTypeList: Parser[RootComponentTypeList] =
     ( componentTypeList
-    ) ^^ { ctl => RootComponentTypeList(ctl) }
+    )
   
   def extensionsAdditions =
     ( op(",") ~> extensionAdditionList
