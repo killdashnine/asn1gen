@@ -94,24 +94,28 @@ class GenJava(out: IndentWriter) {
           NamedType(Identifier(identifier), componentType),
           value)
         => {
-          componentType match {
-            case Type_(TaggedType(_, _, underlyingType), _) => {
-              generateSequenceConstructor(identifier, underlyingType)
-              //out.println("// tag " + number)
-            }
-            case Type_(IntegerType(None), List()) => {
-              out.println("final AsnInteger " + identifier + ",");
-            }
-            case unmatched => {
-              out.println("// Unmatched type: " + unmatched)
-            }
-          }
+          generateSequenceConstructorArgument(identifier, componentType)
         }
       }
     }
     out.println(")")
     out.println("{")
     out.println("}")
+  }
+  
+  def generateSequenceConstructorArgument(identifier: String, componentType: Type_): Unit = {
+    componentType match {
+      case Type_(TaggedType(_, _, underlyingType), _) => {
+        generateSequenceConstructorArgument(identifier, underlyingType)
+        //out.println("// tag " + number)
+      }
+      case Type_(IntegerType(None), List()) => {
+        out.println("final AsnInteger " + identifier + ",");
+      }
+      case unmatched => {
+        out.println("// Unmatched type: " + unmatched)
+      }
+    }
   }
   
   def generateSequenceFields(list: List[ComponentType]): Unit = {
