@@ -675,12 +675,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( op("{") ~> rep1sep(charsDefn, op(",")) <~ op("}")
     ) ^^ { cds => CharacterStringList(cds) }
   
-  def charsDefn =
+  def charsDefn: Parser[CharsDefn] =
     ( cstring
     | quadruple
     | tuple
     | definedValue
-    ) ^^ { kind => CharsDefn(kind) }
+    )
   
   // ASN1D 11.10.2<9>
   def quadruple =
@@ -858,10 +858,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def extensionAdditionList =
     ( rep1sep(extensionAddition, op(","))
     ) ^^ { eas => ExtensionAdditionList(eas) }
-  def extensionAddition =
+  def extensionAddition: Parser[ExtensionAddition] =
     ( componentType
     | extensionAdditionGroup
-    ) ^^ { case kind => ExtensionAddition(kind) }
+    )
   def extensionAdditionGroup =
     ( op("[[") ~> componentTypeList <~ op("]", "]")
     ) ^^ { ctl => ExtensionAdditionGroup(ctl) }
@@ -1012,10 +1012,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( rep1sep(extensionAdditionAlternative, op(","))
     ) ^^ { eaas => ExtensionAdditionAlternativesList(eaas) }
 
-  def extensionAdditionAlternative =
+  def extensionAdditionAlternative: Parser[ExtensionAdditionAlternative] =
     ( extensionAdditionGroupAlternatives
     | namedType
-    ) ^^ { kind => ExtensionAdditionAlternative(kind) }
+    )
 
   def extensionAdditionGroupAlternatives =
     ( op("[[")
@@ -1051,10 +1051,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { exists => OptionalExtensionMarker(exists) } // TODO
   
   // ASN1D 12.9.2<18>
-  def exceptionSpec =
+  def exceptionSpec: Parser[ExceptionSpec] =
     ( op("!") ~> exceptionIdentification
     | empty
-    ) ^^ { kind => ExceptionSpec(kind) }
+    )
 
   // ASN1D 12.9.2<20>
   def exceptionIdentificationTypeAndValue =
@@ -1103,12 +1103,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case exclusive ~ uev => UpperEndPoint(exclusive.isDefined, uev) }
   
   // ASN1D 13.4.2<4>
-  def lowerEndValue =
+  def lowerEndValue: Parser[LowerEndValue] =
     ( value | kwMin
-    ) ^^ { kind => LowerEndValue(kind) }
-  def upperEndValue =
+    )
+  def upperEndValue: Parser[UpperEndValue] =
     ( value | kwMax
-    ) ^^ { kind => UpperEndValue(kind) }
+    )
   
   // ASN1D 13.5.2<1>
   // See ASN1D 12.4.2<5>
@@ -1152,10 +1152,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // See ASN1D 13.8.2<1>
   
   // ASN1D 13.9.2<4>
-  def multipleTypeConstraints =
+  def multipleTypeConstraints: Parser[MultipleTypeConstraints] =
     ( fullSpecification
     | partialSpecification
-    ) ^^ { kind => MultipleTypeConstraints(kind) }
+    )
 
   // ASN1D 13.9.2<5>
   def fullSpecification =
@@ -1302,7 +1302,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def constraintSpec: Parser[ConstraintSpec] =
     ( generalConstraint
     | elementSetSpecs
-    ) ^^ { kind => ConstraintSpec(kind) }
+    )
 
   // ASN1D 13.12.2<6>
   // See ASN1D 13.11.2<1>
@@ -1370,11 +1370,11 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { sv => UnrestrictedCharacterStringValue(sv) }
 
   // ASN1D 15.2.2<1>
-  def objectClass =
+  def objectClass: Parser[ObjectClass] =
     ( definedObjectClass
     | objectClassDefn
     | parameterizedObjectClass
-    ) ^^ { kind => ObjectClass(kind) }
+    )
   def objectClassDefn =
     ( kw("CLASS")
     ~ op("{")
@@ -1488,10 +1488,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { kind => Object_(kind) }
 
   // ASN1D 15.2.2<35>
-  def objectDefn =
+  def objectDefn: Parser[ObjectDefn] =
     ( defaultSyntax
     | definedSyntax
-    ) ^^ { kind => ObjectDefn(kind) }
+    )
 
   // ASN1D 15.2.2<36>
   def defaultSyntax =
@@ -1502,32 +1502,32 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case pfn ~ s => FieldSetting(pfn, s) }
 
   // ASN1D 15.2.2<38>
-  def setting =
+  def setting: Parser[Setting] =
     ( type_
     | value
     | valueSet
     | object_
     | objectSet
-    ) ^^ { kind => Setting(kind) }
+    )
   
   // ASN1D 15.3.2<1>
-  def withSyntaxSpec =
+  def withSyntaxSpec: Parser[WithSyntaxSpec] =
     ( kw("WITH") ~> kw("SYNTAX") ~> syntaxList
     | empty
-    ) ^^ { kind => WithSyntaxSpec(kind) }
+    )
 
   // ASN1D 15.3.2<2>
   def syntaxList =
     ( op("{") ~ tokenOrGroupSpec.+ ~ op("}")
     ) ^^ { case _ ~ togss ~ _ => SyntaxList(togss) }
-  def tokenOrGroupSpec =
+  def tokenOrGroupSpec: Parser[TokenOrGroupSpec] =
     ( requiredToken
     | optionalGroup
-    ) ^^ { kind => TokenOrGroupSpec(kind) }
-  def requiredToken =
+    )
+  def requiredToken: Parser[RequiredToken] =
     ( literal
     | primitiveFieldName
-    ) ^^ { kind => RequiredToken(kind) }
+    )
   
   // ASN1D 15.3.2<3>
   def optionalGroup: Parser[OptionalGroup] =
@@ -1544,10 +1544,10 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def definedSyntax =
     ( op("{") ~ definedSyntaxToken.* ~ op("}")
     ) ^^ { case _ ~ dsts ~ _ => DefinedSyntax(dsts) }
-  def definedSyntaxToken =
+  def definedSyntaxToken: Parser[DefinedSyntaxToken] =
     ( setting
     | literal
-    ) ^^ { kind => DefinedSyntaxToken(kind) }
+    )
   // See ASN1D 15.3.2<8>
   // See ASN1D 15.2.2<38>
   
@@ -1640,12 +1640,12 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case ro ~ _ ~ fn => ObjectSetFromObjects(ro, fn) }
 
   // ASN1D 15.6.2<19>
-  def referencedObjects =
+  def referencedObjects: Parser[ReferencedObjects] =
     ( definedObject
     | parameterizedObject
     | definedObjectSet
     | parameterizedObjectSet
-    ) ^^ { kind => ReferencedObjects(kind) }
+    )
   // See ASN1D 15.2.2<33>
   
   // ASN1D 15.6.2<20>
@@ -1679,15 +1679,15 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.7.2<16>
   // See ASN1D 13.12.2<5>
-  def generalConstraint =
+  def generalConstraint: Parser[GeneralConstraint] =
     ( userDefinedConstraint
     | tableConstraint
     | contentsConstraint
-    ) ^^ { kind => GeneralConstraint(kind) }
-  def tableConstraint =
+    )
+  def tableConstraint: Parser[TableConstraint] =
     ( componentRelationConstraint
     | simpleTableConstraint
-    ) ^^ { kind => TableConstraint(kind) }
+    )
   
   // ASN1D 15.7.2<17>
   def simpleTableConstraint =
@@ -1738,14 +1738,14 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // See ASN1D 15.9.2<1>
 
   // ASN1D 17.2.2<1>
-  def parameterizedAssignment =
+  def parameterizedAssignment: Parser[ParameterizedAssignment] =
     ( parameterizedTypeAssignment
     | parameterizedValueAssignment
     | parameterizedValueSetTypeAssignment
     | parameterizedObjectClassAssignment
     | parameterizedObjectAssignment
     | parameterizedObjectSetAssignment
-    ) ^^ { kind => ParameterizedAssignment(kind) }
+    )
   
   // ASN1D 17.2.2<3>
   def parameterizedTypeAssignment =
@@ -1829,20 +1829,20 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def parameterizedValueSetType =
     ( simpleDefinedType ~ actualParameterList
     ) ^^ { case sdt ~ apl => ParameterizedValueSetType(sdt, apl) }
-  def simpleDefinedType =
+  def simpleDefinedType: Parser[SimpleDefinedType] =
     ( externalTypeReference
     | typeReference
-    ) ^^ { kind => SimpleDefinedType(kind) }
+    )
   
   // ASN1D 17.2.2<27>
   def parameterizedValue =
     ( simpleDefinedValue ~ actualParameterList
     ) ^^ { case sdv ~ apl => ParameterizedValue(sdv, apl) }
   
-  def simpleDefinedValue =
+  def simpleDefinedValue: Parser[SimpleDefinedValue] =
     ( externalValueReference
     | valueReference
-    ) ^^ { kind => SimpleDefinedValue(kind) }
+    )
   
   // ASN1D 17.2.2<29>
   def parameterizedObjectClass =
@@ -1864,14 +1864,14 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( op("{") ~ rep1sep(actualParameter, op(",")) ~ op("}")
     ) ^^ { case _ ~ parameters ~ _ => ActualParameterList(parameters) }
   
-  def actualParameter =
+  def actualParameter: Parser[ActualParameter] =
     ( type_
     | value
     | valueSet
     | definedObjectClass
     | object_
     | objectSet
-    ) ^^ { kind => ActualParameter(kind) }
+    )
 
   // Custom
   def default[T](p: Parser[T]) =

@@ -1,6 +1,4 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
-trait ComponentType extends ExtensionAdditionKind {
+trait ComponentType extends ExtensionAddition {
 }

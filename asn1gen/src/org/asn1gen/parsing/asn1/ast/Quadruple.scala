@@ -9,6 +9,6 @@ case class Quadruple(
   cell: Cell
 ) extends Node
   with RelativeOidComponentsKind
-  with CharsDefnKind
+  with CharsDefn
   with RestrictedCharacterStringValue {
 }

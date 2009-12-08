@@ -6,7 +6,7 @@ object Empty
   extends Node
   with AssignedIdentifier
   with Class_
-  with ExceptionSpecKind
+  with ExceptionSpec
   with ExtensionAdditionAlternatives
   with OptionalDefault[Nothing]
   with PresenceConstraint
@@ -14,5 +14,5 @@ object Empty
   with TaggedKind
   with TagDefault
   with ValueConstraint
-  with WithSyntaxSpecKind {
+  with WithSyntaxSpec {
 }

@@ -4,5 +4,5 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class PrimitiveFieldName(
   kind: PrimitiveFieldNameKind
-) extends Node with RequiredTokenKind {
+) extends Node with RequiredToken {
 }

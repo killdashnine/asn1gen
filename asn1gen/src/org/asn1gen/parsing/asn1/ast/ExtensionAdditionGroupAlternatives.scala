@@ -1,8 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 case class ExtensionAdditionGroupAlternatives(
     alternativeTypeList: AlternativeTypeList
-) extends Node with ExtensionAdditionAlternativeKind {
+) extends Node with ExtensionAdditionAlternative {
 }

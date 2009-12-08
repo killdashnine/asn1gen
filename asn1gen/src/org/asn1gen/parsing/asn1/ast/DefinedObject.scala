@@ -4,5 +4,5 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 trait DefinedObject
   extends ObjectKind
-  with ReferencedObjectsKind {
+  with ReferencedObjects {
 }
