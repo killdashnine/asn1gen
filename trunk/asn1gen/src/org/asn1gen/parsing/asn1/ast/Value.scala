@@ -1,10 +1,9 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
-trait Value extends ActualParameterKind
+trait Value
+  extends ActualParameter
   with GovernorConstraintParameterValue
-  with LowerEndValueKind
-  with SettingKind
-  with UpperEndValueKind {
+  with LowerEndValue
+  with Setting
+  with UpperEndValue {
 }

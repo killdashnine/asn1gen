@@ -24,5 +24,20 @@ package test.org.asn1gen.gen {
         case x => fail("Parse failed: " + x)
       }
     }
+    
+    @Test def test2() {
+      val text = """
+        ModuleName DEFINITIONS ::= BEGIN -- xasdfsfd -- MyChoice ::= SEQUENCE {
+          field1 [0] INTEGER,
+          field2 [1] INTEGER
+        } END
+        """
+      Asn1.parse(text) match {
+        case Asn1.Success(moduleDefinition, _) => {
+          new GenJava(new IndentWriter(System.out)).generate(moduleDefinition)
+        }
+        case x => fail("Parse failed: " + x)
+      }
+    }
   }
 }

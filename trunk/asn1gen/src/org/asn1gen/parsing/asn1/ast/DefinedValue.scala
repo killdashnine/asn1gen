@@ -4,7 +4,7 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 trait DefinedValue
   extends AssignedIdentifier
-  with CharsDefnKind
+  with CharsDefn
   with ClassNumber
   with ExceptionIdentification
   with ObjIdComponents
