@@ -89,31 +89,46 @@ class GenJava(out: IndentWriter) {
       sequenceName: String, list: List[ComponentType]): Unit = {
     out.println("public " + sequenceName + "(")
     out.indent(2) {
+      var firstTime = true
       list foreach {
         case NamedComponentType(
           NamedType(Identifier(identifier), componentType),
           value)
         => {
-          generateSequenceConstructorArgument(identifier, componentType)
+          if (!firstTime) {
+            out.println(",")
+          }
+          out.print("final " + typeNameOf(componentType) + " " + identifier)
+          firstTime = false
         }
       }
     }
     out.println(")")
     out.println("{")
+    out.indent(2) {
+      list foreach {
+        case NamedComponentType(
+          NamedType(Identifier(identifier), componentType),
+          value)
+        => {
+          out.println("this." + identifier + " = " + identifier + ";")
+        }
+      }
+    }
     out.println("}")
+    out.println()
   }
   
-  def generateSequenceConstructorArgument(identifier: String, componentType: Type_): Unit = {
-    componentType match {
+  def typeNameOf(type_ : Type_): String = {
+    type_ match {
       case Type_(TaggedType(_, _, underlyingType), _) => {
-        generateSequenceConstructorArgument(identifier, underlyingType)
-        //out.println("// tag " + number)
+        return typeNameOf(underlyingType)
       }
-      case Type_(IntegerType(None), List()) => {
-        out.println("final AsnInteger " + identifier + ",");
+      case Type_(IntegerType(_), _) => {
+        return "AsnInteger"
       }
       case unmatched => {
-        out.println("// Unmatched type: " + unmatched)
+        return "Unknown(" + unmatched + ")"
       }
     }
   }
