@@ -36,10 +36,25 @@ class GenJava(out: IndentWriter) {
     assignment match {
       case TypeAssignment(
         TypeReference(name),
-        Type_(
-          ChoiceType(
-            AlternativeTypeLists(rootAlternativeTypeList, _, _, _)),
-          _))
+        type_ : Type_)
+      => {
+        generate(type_ , name)
+      }
+    }
+  }
+  
+  def generate(type_ : Type_, name: String): Unit = {
+    type_ match {
+      case Type_(builtinType: BuiltinType, _) => {
+        generate(builtinType, name)
+      }
+    }
+  }
+  
+  def generate(builtinType: BuiltinType, name: String): Unit = {
+    builtinType match {
+      case ChoiceType(
+        AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
         out.println("public class " + name + " {")
         out.indent(2) {
@@ -51,6 +66,76 @@ class GenJava(out: IndentWriter) {
           generateSimpleGetters(rootAlternativeTypeList)
         }
         out.println("}")
+      }
+      case SequenceType(ComponentTypeLists(list1, extension, list2))
+      => {
+        out.println("public class " + name + " extends AsnSequence {")
+        out.indent(2) {
+          out.println()
+          list1 match {
+            case Some(ComponentTypeList(list)) => {
+              generateSequenceConstructor(name, list)
+              generateSequenceFields(list)
+            }
+            case None => ()
+          }
+        }
+        out.println("}")
+      }
+    }
+  }
+  
+  def generateSequenceConstructor(
+      sequenceName: String, list: List[ComponentType]): Unit = {
+    out.println("public " + sequenceName + "(")
+    out.indent(2) {
+      list foreach {
+        case NamedComponentType(
+          NamedType(Identifier(identifier), componentType),
+          value)
+        => {
+          componentType match {
+            case Type_(TaggedType(_, _, underlyingType), _) => {
+              generateSequenceConstructor(identifier, underlyingType)
+              //out.println("// tag " + number)
+            }
+            case Type_(IntegerType(None), List()) => {
+              out.println("final AsnInteger " + identifier + ",");
+            }
+            case unmatched => {
+              out.println("// Unmatched type: " + unmatched)
+            }
+          }
+        }
+      }
+    }
+    out.println(")")
+    out.println("{")
+    out.println("}")
+  }
+  
+  def generateSequenceFields(list: List[ComponentType]): Unit = {
+    list foreach {
+      case NamedComponentType(
+        NamedType(Identifier(identifier), componentType),
+        value)
+      => {
+        generateSequenceField(identifier, componentType)
+      }
+    }
+  }
+  
+  def generateSequenceField(identifier: String, type_ : Type_): Unit = {
+    type_ match {
+      case Type_(TaggedType(_, _, underlyingType), _) => {
+        generateSequenceField(identifier, underlyingType)
+        //out.println("// tag " + number)
+      }
+      case Type_(IntegerType(None), List()) => {
+        out.println("public final AsnInteger " + identifier + ";");
+      }
+      case unmatched => {
+        out.println("// Unmatched type: " + unmatched)
       }
     }
   }
