@@ -6,8 +6,9 @@ case class Type_(
   kind: TypeKind,
   constraints: List[Constraint]
 ) extends Node
-  with ActualParameter
-  with GovernorKind
-  with Setting
-  with UserDefinedConstraintParameter {
+    with ActualParameter
+    with GovernorKind
+    with Setting
+    with UserDefinedConstraintParameter {
+  def typeName = kind.typeName
 }

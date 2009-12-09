@@ -8,4 +8,5 @@ case class TypeReference(
     with SimpleDefinedType {
   def name = chars
   def asModuleReference = ModuleReference(chars)
+  def typeName: String = name
 }
