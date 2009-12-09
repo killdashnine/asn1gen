@@ -4,5 +4,4 @@ case class ObjectClassFieldType(
   definedObjectClass: DefinedObjectClass,
   fieldName: FieldName
 ) extends Node with BuiltinType {
-  def typeName: String = "<ObjectClassFieldType>"
 }

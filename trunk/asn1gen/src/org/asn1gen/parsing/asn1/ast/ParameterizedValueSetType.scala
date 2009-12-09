@@ -4,5 +4,4 @@ case class ParameterizedValueSetType(
   simpleDefinedType: SimpleDefinedType,
   actualParameterList: ActualParameterList
 ) extends Node with DefinedType {
-  def typeName: String = "<ParameterizedValueSetType>"
 }

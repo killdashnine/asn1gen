@@ -4,5 +4,4 @@ case class ExternalTypeReference(
   moduleReference: ModuleReference,
   typeReference: TypeReference
 ) extends Node with DefinedType with SimpleDefinedType {
-  def typeName: String = typeReference.name
 }

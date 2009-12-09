@@ -7,5 +7,4 @@ case class TaggedType(
   taggedKind: TaggedKind,
   type_ : Type_
 ) extends Node with BuiltinType {
-  def typeName: String = "<TaggedType>"
 }

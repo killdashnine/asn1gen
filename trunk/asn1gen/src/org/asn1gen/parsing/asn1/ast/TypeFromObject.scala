@@ -4,5 +4,4 @@ case class TypeFromObject(
   referencedObjects: ReferencedObjects,
   fieldName: FieldName
 ) extends Node with ReferencedType {
-  def typeName: String = "<TypeFromObject>"
 }
