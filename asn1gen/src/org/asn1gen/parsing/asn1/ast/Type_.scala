@@ -10,5 +10,4 @@ case class Type_(
     with GovernorKind
     with Setting
     with UserDefinedConstraintParameter {
-  def typeName = kind.typeName
 }

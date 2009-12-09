@@ -4,5 +4,4 @@ case class ValueSetFromObjects(
   referencedObjects: ReferencedObjects,
   fieldName: FieldName
 ) extends Node with ReferencedType {
-  def typeName: String = "<ValueSetFromObjects>"
 }

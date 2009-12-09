@@ -6,5 +6,4 @@ case class SelectionType(
   identifier: Identifier,
   type_ : Type_
 ) extends Node with ReferencedType {
-  def typeName: String = "<SelectionType>"
 }
