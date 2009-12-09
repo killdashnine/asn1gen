@@ -4,5 +4,6 @@ case class ParameterizedType(
   simpleDefinedType: SimpleDefinedType,
   actualParameterList: ActualParameterList
 ) extends Node with DefinedType {
+  def typeName: String = "<ParameterizedType>"
 }
 
