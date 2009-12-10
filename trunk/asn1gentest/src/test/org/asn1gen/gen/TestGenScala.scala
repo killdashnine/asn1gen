@@ -14,7 +14,8 @@ package test.org.asn1gen.gen {
     @Test def test1() {
       val text = """
         ModuleName DEFINITIONS ::= BEGIN -- xasdfsfd -- MyChoice ::= CHOICE {
-          choice1 [0] INTEGER, choice2 [1] INTEGER
+          choice1 [0] INTEGER,
+          choice2 [1] REAL
         } END
         """
       Asn1.parse(text) match {
@@ -29,8 +30,30 @@ package test.org.asn1gen.gen {
       val text = """
         ModuleName DEFINITIONS ::= BEGIN -- xasdfsfd -- MySequence ::= SEQUENCE {
           field1 [0] INTEGER,
-          field2 [1] INTEGER
+          field2 [1] REAL
         } END
+        """
+      Asn1.parse(text) match {
+        case Asn1.Success(moduleDefinition, _) => {
+          new GenScala(new IndentWriter(System.out)).generate(moduleDefinition)
+        }
+        case x => fail("Parse failed: " + x)
+      }
+    }
+    
+    @Test def test3() {
+      val text = """
+        ModuleName DEFINITIONS ::= BEGIN
+	      MySequence ::= SEQUENCE {
+	        field1 [0] INTEGER,
+	        field2 [1] INTEGER
+	      }
+	      MyChoice ::= CHOICE {
+            choice1 [0] INTEGER,
+            choice2 [1] REAL,
+            choice3 [2] MySequence
+          }
+        END
         """
       Asn1.parse(text) match {
         case Asn1.Success(moduleDefinition, _) => {

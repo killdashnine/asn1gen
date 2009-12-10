@@ -112,14 +112,82 @@ class GenScala(out: IndentWriter) {
   
   def typeNameOf(type_ : Type_): String = {
     type_ match {
-      case Type_(TaggedType(_, _, underlyingType), _) => {
-        return typeNameOf(underlyingType)
+      case Type_(typeKind, _) => typeNameOf(typeKind)
+    }
+  }
+  
+  def typeNameOf(typeKind: TypeKind): String = {
+    typeKind match {
+      case builtinType: BuiltinType => typeNameOf(builtinType)
+      case TypeReference(reference) => reference
+      case unmatched => "Unmatched(" + unmatched + ")"
+    }
+  }
+  
+  def typeNameOf(builtinType: BuiltinType): String = {
+    builtinType match {
+      case BitStringType(_) => {
+        return "AsnBitString"
       }
-      case Type_(IntegerType(_), _) => {
+      case BOOLEAN => {
+        return "AsnBoolean"
+      }
+      case _: CharacterStringType => {
+        return "AsnCharacterString"
+      }
+      case _: ChoiceType => {
+        return "AsnChoice"
+      }
+      case EmbeddedPdvType => {
+        return "AdnEmbeddedPdv"
+      }
+      case EnumeratedType(_) => {
+        return "AsnEnumerated"
+      }
+      case EXTERNAL => {
+        return "ExternalType"
+      }
+      case InstanceOfType(_) => {
+        return "InstanceOfType"
+      }
+      case IntegerType(_) => {
         return "AsnInteger"
       }
+      case NULL => {
+        return "AsnNull"
+      }
+      case _: ObjectClassFieldType => {
+        return "AsnObjectClassField"
+      }
+      case ObjectIdentifierType => {
+        return "AsnObjectIdentifier"
+      }
+      case OctetStringType => {
+        return "AsnOctetString"
+      }
+      case REAL => {
+        return "AsnReal"
+      }
+      case RelativeOidType => {
+        return "AsnRelativeOidType"
+      }
+      case SequenceOfType(_) => {
+        return "AsnSequenceOf"
+      }
+      case SequenceType(_) => {
+        return "AsnSequence"
+      }
+      case SetOfType(_) => {
+        return "AsnSetOf"
+      }
+      case SetType(_) => {
+        return "AsnSet"
+      }
+      case TaggedType(_, _, underlyingType) => {
+        return typeNameOf(underlyingType)
+      }
       case unmatched => {
-        return "Unknown(" + unmatched + ")"
+        return "UnknownBuiltinType(" + unmatched + ")"
       }
     }
   }
@@ -151,10 +219,11 @@ class GenScala(out: IndentWriter) {
         generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, fieldNames)
         //out.println("// tag " + number)
       }
-      case Type_(IntegerType(None), List()) => {
+      case Type_(builtinType: BuiltinType, List()) => {
+    	val setterType = typeNameOf(builtinType)
         out.println(
-            "def " + fieldName + "(f: (" + "AsnInteger" + " => " +
-            "AsnInteger" + ")): " + sequenceName + " = " + sequenceName + "(")
+            "def " + fieldName + "(f: (" + setterType + " => " +
+            setterType + ")): " + sequenceName + " = " + sequenceName + "(")
         var firstIteration = true
         out.indent(2) {
           fieldNames foreach { listedFieldName =>
@@ -193,11 +262,11 @@ class GenScala(out: IndentWriter) {
         Identifier(name),
         Type_(
           TaggedType(
-            Tag(_, Number(tagNumber)), _, _),
+            Tag(_, Number(tagNumber)), _, type_),
           _))
       => {
         out.println()
-        out.println("val " + name.toUpperCase + " = " + tagNumber + ": Integer")
+        out.println("val " + name.toUpperCase + ": Integer = " + tagNumber)
       }
     }
   }
@@ -216,12 +285,12 @@ class GenScala(out: IndentWriter) {
     namedType match {
       case NamedType(
         Identifier(name),
-        Type_(
-          TaggedType(_, _, type_),
-          _))
+        type_)
       => {
         out.println()
-        out.println("def " + name + ": AsnInteger = choice_.asInstanceOf[AsnInteger]")
+        out.println(
+        		"def " + name + ": " + typeNameOf(type_) +
+        		" = choice_.asInstanceOf[" + typeNameOf(type_) + "]")
       }
     }
   }

@@ -121,14 +121,80 @@ class GenJava(out: IndentWriter) {
   
   def typeNameOf(type_ : Type_): String = {
     type_ match {
-      case Type_(TaggedType(_, _, underlyingType), _) => {
-        return typeNameOf(underlyingType)
+      case Type_(typeKind, _) => typeNameOf(typeKind)
+    }
+  }
+  
+  def typeNameOf(typeKind: TypeKind): String = {
+    typeKind match {
+      case builtinType: BuiltinType => typeNameOf(builtinType)
+    }
+  }
+  
+  def typeNameOf(builtinType: BuiltinType): String = {
+    builtinType match {
+      case BitStringType(_) => {
+        return "AsnBitString"
       }
-      case Type_(IntegerType(_), _) => {
+      case BOOLEAN => {
+        return "AsnBoolean"
+      }
+      case _: CharacterStringType => {
+        return "AsnCharacterString"
+      }
+      case _: ChoiceType => {
+        return "AsnChoice"
+      }
+      case EmbeddedPdvType => {
+        return "AdnEmbeddedPdv"
+      }
+      case EnumeratedType(_) => {
+        return "AsnEnumerated"
+      }
+      case EXTERNAL => {
+        return "ExternalType"
+      }
+      case InstanceOfType(_) => {
+        return "InstanceOfType"
+      }
+      case IntegerType(_) => {
         return "AsnInteger"
       }
+      case NULL => {
+        return "AsnNull"
+      }
+      case _: ObjectClassFieldType => {
+        return "AsnObjectClassField"
+      }
+      case ObjectIdentifierType => {
+        return "AsnObjectIdentifier"
+      }
+      case OctetStringType => {
+        return "AsnOctetString"
+      }
+      case REAL => {
+        return "AsnReal"
+      }
+      case RelativeOidType => {
+        return "AsnRelativeOidType"
+      }
+      case SequenceOfType(_) => {
+        return "AsnSequenceOf"
+      }
+      case SequenceType(_) => {
+        return "AsnSequence"
+      }
+      case SetOfType(_) => {
+        return "AsnSetOf"
+      }
+      case SetType(_) => {
+        return "AsnSet"
+      }
+      case TaggedType(_, _, underlyingType) => {
+        return typeNameOf(underlyingType)
+      }
       case unmatched => {
-        return "Unknown(" + unmatched + ")"
+        return "UnknownBuiltinType(" + unmatched + ")"
       }
     }
   }
@@ -151,7 +217,7 @@ class GenJava(out: IndentWriter) {
         //out.println("// tag " + number)
       }
       case Type_(IntegerType(None), List()) => {
-        out.println("public final AsnInteger " + identifier + ";");
+        out.println("public final " + typeNameOf(type_) + " " + identifier + ";");
       }
       case unmatched => {
         out.println("// Unmatched type: " + unmatched)
@@ -205,7 +271,7 @@ class GenJava(out: IndentWriter) {
       => {
         val getter = "get" + name.first.toUpperCase + name.substring(1)
         out.println()
-        out.println("public AsnInteger " + getter + "() {")
+        out.println("public " + typeNameOf(type_) + " " + getter + "() {")
         out.indent(2) {
           out.println("return (AsnInteger)elem_;")
         }
