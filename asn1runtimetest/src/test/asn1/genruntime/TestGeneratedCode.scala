@@ -1,4 +1,4 @@
-package ModuleName {
+package test.asn1.genruntime {
   import org.asn1gen.runtime._
 
   case class MySequence(
@@ -25,7 +25,7 @@ package ModuleName {
     // Unmatched type: Type_(TypeReference(MyChoice),List())
   }
 }
-package ModuleName {
+package test.asn1.genruntime {
   import org.asn1gen.runtime._
 
   case class MyChoice(override val choice: AsnType) extends AsnChoice(choice) {
