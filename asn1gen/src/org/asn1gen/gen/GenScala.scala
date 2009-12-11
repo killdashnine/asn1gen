@@ -5,6 +5,8 @@ import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.io._
 
 class GenScala(out: IndentWriter) {
+  var moduleName: Option[String] = None
+  
   def generate(moduleDefinition: ModuleDefinition): Unit = {
     moduleDefinition match {
       case moduleDefinition@ModuleDefinition(
@@ -15,7 +17,7 @@ class GenScala(out: IndentWriter) {
         ExtensionDefault(_),
         ModuleBody(_, _, assignmentList))
       => {
-        out.println("package " + moduleName +" {")
+        out.println("package " + this.moduleName.getOrElse(moduleName) +" {")
         out.indent(2) {
           out.println("import org.asn1gen.runtime._")
           out.println()
