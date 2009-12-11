@@ -15,5 +15,6 @@ object ScalaCodeUser {
           .field2{_ => AsnReal(3.0)}
       )
     println(mySequence2)
+    println(MySequence)
   }
 }

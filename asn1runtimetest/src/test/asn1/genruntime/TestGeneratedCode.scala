@@ -24,6 +24,11 @@ package test.asn1.genruntime {
       this.field4)
     // Unmatched type: Type_(TypeReference(MyChoice),List())
   }
+  
+  object MySequence extends MySequence(
+      AsnInteger(1), AsnReal(2.0), AsnPrintableString("x"), MyChoice(AsnInteger(1)))
+  {
+  }
 }
 package test.asn1.genruntime {
   import org.asn1gen.runtime._
