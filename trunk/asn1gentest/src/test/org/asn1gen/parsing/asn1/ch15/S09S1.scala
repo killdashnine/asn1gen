@@ -228,7 +228,7 @@ package test.org.asn1gen.parsing.asn1.ch15 {
           value [0] EXPLICIT TYPE-IDENTIFIER.&Type
         }
       """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -241,7 +241,7 @@ package test.org.asn1gen.parsing.asn1.ch15 {
           value [0] EXPLICIT DefinedObjectClass.&Type
         }
       """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -254,7 +254,7 @@ package test.org.asn1gen.parsing.asn1.ch15 {
           value [0] DefinedObjectClass.&Type ({ObjectSet}{@.type-id})
         }
       """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -305,7 +305,7 @@ package test.org.asn1gen.parsing.asn1.ch15 {
       val text = """
         [0] DefinedObjectClass.&Type ({ObjectSet}{@.type-id})
       """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

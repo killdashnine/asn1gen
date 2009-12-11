@@ -36,16 +36,16 @@ class GenJava(out: IndentWriter) {
     assignment match {
       case TypeAssignment(
         TypeReference(name),
-        type_ : Type_)
+        _type : Type)
       => {
-        generate(type_ , name)
+        generate(_type , name)
       }
     }
   }
   
-  def generate(type_ : Type_, name: String): Unit = {
-    type_ match {
-      case Type_(builtinType: BuiltinType, _) => {
+  def generate(_type: Type, name: String): Unit = {
+    _type match {
+      case Type(builtinType: BuiltinType, _) => {
         generate(builtinType, name)
       }
     }
@@ -119,9 +119,9 @@ class GenJava(out: IndentWriter) {
     out.println()
   }
   
-  def typeNameOf(type_ : Type_): String = {
-    type_ match {
-      case Type_(typeKind, _) => typeNameOf(typeKind)
+  def typeNameOf(_type: Type): String = {
+    _type match {
+      case Type(typeKind, _) => typeNameOf(typeKind)
     }
   }
   
@@ -210,14 +210,14 @@ class GenJava(out: IndentWriter) {
     }
   }
   
-  def generateSequenceField(identifier: String, type_ : Type_): Unit = {
-    type_ match {
-      case Type_(TaggedType(_, _, underlyingType), _) => {
+  def generateSequenceField(identifier: String, _type: Type): Unit = {
+    _type match {
+      case Type(TaggedType(_, _, underlyingType), _) => {
         generateSequenceField(identifier, underlyingType)
         //out.println("// tag " + number)
       }
-      case Type_(IntegerType(None), List()) => {
-        out.println("public final " + typeNameOf(type_) + " " + identifier + ";");
+      case Type(IntegerType(None), List()) => {
+        out.println("public final " + typeNameOf(_type) + " " + identifier + ";");
       }
       case unmatched => {
         out.println("// Unmatched type: " + unmatched)
@@ -239,7 +239,7 @@ class GenJava(out: IndentWriter) {
     namedType match {
       case NamedType(
         Identifier(name),
-        Type_(
+        Type(
           TaggedType(
             Tag(_, Number(tagNumber)), _, _),
           _))
@@ -265,13 +265,13 @@ class GenJava(out: IndentWriter) {
     namedType match {
       case NamedType(
         Identifier(name),
-        Type_(
-          TaggedType(_, _, type_),
+        Type(
+          TaggedType(_, _, _type),
           _))
       => {
         val getter = "get" + name.first.toUpperCase + name.substring(1)
         out.println()
-        out.println("public " + typeNameOf(type_) + " " + getter + "() {")
+        out.println("public " + typeNameOf(_type) + " " + getter + "() {")
         out.indent(2) {
           out.println("return (AsnInteger)elem_;")
         }

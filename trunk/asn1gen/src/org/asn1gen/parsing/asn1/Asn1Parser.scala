@@ -108,16 +108,16 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def typeAssignment =
     ( typeReference
     ~ op("::=")
-    ~ type_
+    ~ _type
     ) ^^ { case n ~ _ ~ t => TypeAssignment(n, t) } | failure("type assignment")
   
-  def type_ : Parser[Type_] =
+  def _type : Parser[Type] =
     ( ( builtinType
       | referencedType
       | constrainedType
       )
     ~ constraint.* // refactored from constrainedType
-    ) ^^ { case kind ~ constraints => Type_(kind, constraints) }
+    ) ^^ { case kind ~ constraints => Type(kind, constraints) }
   
   def builtinType =
     ( bitStringType
@@ -153,7 +153,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 9.1.2<4>
   def valueAssignment =
     ( valueReference
-    ~ type_
+    ~ _type
     ~ op("::=")
     ~ value
     ) ^^ { case vr ~ t ~ _ ~ v => ValueAssignment(vr, t, v) }
@@ -198,7 +198,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   def valueSetTypeAssignment =
     ( typeReference
-    ~ type_
+    ~ _type
     ~ op("::=")
     ~ valueSet
     ) ^^ { case tr ~ t ~ _ ~ vs => ValueSetTypeAssignment(tr, t, vs) }
@@ -771,7 +771,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def taggedType =
     ( tag
     ~ (kwImplicit | kwExplicit | empty)
-    ~ type_
+    ~ _type
     ) ^^ { case tag ~ taggedKind ~ t => TaggedType(tag, taggedKind, t) }
   
   def tag =
@@ -879,7 +879,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case nt ~ od => NamedComponentType(nt, od) }
     
   def basicComponentType =
-    ( kw("COMPONENTS") ~> kw("OF") ~> type_
+    ( kw("COMPONENTS") ~> kw("OF") ~> _type
     ) ^^ { t => BasicComponentType(t) }
     
   def componentType =
@@ -889,7 +889,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 12.2.2<24>
   def namedType =
-    ( identifier ~ type_
+    ( identifier ~ _type
     ) ^^ { case id ~ t => NamedType(id, t) }
 
   // ASN1D 12.2.2<25>
@@ -939,7 +939,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.4.2<1>
   def sequenceOfType =
-    ( kwSequence ~ kw("OF") ~ type_
+    ( kwSequence ~ kw("OF") ~ _type
     ) ^^ { case _ ~ _ ~ t => SequenceOfType(t) } // TODO
 
   // ASN1D 12.4.2<3>
@@ -950,7 +950,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
       | sizeConstraint
       )
     ~ kw("OF")
-    ~ type_
+    ~ _type
     ) ^^ { case ct ~ c ~ _ ~ t => TypeWithConstraint(ct, c, t) }
   
   // ASN1D 12.4.2<5>
@@ -965,7 +965,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.5.2<1>
   def setOfType =
-    ( kwSet ~ kw("OF") ~ type_
+    ( kwSet ~ kw("OF") ~ _type
     ) ^^ { case (_ ~ _ ~ t) => SetOfType(t) } // TODO
 
   // ASN1D 12.5.2<3>
@@ -1037,7 +1037,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.7.2<1>
   def selectionType =
-    ( identifier ~ op("<") ~ type_
+    ( identifier ~ op("<") ~ _type
     ) ^^ { case i ~ _ ~ t => SelectionType(i, t) }
 
   // ASN1D 12.9.2<1>
@@ -1058,7 +1058,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 12.9.2<20>
   def exceptionIdentificationTypeAndValue =
-    ( type_ ~ op(":") ~ value
+    ( _type ~ op(":") ~ value
     ) ^^ { case t ~ _ ~ v => ExceptionIdentificationTypeAndValue(t, v) }
 
   def exceptionIdentification =
@@ -1069,7 +1069,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   
   // ASN1D 13.1.2<1>
   def constrainedType =
-    ( /*failure("refactor to type_") ~ type_ ~ constraint
+    ( /*failure("refactor to _type") ~ _type ~ constraint
     |*/ typeWithConstraint
     ) ^^ { twc => ConstrainedType(twc) } // TODO
 
@@ -1080,7 +1080,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 13.3.2<1>
   def containedSubtype =
-    ( includes ~ type_
+    ( includes ~ _type
     ) ^^ { case i ~ t => ContainedSubtype(i.isDefined, t) }
 
   // ASN1D 13.3.7<7>
@@ -1203,7 +1203,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   // ASN1D 13.10.2<1>
   def contentsConstraint =
     ( ( kw("CONTAINING")
-      ~>type_
+      ~>_type
       ~ ( kw("ENCODED")
         ~>kw("BY")
         ~>value
@@ -1331,13 +1331,13 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   def userDefinedConstraintParameter	=
     ( governorConstraintParameter
-    | type_
+    | _type
     | definedObjectClass
     )
   
   // ASN1D 13.13.2<7>
   def governor =
-    ( type_
+    ( _type
     | definedObjectClass
     ) ^^ { kind => Governor(kind) }
 
@@ -1399,14 +1399,14 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case tfr ~ tos => TypeFieldSpec(tfr, tos) }
   def typeOptionalitySpec =
     ( kwOptional
-    | default(type_)
+    | default(_type)
     | empty
     ) ^^ { value => TypeOptionalitySpec(value) }
   
   // ASN1D 15.2.2<6>
   def fixedTypeValueFieldSpec =
     ( valueFieldReference
-    ~ type_
+    ~ _type
     ~ unique
     ~ valueOptionalitySpec
     ) ^^ { case vfr ~ t ~ u ~ vos => FixedTypeValueFieldSpec(vfr, t, u, vos) }
@@ -1428,7 +1428,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<17>
   def fixedTypeValueSetFieldSpec =
-    ( valueSetFieldReference ~ type_ ~ valueSetOptionalitySpec
+    ( valueSetFieldReference ~ _type ~ valueSetOptionalitySpec
     ) ^^ { case vsfr ~ t ~ vsos => FixedTypeValueSetFieldSpec(vsfr, t, vsos) }
 
   // ASN1D 15.2.2<18>
@@ -1503,7 +1503,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.2.2<38>
   def setting: Parser[Setting] =
-    ( type_
+    ( _type
     | value
     | valueSet
     | object_
@@ -1665,7 +1665,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.7.2<11>
   def openTypeFieldVal =
-    ( type_ ~ op(":") ~ value
+    ( _type ~ op(":") ~ value
     ) ^^ { case t ~ _ ~ v => OpenTypeFieldVal(t, v) }
 
   // ASN1D 15.7.2<13>
@@ -1717,7 +1717,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
 
   // ASN1D 15.7.2<36>
   def typeConstraint =
-    ( type_
+    ( _type
     ) ^^ { t => TypeConstraint(t) }
 
   // ASN1D 15.9<6> refactored
@@ -1752,14 +1752,14 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( typeReference
     ~ parameterList
     ~ op("::=")
-    ~ type_
+    ~ _type
     ) ^^ { case tr ~ pl ~ _ ~ t => ParameterizedTypeAssignment(tr, pl, t) }
 
   // ASN1D 17.2.2<5>
   def parameterizedValueAssignment =
     ( valueReference
     ~ parameterList
-    ~ type_
+    ~ _type
     ~ op("::=")
     ~ value
     ) ^^ { case vr ~ pl ~ t ~ _ ~ v => ParameterizedValueAssignment(vr, pl, t, v) }
@@ -1768,7 +1768,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def parameterizedValueSetTypeAssignment =
     ( typeReference
     ~ parameterList
-    ~ type_
+    ~ _type
     ~ op("::=")
     ~ valueSet
     ) ^^ { case tr ~ pl ~ t ~ _ ~ vs => ParameterizedValueSetTypeAssignment(tr, pl, t, vs) }
@@ -1865,7 +1865,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ) ^^ { case _ ~ parameters ~ _ => ActualParameterList(parameters) }
   
   def actualParameter: Parser[ActualParameter] =
-    ( type_
+    ( _type
     | value
     | valueSet
     | definedObjectClass

@@ -27,7 +27,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
                           -- relative to reference-node --
           }
           """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -40,7 +40,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
             relative-oids RELATIVE-OID
           }
           """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

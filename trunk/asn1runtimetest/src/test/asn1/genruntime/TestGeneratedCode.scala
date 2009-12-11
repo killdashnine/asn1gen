@@ -22,7 +22,7 @@ package test.asn1.genruntime {
       this.field2,
       f(this.field3),
       this.field4)
-    // Unmatched type: Type_(TypeReference(MyChoice),List())
+    // Unmatched type: Type(TypeReference(MyChoice),List())
   }
   
   object MySequence extends MySequence(

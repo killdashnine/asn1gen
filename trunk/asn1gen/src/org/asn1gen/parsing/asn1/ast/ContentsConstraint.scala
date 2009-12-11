@@ -1,7 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
 case class ContentsConstraint(
-  type_ : Option[Type_],
+  _type : Option[Type],
   value: Option[Value]
 ) extends Node with GeneralConstraint {
 }

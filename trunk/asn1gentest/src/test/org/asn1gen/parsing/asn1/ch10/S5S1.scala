@@ -106,7 +106,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
               exponent (-125..128)
             })
           """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
@@ -121,7 +121,7 @@ package test.org.asn1gen.parsing.asn1.ch10 {
               exponent (-125..128)
             })
           """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

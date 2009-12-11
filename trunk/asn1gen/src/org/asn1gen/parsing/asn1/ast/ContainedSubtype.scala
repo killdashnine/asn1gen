@@ -4,7 +4,6 @@ import org.asn1gen.parsing.asn1.ast.kind._
 
 case class ContainedSubtype(
   includes: Boolean,
-  type_ : Type_
+  _type: Type
 ) extends Node with SubtypeElementsKind {
 }
-

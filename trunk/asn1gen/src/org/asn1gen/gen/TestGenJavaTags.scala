@@ -27,7 +27,7 @@ object GenJavaTags {
           assignment match {
             case TypeAssignment(
               name,
-              Type_(ChoiceType(alternativeTypeLists), _))
+              Type(ChoiceType(alternativeTypeLists), _))
             => {
               out.println("public class " + name + "{")
               generate(alternativeTypeLists, out)
@@ -53,7 +53,7 @@ object GenJavaTags {
   
   def generate(namedType: NamedType, out: PrintWriter): Unit = {
     namedType match {
-      case NamedType(id, Type_(TaggedType(Tag(_, number), _, _), _)) =>
+      case NamedType(id, Type(TaggedType(Tag(_, number), _, _), _)) =>
         out.println("/* " + id + " " + number + "*/")
     }
   }

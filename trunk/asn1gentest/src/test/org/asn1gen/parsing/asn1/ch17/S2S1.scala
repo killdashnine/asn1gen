@@ -56,7 +56,7 @@ package test.org.asn1gen.parsing.asn1.ch17 {
           utf8String UTF8String (SIZE (1..ub-match))
         }
       """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }
