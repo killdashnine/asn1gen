@@ -1,4 +1,4 @@
 package org.asn1gen.runtime
 
-class AsnReal extends AsnType {
+case class AsnReal(value: Double) extends AsnType {
 }

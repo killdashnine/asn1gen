@@ -1,4 +1,4 @@
 package org.asn1gen.runtime
 
-class AsnInteger extends AsnType {
+case class AsnInteger(value: Int) extends AsnType {
 }
