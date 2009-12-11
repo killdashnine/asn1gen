@@ -132,14 +132,14 @@ class GenScala(out: IndentWriter) {
       case BOOLEAN => {
         return "AsnBoolean"
       }
-      case _: CharacterStringType => {
-        return "AsnCharacterString"
+      case characterString: CharacterStringType => {
+        typeNameOf(characterString)
       }
       case _: ChoiceType => {
         return "AsnChoice"
       }
       case EmbeddedPdvType => {
-        return "AdnEmbeddedPdv"
+        return "AsnEmbeddedPdv"
       }
       case EnumeratedType(_) => {
         return "AsnEnumerated"
@@ -188,6 +188,53 @@ class GenScala(out: IndentWriter) {
       }
       case unmatched => {
         return "UnknownBuiltinType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def typeNameOf(characterString: CharacterStringType): String = {
+    characterString match {
+      case BMPString => {
+        return "AsnBmpString"
+      }
+      case GeneralString => {
+        return "AsnGeneralString"
+      }
+      case GraphicString => {
+        return "AsnGraphicString"
+      }
+      case IA5String => {
+        return "AsnIa5String"
+      }
+      case ISO646String => {
+        return "AsnIso646String"
+      }
+      case NumericString => {
+        return "AsnNumericString"
+      }
+      case PrintableString => {
+        return "AsnPrintableString"
+      }
+      case T61String => {
+        return "AsnT61String"
+      }
+      case TeletexString => {
+        return "AsnTeletexString"
+      }
+      case UniversalString => {
+        return "AsnUniversalString"
+      }
+      case UTF8String => {
+        return "AsnUtf8String"
+      }
+      case VideotexString => {
+        return "AsnVideotexString"
+      }
+      case VisibleString => {
+        return "AsnVisibleString"
+      }
+      case unknown => {
+        return "UnknownCharacterString(" + unknown + ")"
       }
     }
   }
