@@ -101,7 +101,7 @@ package test.org.asn1gen.parsing.asn1.ch12 {
           universalString UniversalString
         }
       """
-      parse(type_, text) match {
+      parse(_type, text) match {
         case Success(_, _) => ()
         case x => fail("Parse failure: " + x)
       }

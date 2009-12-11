@@ -56,7 +56,7 @@ package test.org.asn1gen.parsing.asn1 {
         case Success(
           result: BuiltinType,
           _) =>
-        case x => fail("Parse 'type_' failure: " + x)
+        case x => fail("Parse '_type' failure: " + x)
       }
     }
   }

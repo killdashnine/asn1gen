@@ -40,16 +40,16 @@ class GenScala(out: IndentWriter) {
     assignment match {
       case TypeAssignment(
         TypeReference(name),
-        type_ : Type_)
+        _type: Type)
       => {
-        generate(type_ , name)
+        generate(_type , name)
       }
     }
   }
   
-  def generate(type_ : Type_, name: String): Unit = {
-    type_ match {
-      case Type_(builtinType: BuiltinType, _) => {
+  def generate(_type: Type, name: String): Unit = {
+    _type match {
+      case Type(builtinType: BuiltinType, _) => {
         generate(builtinType, name)
       }
     }
@@ -112,9 +112,9 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def typeNameOf(type_ : Type_): String = {
-    type_ match {
-      case Type_(typeKind, _) => typeNameOf(typeKind)
+  def typeNameOf(_type: Type): String = {
+    _type match {
+      case Type(typeKind, _) => typeNameOf(typeKind)
     }
   }
   
@@ -261,14 +261,14 @@ class GenScala(out: IndentWriter) {
   def generateSequenceImmutableSetter(
       sequenceName: String,
       fieldName: String,
-      type_ : Type_,
+      _type: Type,
       fieldNames: List[String]): Unit = {
-    type_ match {
-      case Type_(TaggedType(_, _, fieldType), _) => {
+    _type match {
+      case Type(TaggedType(_, _, fieldType), _) => {
         generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, fieldNames)
         //out.println("// tag " + number)
       }
-      case Type_(builtinType: BuiltinType, List()) => {
+      case Type(builtinType: BuiltinType, List()) => {
     	val setterType = typeNameOf(builtinType)
         out.println(
             "def " + fieldName + "(f: (" + setterType + " => " +
@@ -309,9 +309,9 @@ class GenScala(out: IndentWriter) {
     namedType match {
       case NamedType(
         Identifier(name),
-        Type_(
+        Type(
           TaggedType(
-            Tag(_, Number(tagNumber)), _, type_),
+            Tag(_, Number(tagNumber)), _, _type),
           _))
       => {
         out.println()
@@ -334,12 +334,12 @@ class GenScala(out: IndentWriter) {
     namedType match {
       case NamedType(
         Identifier(name),
-        type_)
+        _type)
       => {
         out.println()
         out.println(
-        		"def " + name + ": " + typeNameOf(type_) +
-        		" = choice_.asInstanceOf[" + typeNameOf(type_) + "]")
+        		"def " + name + ": " + typeNameOf(_type) +
+        		" = choice_.asInstanceOf[" + typeNameOf(_type) + "]")
       }
     }
   }

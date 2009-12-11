@@ -16,18 +16,18 @@ package test.org.asn1gen.parsing.asn1 {
     import TheParser._
     
     @Test def test_type_1() {
-      parse(type_, "INTEGER { a(1), b(2), c(3) }") match {
+      parse(_type, "INTEGER { a(1), b(2), c(3) }") match {
         case Success(
-          result@Type_(_, _),
+          result@Type(_, _),
           _) =>
-        case x => fail("Parse 'type_' failure: " + x)
+        case x => fail("Parse '_type' failure: " + x)
       }
     }
     
     @Test def test_type_2() {
-      parse(type_, "CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
+      parse(_type, "CHOICE { choice1 [0] INTEGER, choice2 [1] INTEGER }") match {
         case Success(
-          result@Type_(
+          result@Type(
             ChoiceType(
               AlternativeTypeLists(
                 RootAlternativeTypeList(
@@ -35,25 +35,25 @@ package test.org.asn1gen.parsing.asn1 {
                     List(
                       NamedType(
                         Identifier("choice1"),
-                        Type_(
+                        Type(
                           TaggedType(
                             Tag(Empty, Number("0")),
                             _,
-                            Type_(
+                            Type(
                               IntegerType(None), _)),
                           _)),
                       NamedType(
                         Identifier("choice2"),
-                        Type_(
+                        Type(
                           TaggedType(
                             Tag(Empty, Number("1")),
                             _,
-                            Type_(IntegerType(None), _)),
+                            Type(IntegerType(None), _)),
                           _))))),
                   None,None,None)),
             _),
           _) => println(result)
-        case x => fail("Parse 'type_' failure: " + x)
+        case x => fail("Parse '_type' failure: " + x)
       }
     }
     
@@ -72,12 +72,12 @@ package test.org.asn1gen.parsing.asn1 {
         case Success(
           TypeAssignment(
             TypeReference("TypeReference"),
-            Type_(ChoiceType(AlternativeTypeLists(
+            Type(ChoiceType(AlternativeTypeLists(
               RootAlternativeTypeList(
                 AlternativeTypeList(
                   List(
-                    NamedType(Identifier("integer"),Type_(IntegerType(None), _)),
-                    NamedType(Identifier("boolean"),Type_(BOOLEAN, _))))),
+                    NamedType(Identifier("integer"), Type(IntegerType(None), _)),
+                    NamedType(Identifier("boolean"), Type(BOOLEAN, _))))),
               None,
               None,
               None)),
@@ -91,7 +91,7 @@ package test.org.asn1gen.parsing.asn1 {
     @Test def test_typeAssignment_3() {
       parse(typeAssignment, "Pair ::= SEQUENCE { x INTEGER, y INTEGER }") match {
         case Success(
-          result@TypeAssignment(TypeReference("Pair"), Type_(SequenceType(_), _)),
+          result@TypeAssignment(TypeReference("Pair"), Type(SequenceType(_), _)),
           _) =>
         case x => fail("Parse 'type' failure: " + x)
       }
