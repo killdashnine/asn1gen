@@ -95,18 +95,40 @@ class GenScala(out: IndentWriter) {
     }
   }
   
+  def typeNameOf(namedComponentType: NamedComponentType): String = {
+    namedComponentType match {
+      case NamedComponentType(
+        NamedType(Identifier(identifier), _type),
+        value)
+      => {
+        typeNameOf(_type, value)
+      }
+    }
+  }
+  
+  def typeNameOf(_type: Type, value: OptionalDefault[Value]): String = {
+    value match {
+      case Empty =>
+        return typeNameOf(_type)
+      case Default(value) =>
+        return typeNameOf(_type)
+      case Optional =>
+        return "Option[" + typeNameOf(_type) + "]"
+    }
+  }
+  
   def generateSequenceConstructor(
       sequenceName: String, list: List[ComponentType]): Unit = {
     var firstTime = true
     list foreach {
       case NamedComponentType(
-        NamedType(Identifier(identifier), componentType),
+        NamedType(Identifier(identifier), _type),
         value)
       => {
         if (!firstTime) {
           out.println(",")
         }
-        out.print(identifier + ": " + typeNameOf(componentType))
+        out.print(identifier + ": " + typeNameOf(_type, value))
         firstTime = false
       }
     }
@@ -123,6 +145,17 @@ class GenScala(out: IndentWriter) {
       case builtinType: BuiltinType => typeNameOf(builtinType)
       case TypeReference(reference) => reference
       case unmatched => "Unmatched(" + unmatched + ")"
+    }
+  }
+  
+  def typeNameOf(typeKind: TypeKind, value: OptionalDefault[Value]): String = {
+    value match {
+      case Empty =>
+        return typeNameOf(typeKind)
+      case Default(value) =>
+        return typeNameOf(typeKind)
+      case Optional =>
+        return "Option[" + typeNameOf(typeKind) + "]"
     }
   }
   
@@ -250,10 +283,11 @@ class GenScala(out: IndentWriter) {
     }
     list foreach {
       case NamedComponentType(
-        NamedType(Identifier(identifier), componentType),
+        NamedType(Identifier(identifier), _type),
         value)
       => {
-        generateSequenceImmutableSetter(sequenceName: String, identifier, componentType, fieldNames)
+        generateSequenceImmutableSetter(
+            sequenceName: String, identifier, _type, value, fieldNames)
       }
     }
   }
@@ -262,14 +296,15 @@ class GenScala(out: IndentWriter) {
       sequenceName: String,
       fieldName: String,
       _type: Type,
+      value: OptionalDefault[Value],
       fieldNames: List[String]): Unit = {
     _type match {
       case Type(TaggedType(_, _, fieldType), _) => {
-        generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, fieldNames)
+        generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, value, fieldNames)
         //out.println("// tag " + number)
       }
       case Type(builtinType: BuiltinType, List()) => {
-    	val setterType = typeNameOf(builtinType)
+        val setterType = typeNameOf(builtinType, value)
         out.println(
             "def " + fieldName + "(f: (" + setterType + " => " +
             setterType + ")): " + sequenceName + " = " + sequenceName + "(")
