@@ -60,13 +60,22 @@ class GenScala(out: IndentWriter) {
       case ChoiceType(
         AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
-        out.println("case class " + assignmentName + "(override val choice: AsnType) extends AsnChoice(choice) {")
+        out.println(
+            "case class " + assignmentName +
+            "(_choice: Int, _element: AsnType) extends AsnChoice {")
         out.indent(2) {
           out.println("//////////////////////////////////////////////////////////////////")
           out.println("// Choice IDs")
           generateChoiceIds(rootAlternativeTypeList)
           generateSimpleGetters(rootAlternativeTypeList)
         }
+        out.println("}")
+        out.println()
+        val firstChoiceType =
+          rootAlternativeTypeList.alternativeTypeList.namedTypes(0)._type
+        out.println(
+            "object " + assignmentName + " extends " + assignmentName +
+            "(0, " + typeNameOf(firstChoiceType) + ") {")
         out.println("}")
       }
       case SequenceType(ComponentTypeLists(list1, extension, list2))
