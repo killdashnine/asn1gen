@@ -92,6 +92,34 @@ class GenScala(out: IndentWriter) {
         }
         out.println("}")
       }
+      case EnumeratedType(enumerations)
+      => {
+        out.println("case class MyEnum(_value: Int) extends AsnEnumeration {")
+        out.println("}")
+        out.println()
+        out.println("object MyEnum extends MyEnum(0) {")
+        out.indent(2) {
+          generate(enumerations)
+        }
+        out.println("}")
+      }
+    }
+  }
+  
+  def generate(enumerations: Enumerations): Unit = {
+    enumerations match {
+      case Enumerations(RootEnumeration(Enumeration(items)), extension)
+      => {
+        var index = 0
+        items foreach { case Identifier(item) =>
+          out.println("def " + item + ": Int = " + index)
+          index = index + 1
+        }
+        extension match {
+          case None => {}
+          case _ => out.println(extension)
+        }
+      }
     }
   }
   
