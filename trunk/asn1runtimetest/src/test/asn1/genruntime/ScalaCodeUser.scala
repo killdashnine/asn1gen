@@ -8,7 +8,7 @@ object ScalaCodeUser {
         Some(AsnInteger(1)),
         AsnReal(1.0),
         AsnPrintableString("Hello world"),
-        MyChoice(AsnInteger(1)))
+        MyChoice(1, AsnInteger(2)))
     val mySequence2 =
       ( mySequence
           .field1{
@@ -18,6 +18,18 @@ object ScalaCodeUser {
           .field2{_ => AsnReal(3.0)}
       )
     println(mySequence2)
+    println(mySequence2.field4._choice)
+    println(mySequence.field4{_.field2{(_, _) => AsnReal(9.9)}})
+    println(Empty)
+    println(MySequence)
+    println(MyChoice)
+    val moo =
+      ( MySequence
+          .field1{_ => Some(AsnInteger(12))}
+          .field2{_ => AsnReal(123.0)}
+      )
+    println(moo)
+    println(MyEnum.value1)
     //println(MySequence)
   }
 }
