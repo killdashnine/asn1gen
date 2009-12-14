@@ -78,25 +78,34 @@ class GenScala(out: IndentWriter) {
             "(0, " + typeNameOf(firstChoiceType) + ") {")
         out.println("}")
       }
-      case SequenceType(ComponentTypeLists(list1, extension, list2))
-      => {
+      case SequenceType(spec) => {
         out.println("case class " + assignmentName + "(")
-        out.indent(2) {
-          list1 match {
-            case Some(ComponentTypeList(list)) => {
-              generateSequenceConstructor(assignmentName, list)
+        spec match {
+          case ComponentTypeLists(list1, extension, list2) => {
+            out.indent(2) {
+              list1 match {
+                case Some(ComponentTypeList(list)) => {
+                  generateSequenceConstructor(assignmentName, list)
+                }
+                case None => ()
+              }
+              out.println()
             }
-            case None => ()
           }
+          case Empty => {}
         }
-        out.println()
         out.println(") extends AsnSequence {")
         out.indent(2) {
-          list1 match {
-            case Some(ComponentTypeList(list)) => {
-              generateSequenceImmutableSetters(assignmentName, list)
+          spec match {
+            case ComponentTypeLists(list1, extension, list2) => {
+              list1 match {
+                case Some(ComponentTypeList(list)) => {
+                  generateSequenceImmutableSetters(assignmentName, list)
+                }
+                case None => ()
+              }
             }
-            case None => ()
+            case Empty => {}
           }
         }
         out.println("}")
@@ -111,6 +120,9 @@ class GenScala(out: IndentWriter) {
           generate(assignmentName, enumerations)
         }
         out.println("}")
+      }
+      case unmatched => {
+        out.println("// Unmatched: " + unmatched)
       }
     }
   }
