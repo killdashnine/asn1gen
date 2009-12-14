@@ -467,7 +467,7 @@ class GenScala(out: IndentWriter) {
         out.println()
         out.println(
         		"def " + name + ": " + typeNameOf(_type) +
-        		" = choice_.asInstanceOf[" + typeNameOf(_type) + "]")
+        		" = _element.asInstanceOf[" + typeNameOf(_type) + "]")
       }
     }
   }
