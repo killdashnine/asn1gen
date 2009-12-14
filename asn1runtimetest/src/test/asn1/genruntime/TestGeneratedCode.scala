@@ -38,7 +38,12 @@ package test.asn1.genruntime {
       f(this.field4))
   }
 
-  object MySequence extends MySequence(Some(AsnInteger), AsnReal, AsnPrintableString, MyChoice) {
+  object MySequence extends MySequence(
+    Some(AsnInteger),
+    AsnReal,
+    AsnPrintableString,
+    MyChoice
+  ) {
   }
 }
 package test.asn1.genruntime {
