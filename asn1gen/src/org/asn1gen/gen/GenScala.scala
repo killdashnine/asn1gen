@@ -110,6 +110,47 @@ class GenScala(out: IndentWriter) {
           }
         }
         out.println("}")
+        out.println()
+        out.print("object " + assignmentName + " extends " + assignmentName + "(")
+        out.indent(2) {
+          spec match {
+            case ComponentTypeLists(list1, extension, list2) => {
+              out.println()
+              list1 match {
+                case Some(ComponentTypeList(list)) => {
+                  var firstItem = true
+                  list.map {
+                    case NamedComponentType(
+                      NamedType(_, _type),
+                      optionalDefault)
+                    => {
+                      if (!firstItem) {
+                        out.println(",")
+                      }
+                      optionalDefault match {
+                        case Empty => {
+                          out.print(typeNameOf(_type))
+                        }
+                        case Optional => {
+                          out.print("Some(" + typeNameOf(_type) + ")")
+                        }
+                        case Default(value) => {
+                          out.print("/* Default(" + value + ") */")
+                        }
+                      }
+                      firstItem = false
+                    }
+                  }
+                  out.println()
+                }
+                case None => ()
+              }
+            }
+            case Empty => {}
+          }
+        }
+        out.println(") {")
+        out.println("}")
       }
       case EnumeratedType(enumerations)
       => {
