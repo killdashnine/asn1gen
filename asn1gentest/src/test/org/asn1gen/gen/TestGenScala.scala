@@ -34,7 +34,7 @@ package test.org.asn1gen.gen {
       val text = """
         ModuleName DEFINITIONS ::= BEGIN
         	MySequence ::= SEQUENCE {
-            field1 [0] INTEGER,
+            field1 [0] INTEGER OPTIONAL,
             field2 [1] REAL,
             field3 [2] PrintableString,
             field4 [3] MyChoice

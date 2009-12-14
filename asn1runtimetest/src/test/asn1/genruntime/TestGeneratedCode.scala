@@ -2,12 +2,12 @@ package test.asn1.genruntime {
   import org.asn1gen.runtime._
 
   case class MySequence(
-    field1: AsnInteger,
+    field1: Option[AsnInteger],
     field2: AsnReal,
     field3: AsnPrintableString,
     field4: MyChoice
   ) extends AsnSequence {
-    def field1(f: (AsnInteger => AsnInteger)): MySequence = MySequence(
+    def field1(f: (Option[AsnInteger] => Option[AsnInteger])): MySequence = MySequence(
       f(this.field1),
       this.field2,
       this.field3,
@@ -23,11 +23,6 @@ package test.asn1.genruntime {
       f(this.field3),
       this.field4)
     // Unmatched type: Type(TypeReference(MyChoice),List())
-  }
-  
-  object MySequence extends MySequence(
-      AsnInteger(1), AsnReal(2.0), AsnPrintableString("x"), MyChoice(AsnInteger(1)))
-  {
   }
 }
 package test.asn1.genruntime {
