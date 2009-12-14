@@ -79,9 +79,8 @@ package test.asn1.genruntime {
   
   object MyEnum extends MyEnum(0) {
     def value0: MyEnum = MyEnum(0)
-    
     def value1: MyEnum = MyEnum(1)
-    
     def value2: MyEnum = MyEnum(2)
+    def value3: MyEnum = MyEnum(3)
   }
 }
