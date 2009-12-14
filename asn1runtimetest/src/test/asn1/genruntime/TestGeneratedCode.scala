@@ -64,13 +64,13 @@ package test.asn1.genruntime {
 
     def choice2: AsnReal = _element.asInstanceOf[AsnReal]
     
-    def field0(f: ((Int, AsnType) => Empty)): MyChoice = MyChoice(
+    def choice0(f: ((Int, AsnType) => Empty)): MyChoice = MyChoice(
       _Choices.field1, f(_choice, _element))
     
-    def field1(f: ((Int, AsnType) => AsnInteger)): MyChoice = MyChoice(
+    def choice1(f: ((Int, AsnType) => AsnInteger)): MyChoice = MyChoice(
       _Choices.field1, f(_choice, _element))
     
-    def field2(f: ((Int, AsnType) => AsnReal)): MyChoice = MyChoice(
+    def choice2(f: ((Int, AsnType) => AsnReal)): MyChoice = MyChoice(
       _Choices.field2, f(_choice, _element))
   }
 

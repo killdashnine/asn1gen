@@ -19,7 +19,7 @@ object ScalaCodeUser {
       )
     println(mySequence2)
     println(mySequence2.field4._choice)
-    println(mySequence.field4{_.field2{(_, _) => AsnReal(9.9)}})
+    println(mySequence.field4{_.choice2{(_, _) => AsnReal(9.9)}})
     println(Empty)
     println(MySequence)
     println(MyChoice)
