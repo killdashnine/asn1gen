@@ -68,6 +68,7 @@ class GenScala(out: IndentWriter) {
           out.println("// Choice IDs")
           generateChoiceIds(rootAlternativeTypeList)
           generateSimpleGetters(rootAlternativeTypeList)
+          generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
         }
         out.println("}")
         out.println()
@@ -444,6 +445,35 @@ class GenScala(out: IndentWriter) {
       => {
         out.println()
         out.println("val " + name.toUpperCase + ": Integer = " + tagNumber)
+      }
+    }
+  }
+
+  def generateChoiceFieldTransformers(
+      choiceTypeName: String,
+      rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+    rootAlternativeTypeList match {
+      case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
+        namedTypes foreach { namedType =>
+          generateChoiceFieldTransformer(choiceTypeName, namedType)
+        }
+      }
+    }
+  }
+
+  def generateChoiceFieldTransformer(choiceTypeName: String, namedType: NamedType): Unit = {
+    namedType match {
+      case NamedType(
+        Identifier(name),
+        _type)
+      => {
+        out.println()
+        out.println(
+            "def " + name + "(f: ((Int, AsnType) => " + typeNameOf(_type) +
+            ")): " + choiceTypeName + " = " + choiceTypeName + "(")
+        out.indent(2) {
+          out.println("_Choices." + name + ", f(_choice, _element))")
+        }
       }
     }
   }
