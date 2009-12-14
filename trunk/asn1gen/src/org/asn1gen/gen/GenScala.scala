@@ -79,9 +79,10 @@ class GenScala(out: IndentWriter) {
         out.println("}")
       }
       case SequenceType(spec) => {
-        out.println("case class " + assignmentName + "(")
+        out.print("case class " + assignmentName + "(")
         spec match {
           case ComponentTypeLists(list1, extension, list2) => {
+            out.println()
             out.indent(2) {
               list1 match {
                 case Some(ComponentTypeList(list)) => {
