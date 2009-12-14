@@ -14,6 +14,24 @@ package test.org.asn1gen.gen {
     @Test def test1() {
       val text = """
         ModuleName DEFINITIONS ::= BEGIN
+          MyEnum ::= ENUMERATED {
+            value0, value1, value2, value3
+          }
+        END
+        """
+      Asn1.parse(text) match {
+        case Asn1.Success(moduleDefinition, _) => {
+          val genScala = new GenScala(new IndentWriter(System.out))
+          genScala.moduleName = Some("test.asn1.genruntime")
+          genScala.generate(moduleDefinition)
+        }
+        case x => fail("Parse failed: " + x)
+      }
+    }
+
+    @Test def test2() {
+      val text = """
+        ModuleName DEFINITIONS ::= BEGIN
           MyChoice ::= CHOICE {
             choice1 [0] INTEGER,
             choice2 [1] REAL
@@ -30,7 +48,7 @@ package test.org.asn1gen.gen {
       }
     }
     
-    @Test def test2() {
+    @Test def test3() {
       val text = """
         ModuleName DEFINITIONS ::= BEGIN
         	MySequence ::= SEQUENCE {
