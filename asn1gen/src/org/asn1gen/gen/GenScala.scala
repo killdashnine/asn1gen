@@ -55,12 +55,12 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def generate(builtinType: BuiltinType, name: String): Unit = {
+  def generate(builtinType: BuiltinType, assignmentName: String): Unit = {
     builtinType match {
       case ChoiceType(
         AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
-        out.println("case class " + name + "(override val choice: AsnType) extends AsnChoice(choice) {")
+        out.println("case class " + assignmentName + "(override val choice: AsnType) extends AsnChoice(choice) {")
         out.indent(2) {
           out.println("//////////////////////////////////////////////////////////////////")
           out.println("// Choice IDs")
@@ -71,11 +71,11 @@ class GenScala(out: IndentWriter) {
       }
       case SequenceType(ComponentTypeLists(list1, extension, list2))
       => {
-        out.println("case class " + name + "(")
+        out.println("case class " + assignmentName + "(")
         out.indent(2) {
           list1 match {
             case Some(ComponentTypeList(list)) => {
-              generateSequenceConstructor(name, list)
+              generateSequenceConstructor(assignmentName, list)
             }
             case None => ()
           }
@@ -85,7 +85,7 @@ class GenScala(out: IndentWriter) {
         out.indent(2) {
           list1 match {
             case Some(ComponentTypeList(list)) => {
-              generateSequenceImmutableSetters(name, list)
+              generateSequenceImmutableSetters(assignmentName, list)
             }
             case None => ()
           }
@@ -94,25 +94,27 @@ class GenScala(out: IndentWriter) {
       }
       case EnumeratedType(enumerations)
       => {
-        out.println("case class MyEnum(_value: Int) extends AsnEnumeration {")
+        out.println("case class " + assignmentName + "(_value: Int) extends AsnEnumeration {")
         out.println("}")
         out.println()
-        out.println("object MyEnum extends MyEnum(0) {")
+        out.println("object " + assignmentName + " extends " + assignmentName + "(0) {")
         out.indent(2) {
-          generate(enumerations)
+          generate(assignmentName, enumerations)
         }
         out.println("}")
       }
     }
   }
   
-  def generate(enumerations: Enumerations): Unit = {
+  def generate(assignmentName: String, enumerations: Enumerations): Unit = {
     enumerations match {
       case Enumerations(RootEnumeration(Enumeration(items)), extension)
       => {
         var index = 0
         items foreach { case Identifier(item) =>
-          out.println("def " + item + ": Int = " + index)
+          out.println(
+            "def " + item + ": " + assignmentName +
+            " = " + assignmentName + "(" + index + ")")
           index = index + 1
         }
         extension match {
