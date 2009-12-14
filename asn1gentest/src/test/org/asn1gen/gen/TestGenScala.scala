@@ -68,5 +68,21 @@ package test.org.asn1gen.gen {
         case x => fail("Parse failed: " + x)
       }
     }
+    @Test def test4() {
+      val text = """
+        ModuleName DEFINITIONS ::= BEGIN
+          Empty ::= SEQUENCE {
+          }
+        END
+        """
+      Asn1.parse(text) match {
+        case Asn1.Success(moduleDefinition, _) => {
+          val genScala = new GenScala(new IndentWriter(System.out))
+          genScala.moduleName = Some("test.asn1.genruntime")
+          genScala.generate(moduleDefinition)
+        }
+        case x => fail("Parse failed: " + x)
+      }
+    }
   }
 }
