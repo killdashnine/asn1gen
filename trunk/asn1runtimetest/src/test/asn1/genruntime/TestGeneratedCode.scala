@@ -3,7 +3,7 @@ package test.asn1.genruntime {
 
   case class Empty() extends AsnSequence {
   }
-  
+
   object Empty extends Empty() {
   }
 }
@@ -37,7 +37,7 @@ package test.asn1.genruntime {
       this.field3,
       f(this.field4))
   }
-  
+
   object MySequence extends MySequence(Some(AsnInteger), AsnReal, AsnPrintableString, MyChoice) {
   }
 }
@@ -68,7 +68,7 @@ package test.asn1.genruntime {
     def field2(f: ((Int, AsnType) => AsnReal)): MyChoice = MyChoice(
       _Choices.field2, f(_choice, _element))
   }
-  
+
   object MyChoice extends MyChoice(0, Empty)
 }
 package test.asn1.genruntime {
