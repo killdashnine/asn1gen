@@ -69,7 +69,8 @@ package test.asn1.genruntime {
       _Choices.field2, f(_choice, _element))
   }
 
-  object MyChoice extends MyChoice(0, Empty)
+  object MyChoice extends MyChoice(0, Empty) {
+  }
 }
 package test.asn1.genruntime {
   import org.asn1gen.runtime._
