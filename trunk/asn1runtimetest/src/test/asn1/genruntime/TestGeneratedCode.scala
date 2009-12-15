@@ -49,32 +49,38 @@ package test.asn1.genruntime {
 package test.asn1.genruntime {
   import org.asn1gen.runtime._
 
-  case class MyChoice(_choice: Int, _element: AsnType) extends AsnChoice {
-    //////////////////////////////////////////////////////////////////
-    // Choice IDs
-    object _Choices {
-      val field0: Int = 0
-      val field1: Int = 1
-      val field2: Int = 2
-    }
+  abstract class MyChoice(_element: AsnType) extends AsnChoice {
+    def _choice: Int
 
     def choice0: Empty = _element.asInstanceOf[Empty]
-    
+
     def choice1: AsnInteger = _element.asInstanceOf[AsnInteger]
 
     def choice2: AsnReal = _element.asInstanceOf[AsnReal]
-    
-    def choice0(f: ((Int, AsnType) => Empty)): MyChoice = MyChoice(
-      _Choices.field1, f(_choice, _element))
-    
-    def choice1(f: ((Int, AsnType) => AsnInteger)): MyChoice = MyChoice(
-      _Choices.field1, f(_choice, _element))
-    
-    def choice2(f: ((Int, AsnType) => AsnReal)): MyChoice = MyChoice(
-      _Choices.field2, f(_choice, _element))
+
+    def choice0(f: (MyChoice => Empty)): MyChoice =
+      MyChoice_choice0(f(this))
+
+    def choice1(f: (MyChoice => AsnInteger)): MyChoice =
+      MyChoice_choice1(f(this))
+
+    def choice2(f: (MyChoice => AsnReal)): MyChoice =
+      MyChoice_choice2(f(this))
   }
 
-  object MyChoice extends MyChoice(0, Empty) {
+  case class MyChoice_choice0(_element: Empty) extends MyChoice(_element) {
+    def _choice: Int = 0
+  }
+
+  case class MyChoice_choice1(_element: AsnInteger) extends MyChoice(_element) {
+    def _choice: Int = 1
+  }
+
+  case class MyChoice_choice2(_element: AsnReal) extends MyChoice(_element) {
+    def _choice: Int = 2
+  }
+
+  object MyChoice extends MyChoice_choice0(Empty) {
   }
 }
 package test.asn1.genruntime {
@@ -82,7 +88,7 @@ package test.asn1.genruntime {
 
   case class MyEnum(_value: Int) extends AsnEnumeration {
   }
-  
+
   object MyEnum extends MyEnum(0) {
     def value0: MyEnum = MyEnum(0)
     def value1: MyEnum = MyEnum(1)

@@ -61,22 +61,22 @@ class GenScala(out: IndentWriter) {
         AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
         out.println(
-            "case class " + assignmentName +
-            "(_choice: Int, _element: AsnType) extends AsnChoice {")
+            "abstract class " + assignmentName +
+            "(_element: AsnType) extends AsnChoice {")
         out.indent(2) {
-          out.println("//////////////////////////////////////////////////////////////////")
-          out.println("// Choice IDs")
-          generateChoiceIds(rootAlternativeTypeList)
+          out.println("def _choice: Int")
           generateSimpleGetters(rootAlternativeTypeList)
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
         }
         out.println("}")
+        generateChoices(assignmentName, rootAlternativeTypeList)
+        val firstNamedType =
+          rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
         out.println()
-        val firstChoiceType =
-          rootAlternativeTypeList.alternativeTypeList.namedTypes(0)._type
         out.println(
-            "object " + assignmentName + " extends " + assignmentName +
-            "(0, " + typeNameOf(firstChoiceType) + ") {")
+            "object " + assignmentName + " extends " +
+            assignmentName + "_" + firstNamedType.id.name +
+            "(" + typeNameOf(firstNamedType._type) + ") {")
         out.println("}")
       }
       case SequenceType(spec) => {
@@ -397,7 +397,7 @@ class GenScala(out: IndentWriter) {
         generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, value, fieldNames)
         //out.println("// tag " + number)
       }
-      case Type(builtinType: BuiltinType, List()) => {
+      case Type(builtinType: TypeKind, List()) => {
         val setterType = typeNameOf(builtinType, value)
         out.println(
             "def " + fieldName + "(f: (" + setterType + " => " +
@@ -424,17 +424,21 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def generateChoiceIds(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+  def generateChoices(
+      assignmentName: String,
+      rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
       case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
-          generateChoiceIds(namedType)
+          generateChoices(assignmentName, namedType)
         }
       }
     }
   }
   
-  def generateChoiceIds(namedType: NamedType): Unit = {
+  def generateChoices(
+      assignmentName: String,
+      namedType: NamedType): Unit = {
     namedType match {
       case NamedType(
         Identifier(name),
@@ -444,7 +448,13 @@ class GenScala(out: IndentWriter) {
           _))
       => {
         out.println()
-        out.println("val " + name.toUpperCase + ": Integer = " + tagNumber)
+        out.println(
+            "case class MyChoice_" + name +
+            "(_element: " + typeNameOf(_type) + ") extends MyChoice(_element) {")
+        out.indent(2) {
+          out.println("def _choice: Int = " + tagNumber)
+        }
+        out.println("}")
       }
     }
   }
@@ -469,10 +479,12 @@ class GenScala(out: IndentWriter) {
       => {
         out.println()
         out.println(
-            "def " + name + "(f: ((Int, AsnType) => " + typeNameOf(_type) +
-            ")): " + choiceTypeName + " = " + choiceTypeName + "(")
+            "def " + name +
+            "(f: (" + choiceTypeName + " => " + typeNameOf(_type) +
+            ")): " + choiceTypeName + " =")
         out.indent(2) {
-          out.println("_Choices." + name + ", f(_choice, _element))")
+          out.println(
+              choiceTypeName + "_" + name + "(f(this))")
         }
       }
     }
