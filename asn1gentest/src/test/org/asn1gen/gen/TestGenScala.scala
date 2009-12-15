@@ -33,8 +33,9 @@ package test.org.asn1gen.gen {
       val text = """
         ModuleName DEFINITIONS ::= BEGIN
           MyChoice ::= CHOICE {
-            choice1 [0] INTEGER,
-            choice2 [1] REAL
+            choice0 [0] Empty,
+            choice1 [1] INTEGER,
+            choice2 [2] REAL
           }
         END
         """
