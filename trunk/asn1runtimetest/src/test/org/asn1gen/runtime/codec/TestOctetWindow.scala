@@ -46,27 +46,27 @@ class TestOctetWindow {
     val window = OctetWindow(Array[Byte](1, 2, 3), 3, 0)
   }
   
-  @Test
+  @Test(expected = classOf[AssertionError])
   def testConstructor_09x() = {
     val window = OctetWindow(Array[Byte](1, 2, 3), -1, 3)
   }
   
-  @Test
+  @Test(expected = classOf[AssertionError])
   def testConstructor_10x() = {
     val window = OctetWindow(Array[Byte](1, 2, 3), 1, 3)
   }
   
-  @Test
+  @Test(expected = classOf[AssertionError])
   def testConstructor_11x() = {
     val window = OctetWindow(Array[Byte](1, 2, 3), 0, -1)
   }
   
-  @Test
+  @Test(expected = classOf[AssertionError])
   def testConstructor_12x() = {
     val window = OctetWindow(Array[Byte](1, 2, 3), 4, 0)
   }
   
-  @Test
+  @Test(expected = classOf[AssertionError])
   def testConstructor_13x() = {
     val window = OctetWindow(Array[Byte](1, 2, 3), -1, 0)
   }
