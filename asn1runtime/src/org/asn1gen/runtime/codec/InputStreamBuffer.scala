@@ -45,9 +45,9 @@ case class InputStreamBuffer(
   
   def read(length: Int): Int = {
     ensureRemainingCapacity(index + length)
-    is.read(buffer, index, length)
+    val readLength = is.read(buffer, index, length)
     val oldIndex = index
-    index += length
-    return oldIndex
+    index += readLength
+    return readLength
   }
 }
