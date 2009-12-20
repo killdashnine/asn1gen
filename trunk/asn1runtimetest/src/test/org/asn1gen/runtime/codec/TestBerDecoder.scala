@@ -93,7 +93,6 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
   def test_readTripleWindow_06(): Unit = {
     val data = Array[Byte](31, 0x80.toByte, 0, 2, 100, 101)
-    println(data(1))
     val is = new ByteArrayInputStream(data)
     val decoder = new BerDecoderReader(is)
     val window = decoder.readTripletWindow()
@@ -114,5 +113,13 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
     assertThrows[IndexOutOfBoundsException] {
       val window = decoder.readTripletWindow()
     }
+  }
+  
+  @Test
+  def test_scalaStream_01(): Unit = {
+    val data = Array[Byte](31, 0x80.toByte, 0, 3, 100, 101)
+    val is = new ByteArrayInputStream(data)
+    val stream = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte) 
+    stream.print
   }
 }
