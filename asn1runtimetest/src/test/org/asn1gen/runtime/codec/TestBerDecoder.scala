@@ -8,6 +8,24 @@ import _root_.java.io._
 
 class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
+  def test_decodeTriplet_01(): Unit = {
+    val data = Array[Byte](0, 1, 0)
+    val is = new ByteArrayInputStream(data)
+
+    val decoder = new BerDecoder
+    
+    val (rtag, rlength) = decoder.decodeTriplet(is) { (tag, length) =>
+      assertEquals(0, tag)
+      assertEquals(1, length)
+      is.skip(length)
+      (tag, length)
+    }
+    
+    assertEquals(0, rtag)
+    assertEquals(1, rlength)
+  }
+  
+  @Test
   def test_constructor_01(): Unit = {
     val data = Array[Byte](0, 1, 0)
     val is = new ByteArrayInputStream(data)

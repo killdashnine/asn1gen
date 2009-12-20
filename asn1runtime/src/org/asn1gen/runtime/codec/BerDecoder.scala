@@ -5,6 +5,8 @@ import org.asn1gen.extra._
 import java.io._
 
 class BerDecoder {
+  import org.asn1gen.extra.Extras._
+  
   def tripletFor(window: OctetWindow): Triplet = {
     Triplet(window)
   }
@@ -21,4 +23,44 @@ class BerDecoder {
   def decode(is: InputStream): AsnType = {
     decode(BerDecoderReader(is).readTripletWindow())
   }
+
+
+
+
+
+
+  def decodeTriplet[T](is: InputStream)(f: (Int, Int) => T): T = {
+    val tis = new DecodingInputStream(is)
+    
+    // Read tag bytes
+    var firstTagByte = tis.read()
+    if ((firstTagByte & 0x1f) > 30) {
+      while (tis.readByte definesBit 7) {
+      }
+    }
+    
+    // Read length bytes
+    val lengthByte = tis.readByte
+    val length = (
+      if (lengthByte definesBit 7) {
+        val lengthSize = lengthByte & 0x7f
+        if (lengthSize == 0) {
+          throw new Exception("Indefinite length currently not supported")
+        }
+        
+        var partialLength = 0
+        (0 until lengthSize) foreach { i =>
+          partialLength = partialLength << 8
+          partialLength += tis.readByte
+        }
+        
+        partialLength
+      } else {
+        lengthByte
+      }
+    )
+    
+    f(0, length)
+  }
 }
+
