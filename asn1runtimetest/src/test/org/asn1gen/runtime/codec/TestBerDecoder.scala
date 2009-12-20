@@ -3,6 +3,7 @@ package test.org.asn1gen.runtime.codec
 import _root_.org.junit._
 import _root_.org.junit.Assert._
 import _root_.junit.framework.TestCase
+import _root_.org.asn1gen.runtime._
 import _root_.org.asn1gen.runtime.codec._
 import _root_.java.io._
 
@@ -14,7 +15,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
 
     val decoder = new BerDecoder
     
-    val (rtag, rlength) = decoder.decodeTriplet(is) { (tag, length) =>
+    val (rtag, rlength) = decoder.decodeTriplet(is) { (tagClass, constructed, tag, length) =>
       assertEquals(0, tag)
       assertEquals(1, length)
       is.skip(length)
@@ -23,6 +24,18 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
     
     assertEquals(0, rtag)
     assertEquals(1, rlength)
+  }
+  
+  @Test
+  def test_decode_AsnBoolean_00(): Unit = {
+    val data = Array[Byte](1, 1, 0)
+    val is = new ByteArrayInputStream(data)
+
+    val decoder = new BerDecoder
+    
+    val value = decoder.decode(is, AsnBoolean)
+    
+    assertEquals(AsnBoolean(false), value)
   }
   
   @Test
