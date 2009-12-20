@@ -27,7 +27,15 @@ class BerDecoder {
 
 
 
-
+  def decode(is: InputStream, template: AsnBoolean): AsnBoolean = {
+    decodeTriplet(is) { (tag, length) =>
+      assert(tag == 1)
+      assert(length == 1)
+      val dis = new DecodingInputStream(is)
+      val value = dis.readByte
+      AsnBoolean(value != 0)
+    }
+  }
 
   def decodeTriplet[T](is: InputStream)(f: (Int, Int) => T): T = {
     val tis = new DecodingInputStream(is)
