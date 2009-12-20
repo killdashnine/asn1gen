@@ -28,8 +28,9 @@ class BerDecoder {
 
 
   def decode(is: InputStream, template: AsnBoolean): AsnBoolean = {
-    decodeTriplet(is) { (tag, length) =>
-      assert(tag == 1)
+    decodeTriplet(is) { (tagClass, constructed, tagValue, length) =>
+      assert(!constructed)
+      assert(tagValue == 1)
       assert(length == 1)
       val dis = new DecodingInputStream(is)
       val value = dis.readByte
@@ -37,18 +38,27 @@ class BerDecoder {
     }
   }
 
-  def decodeTriplet[T](is: InputStream)(f: (Int, Int) => T): T = {
-    val tis = new DecodingInputStream(is)
+  def decodeTriplet[T](is: InputStream)(f: (TagClass, Boolean, Int, Int) => T): T = {
+    val dis = new DecodingInputStream(is)
     
     // Read tag bytes
-    var firstTagByte = tis.read()
+    var firstTagByte = dis.readByte
+    val tagClass = ((firstTagByte >> 6) & 0x3) match {
+      case 0 => TagClass.Universal
+      case 1 => TagClass.Application
+      case 2 => TagClass.ContextSpecific
+      case 3 => TagClass.Private
+    }
+    val tagConstructed = (firstTagByte & 0x20) != 0
+    var tagValue = firstTagByte & 0x1f
+    
     if ((firstTagByte & 0x1f) > 30) {
-      while (tis.readByte definesBit 7) {
+      while (dis.readByte definesBit 7) {
       }
     }
     
     // Read length bytes
-    val lengthByte = tis.readByte
+    val lengthByte = dis.readByte
     val length = (
       if (lengthByte definesBit 7) {
         val lengthSize = lengthByte & 0x7f
@@ -59,7 +69,7 @@ class BerDecoder {
         var partialLength = 0
         (0 until lengthSize) foreach { i =>
           partialLength = partialLength << 8
-          partialLength += tis.readByte
+          partialLength += dis.readByte
         }
         
         partialLength
@@ -68,7 +78,7 @@ class BerDecoder {
       }
     )
     
-    f(0, length)
+    f(tagClass, tagConstructed, tagValue, length)
   }
 }
 
