@@ -39,6 +39,26 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   }
   
   @Test
+  def test_decode_AsnBoolean_01(): Unit = {
+    val data = Array[Byte](1, 1, 0xff.toByte)
+    val is = new ByteArrayInputStream(data)
+    val decoder = new BerDecoder
+    val value = decoder.decode(is, AsnBoolean)
+    
+    assertEquals(AsnBoolean(true), value)
+  }
+  
+  @Test
+  def test_decode_AsnBoolean_02(): Unit = {
+    val data = Array[Byte](1, 1, 1)
+    val is = new ByteArrayInputStream(data)
+    val decoder = new BerDecoder
+    val value = decoder.decode(is, AsnBoolean)
+    
+    assertEquals(AsnBoolean(true), value)
+  }
+  
+  @Test
   def test_constructor_01(): Unit = {
     val data = Array[Byte](0, 1, 0)
     val is = new ByteArrayInputStream(data)
