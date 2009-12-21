@@ -3,6 +3,7 @@ package org.asn1gen.runtime.codec
 import org.asn1gen.runtime._
 import org.asn1gen.extra._
 import java.io._
+import scala.annotation.tailrec
 
 class BerDecoder {
   import org.asn1gen.extra.Extras._
@@ -40,6 +41,28 @@ class BerDecoder {
       }
       AsnInteger(value)
     }
+  }
+  
+  final def decodeSequence[T <: AsnSequence](is: InputStream, template: T)(f: Int => T): T = {
+    decodeTriplet(is) { triplet =>
+      assert(triplet.tagClass == TagClass.Universal)
+      assert(triplet.constructed)
+      assert(triplet.tagType == 16)
+    }
+  }
+  
+  def decodeSequenceField[T](is: InputStream, tag: Int)(f: Int => T): T = {
+    decodeTriplet(is) { triplet =>
+      return f(0)
+    }
+  }
+  
+  def decodeSequenceOptionalField[T](is: InputStream, tag: Int)(f: Int => T): T = {
+    return f(0)
+  }
+  
+  def decodeSequenceDefaultField[T](is: InputStream, tag: Int)(f: Int => T): T = {
+    return f(0)
   }
   
   def decodeTriplet[T](is: InputStream)(f: Triplet => T): T = {
