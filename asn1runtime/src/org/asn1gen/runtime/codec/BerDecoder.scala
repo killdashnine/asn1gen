@@ -13,8 +13,10 @@ class BerDecoder {
     assert(triplet.primitive)
     assert(triplet.tagType == 1)
     assert(triplet.length == 1)
-    val value = is.readByte
-    AsnBoolean(value != 0)
+    is.span(triplet.length) {
+      val value = is.readByte
+      AsnBoolean(value != 0)
+    }
   }
   
   def decode(is: DecodingInputStream, template: AsnNull): AsnNull = {
@@ -22,7 +24,9 @@ class BerDecoder {
     assert(triplet.primitive)
     assert(triplet.tagType == 5)
     assert(triplet.length == 0)
-    AsnNull
+    is.span(triplet.length) {
+      AsnNull
+    }
   }
   
   def decode(is: DecodingInputStream, template: AsnInteger): AsnInteger = {
@@ -30,13 +34,15 @@ class BerDecoder {
     assert(triplet.primitive)
     assert(triplet.tagType == 2)
     assert(triplet.length > 0)
-    val buffer = new Array[Byte](triplet.length)
-    is.read(buffer)
-    var value: Long = if (buffer(0) > 0) 0 else -1
-    buffer foreach { byte =>
-      value = (value << 8) | byte
+    is.span(triplet.length) {
+      val buffer = new Array[Byte](triplet.length)
+      is.read(buffer)
+      var value: Long = if (buffer(0) > 0) 0 else -1
+      buffer foreach { byte =>
+        value = (value << 8) | byte
+      }
+      AsnInteger(value)
     }
-    AsnInteger(value)
   }
   
   final def decodeSequence[T <: AsnSequence](is: DecodingInputStream, template: T)(f: Int => T): T = {
