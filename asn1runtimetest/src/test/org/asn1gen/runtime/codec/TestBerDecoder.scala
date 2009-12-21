@@ -15,15 +15,13 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
 
     val decoder = new BerDecoder
     
-    val (tagType, length) = decoder.decodeTriplet(is) { triplet =>
-      assertEquals(0, triplet.tagType)
-      assertEquals(1, triplet.length)
-      is.skip(triplet.length)
-      (triplet.tagType, triplet.length)
-    }
+    val triplet = decoder.decodeTriplet(is)
+    assertEquals(0, triplet.tagType)
+    assertEquals(1, triplet.length)
+    is.skip(triplet.length)
     
-    assertEquals(0, tagType)
-    assertEquals(1, length)
+    assertEquals(0, triplet.tagType)
+    assertEquals(1, triplet.length)
   }
   
   @Test
