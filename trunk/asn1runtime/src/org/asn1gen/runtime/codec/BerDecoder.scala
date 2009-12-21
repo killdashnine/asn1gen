@@ -9,63 +9,51 @@ class BerDecoder {
   import org.asn1gen.extra.Extras._
   
   def decode(is: InputStream, template: AsnBoolean): AsnBoolean = {
-    decodeTriplet(is) { triplet =>
-      assert(triplet.primitive)
-      assert(triplet.tagType == 1)
-      assert(triplet.length == 1)
-      val dis = new DecodingInputStream(is)
-      val value = dis.readByte
-      AsnBoolean(value != 0)
-    }
+    val triplet = decodeTriplet(is)
+    assert(triplet.primitive)
+    assert(triplet.tagType == 1)
+    assert(triplet.length == 1)
+    val dis = new DecodingInputStream(is)
+    val value = dis.readByte
+    AsnBoolean(value != 0)
   }
   
   def decode(is: InputStream, template: AsnNull): AsnNull = {
-    decodeTriplet(is) { triplet =>
-      assert(triplet.primitive)
-      assert(triplet.tagType == 5)
-      assert(triplet.length == 0)
-      AsnNull
-    }
+    val triplet = decodeTriplet(is)
+    assert(triplet.primitive)
+    assert(triplet.tagType == 5)
+    assert(triplet.length == 0)
+    AsnNull
   }
   
   def decode(is: InputStream, template: AsnInteger): AsnInteger = {
-    decodeTriplet(is) { triplet =>
-      assert(triplet.primitive)
-      assert(triplet.tagType == 2)
-      assert(triplet.length > 0)
-      val buffer = new Array[Byte](triplet.length)
-      is.read(buffer)
-      var value: Long = if (buffer(0) > 0) 0 else -1
-      buffer foreach { byte =>
-        value = (value << 8) | byte
-      }
-      AsnInteger(value)
+    val triplet = decodeTriplet(is)
+    assert(triplet.primitive)
+    assert(triplet.tagType == 2)
+    assert(triplet.length > 0)
+    val buffer = new Array[Byte](triplet.length)
+    is.read(buffer)
+    var value: Long = if (buffer(0) > 0) 0 else -1
+    buffer foreach { byte =>
+      value = (value << 8) | byte
     }
+    AsnInteger(value)
   }
   
   final def decodeSequence[T <: AsnSequence](is: InputStream, template: T)(f: Int => T): T = {
-    decodeTriplet(is) { triplet =>
-      assert(triplet.tagClass == TagClass.Universal)
-      assert(triplet.constructed)
-      assert(triplet.tagType == 16)
-    }
+    val triplet = decodeTriplet(is)
+    assert(triplet.tagClass == TagClass.Universal)
+    assert(triplet.constructed)
+    assert(triplet.tagType == 16)
+    f(0)
   }
   
   def decodeSequenceField[T](is: InputStream, tag: Int)(f: Int => T): T = {
-    decodeTriplet(is) { triplet =>
-      return f(0)
-    }
-  }
-  
-  def decodeSequenceOptionalField[T](is: InputStream, tag: Int)(f: Int => T): T = {
+    val triplet = decodeTriplet(is)
     return f(0)
   }
   
-  def decodeSequenceDefaultField[T](is: InputStream, tag: Int)(f: Int => T): T = {
-    return f(0)
-  }
-  
-  def decodeTriplet[T](is: InputStream)(f: Triplet => T): T = {
+  def decodeTriplet[T](is: InputStream): Triplet = {
     val dis = new DecodingInputStream(is)
     
     // Read tag bytes
@@ -108,7 +96,7 @@ class BerDecoder {
       }
     )
     
-    f(Triplet(tagClass, tagConstructed, tagValue, length))
+    Triplet(tagClass, tagConstructed, tagValue, length)
   }
 }
 
