@@ -8,17 +8,16 @@ import scala.annotation.tailrec
 class BerDecoder {
   import org.asn1gen.extra.Extras._
   
-  def decode(is: InputStream, template: AsnBoolean): AsnBoolean = {
+  def decode(is: DecodingInputStream, template: AsnBoolean): AsnBoolean = {
     val triplet = decodeTriplet(is)
     assert(triplet.primitive)
     assert(triplet.tagType == 1)
     assert(triplet.length == 1)
-    val dis = new DecodingInputStream(is)
-    val value = dis.readByte
+    val value = is.readByte
     AsnBoolean(value != 0)
   }
   
-  def decode(is: InputStream, template: AsnNull): AsnNull = {
+  def decode(is: DecodingInputStream, template: AsnNull): AsnNull = {
     val triplet = decodeTriplet(is)
     assert(triplet.primitive)
     assert(triplet.tagType == 5)
@@ -26,7 +25,7 @@ class BerDecoder {
     AsnNull
   }
   
-  def decode(is: InputStream, template: AsnInteger): AsnInteger = {
+  def decode(is: DecodingInputStream, template: AsnInteger): AsnInteger = {
     val triplet = decodeTriplet(is)
     assert(triplet.primitive)
     assert(triplet.tagType == 2)
@@ -40,7 +39,7 @@ class BerDecoder {
     AsnInteger(value)
   }
   
-  final def decodeSequence[T <: AsnSequence](is: InputStream, template: T)(f: Int => T): T = {
+  final def decodeSequence[T <: AsnSequence](is: DecodingInputStream, template: T)(f: Int => T): T = {
     val triplet = decodeTriplet(is)
     assert(triplet.tagClass == TagClass.Universal)
     assert(triplet.constructed)
@@ -48,16 +47,14 @@ class BerDecoder {
     f(0)
   }
   
-  def decodeSequenceField[T](is: InputStream, tag: Int)(f: Int => T): T = {
+  def decodeSequenceField[T](is: DecodingInputStream, tag: Int)(f: Int => T): T = {
     val triplet = decodeTriplet(is)
     return f(0)
   }
   
-  def decodeTriplet[T](is: InputStream): Triplet = {
-    val dis = new DecodingInputStream(is)
-    
+  def decodeTriplet[T](is: DecodingInputStream): Triplet = {
     // Read tag bytes
-    var firstTagByte = dis.readByte
+    var firstTagByte = is.readByte
     val tagClass = ((firstTagByte >> 6) & 0x3) match {
       case 0 => TagClass.Universal
       case 1 => TagClass.Application
@@ -68,15 +65,15 @@ class BerDecoder {
     var tagValue = firstTagByte & 0x1f
     
     if ((firstTagByte & 0x1f) > 30) {
-      var tagByte = dis.readByte
+      var tagByte = is.readByte
       while (tagByte definesBit 7) {
         tagValue = (tagValue << 7) | (tagByte & 0x7f)
-        tagByte = dis.readByte
+        tagByte = is.readByte
       }
     }
     
     // Read length bytes
-    val lengthByte = dis.readByte
+    val lengthByte = is.readByte
     val length = (
       if (lengthByte definesBit 7) {
         val lengthSize = lengthByte & 0x7f
@@ -87,7 +84,7 @@ class BerDecoder {
         var partialLength = 0
         (0 until lengthSize) foreach { i =>
           partialLength = partialLength << 8
-          partialLength += dis.readByte
+          partialLength += is.readByte
         }
         
         partialLength

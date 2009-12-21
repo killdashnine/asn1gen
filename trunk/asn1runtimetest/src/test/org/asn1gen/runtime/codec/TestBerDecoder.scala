@@ -11,7 +11,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
   def test_decodeTriplet_01(): Unit = {
     val data = Array[Byte](0, 1, 0)
-    val is = new ByteArrayInputStream(data)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
 
     val decoder = new BerDecoder
     
@@ -27,7 +27,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
   def test_decode_AsnBoolean_00(): Unit = {
     val data = Array[Byte](1, 1, 0)
-    val is = new ByteArrayInputStream(data)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
 
     val decoder = new BerDecoder
     
@@ -39,7 +39,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
   def test_decode_AsnBoolean_01(): Unit = {
     val data = Array[Byte](1, 1, 0xff.toByte)
-    val is = new ByteArrayInputStream(data)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
     val decoder = new BerDecoder
     val value = decoder.decode(is, AsnBoolean)
     
@@ -49,7 +49,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
   def test_decode_AsnBoolean_02(): Unit = {
     val data = Array[Byte](1, 1, 1)
-    val is = new ByteArrayInputStream(data)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
     val decoder = new BerDecoder
     val value = decoder.decode(is, AsnBoolean)
     
@@ -88,7 +88,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
   def test_decode_AsnNull_00(): Unit = {
     val data = Array[Byte](5, 0)
-    val is = new ByteArrayInputStream(data)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
     val decoder = new BerDecoder
     val value = decoder.decode(is, AsnNull)
     assertEquals(AsnNull, value)
@@ -97,7 +97,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   @Test
   def test_decode_AsnInteger_00(): Unit = {
     val data = Array[Byte](2, 2, bb(10010110), bb(1000110))
-    val is = new ByteArrayInputStream(data)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
     val decoder = new BerDecoder
     val value = decoder.decode(is, AsnInteger)
     println(value)
