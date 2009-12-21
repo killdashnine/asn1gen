@@ -15,15 +15,15 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
 
     val decoder = new BerDecoder
     
-    val (rtag, rlength) = decoder.decodeTriplet(is) { (tagClass, constructed, tag, length) =>
-      assertEquals(0, tag)
-      assertEquals(1, length)
-      is.skip(length)
-      (tag, length)
+    val (tagType, length) = decoder.decodeTriplet(is) { triplet =>
+      assertEquals(0, triplet.tagType)
+      assertEquals(1, triplet.length)
+      is.skip(triplet.length)
+      (triplet.tagType, triplet.length)
     }
     
-    assertEquals(0, rtag)
-    assertEquals(1, rlength)
+    assertEquals(0, tagType)
+    assertEquals(1, length)
   }
   
   @Test
@@ -74,6 +74,36 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
     assertEquals(2, window.length)
     assertEquals(0, window.buffer(0))
     assertEquals(0, window.buffer(1))
+  }
+  
+  def bb(value :Int): Byte = {
+    assert(value >= 0)
+    if (value == 0) {
+      return 0
+    } else {
+      val digit = value % 10
+      assert(digit < 2)
+      ((bb(value / 10) << 1) | digit).toByte
+    }
+  }
+  
+  @Test
+  def test_decode_AsnNull_00(): Unit = {
+    val data = Array[Byte](5, 0)
+    val is = new ByteArrayInputStream(data)
+    val decoder = new BerDecoder
+    val value = decoder.decode(is, AsnNull)
+    assertEquals(AsnNull, value)
+  }
+  
+  @Test
+  def test_decode_AsnInteger_00(): Unit = {
+    val data = Array[Byte](2, 2, bb(10010110), bb(1000110))
+    val is = new ByteArrayInputStream(data)
+    val decoder = new BerDecoder
+    val value = decoder.decode(is, AsnInteger)
+    println(value)
+    assertEquals(AsnInteger(-27066), value)
   }
   
   
