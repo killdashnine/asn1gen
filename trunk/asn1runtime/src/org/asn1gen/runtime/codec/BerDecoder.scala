@@ -7,38 +7,42 @@ import java.io._
 class BerDecoder {
   import org.asn1gen.extra.Extras._
   
-  def tripletFor(window: OctetWindow): Triplet = {
-    Triplet(window)
-  }
-  
-  def decodeAs(triplet: Triplet, value: AsnInteger): AsnInteger = {
-    assert(triplet.tagValue == 2)
-    AsnInteger(1)
-  }
-  
-  def decode(window: OctetWindow): AsnType = {
-    null
-  }
-  
-  def decode(is: InputStream): AsnType = {
-    decode(BerDecoderReader(is).readTripletWindow())
-  }
-
-
-
-
   def decode(is: InputStream, template: AsnBoolean): AsnBoolean = {
-    decodeTriplet(is) { (tagClass, constructed, tagValue, length) =>
-      assert(!constructed)
-      assert(tagValue == 1)
-      assert(length == 1)
+    decodeTriplet(is) { triplet =>
+      assert(triplet.primitive)
+      assert(triplet.tagType == 1)
+      assert(triplet.length == 1)
       val dis = new DecodingInputStream(is)
       val value = dis.readByte
       AsnBoolean(value != 0)
     }
   }
-
-  def decodeTriplet[T](is: InputStream)(f: (TagClass, Boolean, Int, Int) => T): T = {
+  
+  def decode(is: InputStream, template: AsnNull): AsnNull = {
+    decodeTriplet(is) { triplet =>
+      assert(triplet.primitive)
+      assert(triplet.tagType == 5)
+      assert(triplet.length == 0)
+      AsnNull
+    }
+  }
+  
+  def decode(is: InputStream, template: AsnInteger): AsnInteger = {
+    decodeTriplet(is) { triplet =>
+      assert(triplet.primitive)
+      assert(triplet.tagType == 2)
+      assert(triplet.length > 0)
+      val buffer = new Array[Byte](triplet.length)
+      is.read(buffer)
+      var value: Long = if (buffer(0) > 0) 0 else -1
+      buffer foreach { byte =>
+        value = (value << 8) | byte
+      }
+      AsnInteger(value)
+    }
+  }
+  
+  def decodeTriplet[T](is: InputStream)(f: Triplet => T): T = {
     val dis = new DecodingInputStream(is)
     
     // Read tag bytes
@@ -53,7 +57,10 @@ class BerDecoder {
     var tagValue = firstTagByte & 0x1f
     
     if ((firstTagByte & 0x1f) > 30) {
-      while (dis.readByte definesBit 7) {
+      var tagByte = dis.readByte
+      while (tagByte definesBit 7) {
+        tagValue = (tagValue << 7) | (tagByte & 0x7f)
+        tagByte = dis.readByte
       }
     }
     
@@ -78,7 +85,7 @@ class BerDecoder {
       }
     )
     
-    f(tagClass, tagConstructed, tagValue, length)
+    f(Triplet(tagClass, tagConstructed, tagValue, length))
   }
 }
 
