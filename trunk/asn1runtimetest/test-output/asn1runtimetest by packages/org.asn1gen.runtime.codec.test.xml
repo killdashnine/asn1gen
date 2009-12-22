@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="org.asn1gen.runtime.codec.test" failures="1" tests="16" time="0.2" errors="0">
+  <properties/>
+  <testcase name="test_constructor_01" time="0.046" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_decodeTriplet_01" time="0.0090" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_decode_AsnBoolean_00" time="0.0060" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_decode_AsnBoolean_01" time="0.0020" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_decode_AsnBoolean_02" time="0.0020" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_decode_AsnInteger_00" time="0.01" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_decode_AsnNull_00" time="0.0030" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_00" time="0.0050" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_01" time="0.0020" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_02" time="0.0040" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_03" time="0.0030" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_04" time="0.0050" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_05" time="0.0020" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_06" time="0.0020" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+  <testcase name="test_readTripleWindow_07" time="0.015" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2">
+    <failure type="java.lang.IndexOutOfBoundsException" message="(length = 3) == (readLength == 2)">
+      <![CDATA[java.lang.IndexOutOfBoundsException: (length = 3) == (readLength == 2)
+	at org.asn1gen.runtime.codec.BerDecoderReader.readTripletWindow(BerDecoderReader.scala:42)
+	at org.asn1gen.runtime.codec.test.TestBerDecoder2.test_readTripleWindow_07(TestBerDecoder2.scala:186)
+... Removed 22 stack frames]]>
+    </failure>
+  </testcase>
+  <testcase name="test_scalaStream_01" time="0.0060" classname="org.asn1gen.runtime.codec.test.TestBerDecoder2"/>
+</testsuite>

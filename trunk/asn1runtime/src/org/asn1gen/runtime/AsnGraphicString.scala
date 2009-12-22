@@ -1,4 +1,4 @@
 package org.asn1gen.runtime
 
-case class AsnGraphicString extends AsnCharacterString {
+case class AsnGraphicString(value: String) extends AsnCharacterString {
 }

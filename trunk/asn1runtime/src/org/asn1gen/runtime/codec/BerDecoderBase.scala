@@ -5,13 +5,12 @@ import org.asn1gen.extra._
 import java.io._
 import scala.annotation.tailrec
 
-class BerDecoder {
+trait BerDecoderBase {
   import org.asn1gen.extra.Extras._
   
   def decode(is: DecodingInputStream, template: AsnBoolean): AsnBoolean = {
     val triplet = decodeTriplet(is)
-    assert(triplet.primitive)
-    assert(triplet.tagType == 1)
+    assert(triplet.describes(template))
     assert(triplet.length == 1)
     is.span(triplet.length) {
       val value = is.readByte
@@ -21,8 +20,7 @@ class BerDecoder {
   
   def decode(is: DecodingInputStream, template: AsnNull): AsnNull = {
     val triplet = decodeTriplet(is)
-    assert(triplet.primitive)
-    assert(triplet.tagType == 5)
+    assert(triplet.describes(template))
     assert(triplet.length == 0)
     is.span(triplet.length) {
       AsnNull
@@ -31,9 +29,7 @@ class BerDecoder {
   
   def decode(is: DecodingInputStream, template: AsnInteger): AsnInteger = {
     val triplet = decodeTriplet(is)
-    assert(triplet.primitive)
-    assert(triplet.tagType == 2)
-    assert(triplet.length > 0)
+    assert(triplet.describes(template))
     is.span(triplet.length) {
       val buffer = new Array[Byte](triplet.length)
       is.read(buffer)
@@ -47,9 +43,7 @@ class BerDecoder {
   
   final def decodeSequence[T <: AsnSequence](is: DecodingInputStream, template: T)(f: Int => T): T = {
     val triplet = decodeTriplet(is)
-    assert(triplet.tagClass == TagClass.Universal)
-    assert(triplet.constructed)
-    assert(triplet.tagType == 16)
+    assert(triplet.describes(template))
     f(0)
   }
   
@@ -101,5 +95,5 @@ class BerDecoder {
     
     Triplet(tagClass, tagConstructed, tagValue, length)
   }
+  
 }
-
