@@ -96,3 +96,6 @@ package test.asn1.genruntime {
     def value3: MyEnum = MyEnum(3)
   }
 }
+package test.asn1.genruntime {
+  object BerDecoder extends org.asn1gen.runtime.codec.BerDecoderBase
+}
