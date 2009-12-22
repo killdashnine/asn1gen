@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="asn1gentest">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../../Downloads/eclipse-2.8.0-alpha"/>
+    <property name="junit.output.dir" value="build"/>
+    <property name="asn1gen.location" value="../asn1gen"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.6"/>
+    <property name="source" value="1.6"/>
+    <path id="Scala Library version 2.8.0.r19316-b20091028025435.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}/configuration/org.eclipse.osgi/bundles/197/1/.cp/lib/scala-library.jar"/>
+        <pathelement location="${ECLIPSE_HOME}/configuration/org.eclipse.osgi/bundles/197/1/.cp/lib/scala-dbc.jar"/>
+        <pathelement location="${ECLIPSE_HOME}/configuration/org.eclipse.osgi/bundles/197/1/.cp/lib/scala-swing.jar"/>
+    </path>
+    <path id="JUnit 4.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}/plugins/org.junit4_4.5.0.v20090824/junit.jar"/>
+        <pathelement location="${ECLIPSE_HOME}/plugins/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
+    </path>
+    <path id="asn1gen.classpath">
+        <pathelement location="${asn1gen.location}/bin"/>
+        <path refid="Scala Library version 2.8.0.r19316-b20091028025435.libraryclasspath"/>
+        <pathelement location="${asn1gen.location}/lib/specs-1.6.0-sources.jar"/>
+        <pathelement location="${asn1gen.location}/lib/specs-1.6.0.jar"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+    </path>
+    <path id="asn1gentest.classpath">
+        <pathelement location="bin"/>
+        <path refid="Scala Library version 2.8.0.r19316-b20091028025435.libraryclasspath"/>
+        <path refid="asn1gen.classpath"/>
+        <path refid="JUnit 4.libraryclasspath"/>
+    </path>
+    <path id="run.asn1gentest.classpath">
+        <path refid="Scala Library version 2.8.0.r19316-b20091028025435.libraryclasspath"/>
+        <path refid="asn1gentest.classpath"/>
+    </path>
+    <path id="run.bin.classpath">
+        <path refid="Scala Library version 2.8.0.r19316-b20091028025435.libraryclasspath"/>
+        <path refid="asn1gentest.classpath"/>
+    </path>
+    <path id="run.test.org.asn1gen.parsing.asn1.classpath">
+        <path refid="Scala Library version 2.8.0.r19316-b20091028025435.libraryclasspath"/>
+        <path refid="asn1gentest.classpath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall">
+        <ant antfile="${asn1gen.location}/build.xml" dir="${asn1gen.location}" inheritAll="false" target="clean"/>
+    </target>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects">
+        <ant antfile="${asn1gen.location}/build.xml" dir="${asn1gen.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="asn1gentest.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="asn1gentest">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <test name="test.org.asn1gen.gen.TestGenJava" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.gen.TestGenJavaTags" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestLexer" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParser" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserA" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserB" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserC" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserD" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserE" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserF" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserG" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserH" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserI" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserJ" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserK" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserL" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserM" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserN" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserO" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserP" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserQ" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserR" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserS" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserT" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserU" todir="${junit.output.dir}"/>
+            <test name="test.org.asn1gen.parsing.asn1.TestParserV" todir="${junit.output.dir}"/>
+            <classpath refid="run.asn1gentest.classpath"/>
+        </junit>
+    </target>
+    <target name="bin">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <classpath refid="run.bin.classpath"/>
+        </junit>
+    </target>
+    <target name="test.org.asn1gen.parsing.asn1">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" printsummary="withOutAndErr">
+            <formatter type="xml"/>
+            <classpath refid="run.test.org.asn1gen.parsing.asn1.classpath"/>
+        </junit>
+    </target>
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+</project>
