@@ -1,21 +1,11 @@
 package test.org.asn1gen.runtime.codec
 
 import _root_.org.junit._
+import _root_.org.junit.Assert._
 import _root_.junit.framework.TestCase
 import _root_.org.asn1gen.runtime.codec._
-import _root_.org.junit.Assert._
 
-class TestOctetWindow {
-  def assertThrows[E](f: => Unit): Unit = {
-    try {
-      f
-    } catch {
-      case e: E => return
-      case e => throw e
-    }
-    throw new Exception("Exception expected")
-  }
-
+class TestOctetWindow extends org.asn1gen.junit.Assert {
   @Test
   def test_constructor_01(): Unit = {
     OctetWindow(Array[Byte](1, 2, 3), 0, 3)

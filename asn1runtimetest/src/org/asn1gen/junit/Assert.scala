@@ -1,6 +1,6 @@
 package org.asn1gen.junit
 
-object Assert {
+trait Assert {
   def assertThrows[E](f: => Unit): Unit = {
     try {
       f
