@@ -1,13 +1,13 @@
 package test.asn1.genruntime {
   import org.asn1gen.runtime._
+  import org.asn1gen.runtime.codec._
 
   case class Empty() extends AsnSequence {
   }
 
   object Empty extends Empty() {
   }
-}
-package test.asn1.genruntime {
+
   import org.asn1gen.runtime._
 
   case class MySequence(
@@ -45,8 +45,7 @@ package test.asn1.genruntime {
     MyChoice
   ) {
   }
-}
-package test.asn1.genruntime {
+
   import org.asn1gen.runtime._
 
   abstract class MyChoice(_element: AsnType) extends AsnChoice {
@@ -82,8 +81,7 @@ package test.asn1.genruntime {
 
   object MyChoice extends MyChoice_choice0(Empty) {
   }
-}
-package test.asn1.genruntime {
+
   import org.asn1gen.runtime._
 
   case class MyEnum(_value: Int) extends AsnEnumeration {
@@ -95,4 +93,27 @@ package test.asn1.genruntime {
     def value2: MyEnum = MyEnum(2)
     def value3: MyEnum = MyEnum(3)
   }
+
+  trait BerDecoder extends org.asn1gen.runtime.codec.BerDecoderBase {
+    def decode(is: DecodingInputStream, template: MySequence): MySequence = {
+      val triplet = decodeTriplet(is)
+      assert(triplet.describes(template))
+      var fieldTriplet = decodeTriplet(is)
+      is.spanComponent[MySequence](triplet.length) { eos =>
+        MySequence(
+          (fieldTriplet, eos()) match {
+            case (Triplet(TagClass.ContextSpecific, false, 0, length), false) =>
+              val value = decode(is, AsnInteger)
+              Some(value)
+            case _ => None
+          },
+          AsnReal,
+          AsnPrintableString,
+          MyChoice
+        )
+      }
+    }
+  }
+  
+  object BerDecoder extends BerDecoder
 }

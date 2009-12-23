@@ -1,21 +1,20 @@
 package test.org.asn1gen.runtime.codec
 
-import _root_.org.junit._
-import _root_.org.junit.Assert._
-import _root_.junit.framework.TestCase
-import _root_.org.asn1gen.runtime._
-import _root_.org.asn1gen.runtime.codec._
-import _root_.java.io._
+import org.asn1gen.runtime._
+import org.asn1gen.runtime.codec._
+import java.io._
+import org.junit._
+import org.junit.Assert._
+import org.asn1gen.junit.Assert._
+import test.asn1.genruntime.BerDecoder
 
-class TestBerDecoder extends org.asn1gen.junit.Assert {
+class TestBerDecoder {
   @Test
   def test_decodeTriplet_01(): Unit = {
     val data = Array[Byte](0, 1, 0)
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
 
-    val decoder = new BerDecoder
-    
-    val triplet = decoder.decodeTriplet(is)
+    val triplet = BerDecoder.decodeTriplet(is)
     assertEquals(0, triplet.tagType)
     assertEquals(1, triplet.length)
     is.skip(triplet.length)
@@ -29,9 +28,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
     val data = Array[Byte](1, 1, 0)
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
 
-    val decoder = new BerDecoder
-    
-    val value = decoder.decode(is, AsnBoolean)
+    val value = BerDecoder.decode(is, AsnBoolean)
     
     assertEquals(AsnBoolean(false), value)
   }
@@ -40,8 +37,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   def test_decode_AsnBoolean_01(): Unit = {
     val data = Array[Byte](1, 1, 0xff.toByte)
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
-    val decoder = new BerDecoder
-    val value = decoder.decode(is, AsnBoolean)
+    val value = BerDecoder.decode(is, AsnBoolean)
     
     assertEquals(AsnBoolean(true), value)
   }
@@ -50,8 +46,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   def test_decode_AsnBoolean_02(): Unit = {
     val data = Array[Byte](1, 1, 1)
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
-    val decoder = new BerDecoder
-    val value = decoder.decode(is, AsnBoolean)
+    val value = BerDecoder.decode(is, AsnBoolean)
     
     assertEquals(AsnBoolean(true), value)
   }
@@ -89,8 +84,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   def test_decode_AsnNull_00(): Unit = {
     val data = Array[Byte](5, 0)
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
-    val decoder = new BerDecoder
-    val value = decoder.decode(is, AsnNull)
+    val value = BerDecoder.decode(is, AsnNull)
     assertEquals(AsnNull, value)
   }
   
@@ -98,8 +92,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
   def test_decode_AsnInteger_00(): Unit = {
     val data = Array[Byte](2, 2, bb(10010110), bb(1000110))
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
-    val decoder = new BerDecoder
-    val value = decoder.decode(is, AsnInteger)
+    val value = BerDecoder.decode(is, AsnInteger)
     println(value)
     assertEquals(AsnInteger(-27066), value)
   }
@@ -189,7 +182,7 @@ class TestBerDecoder extends org.asn1gen.junit.Assert {
     val data = Array[Byte](31, 0x80.toByte, 0, 3, 100, 101)
     val is = new ByteArrayInputStream(data)
     val decoder = new BerDecoderReader(is)
-    assertThrows[IndexOutOfBoundsException] {
+    assertThrows(classOf[IndexOutOfBoundsException]) {
       val window = decoder.readTripletWindow()
     }
   }

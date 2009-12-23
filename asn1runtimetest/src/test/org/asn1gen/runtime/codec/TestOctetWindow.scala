@@ -1,11 +1,12 @@
 package test.org.asn1gen.runtime.codec
 
 import _root_.org.junit._
-import _root_.org.junit.Assert._
 import _root_.junit.framework.TestCase
 import _root_.org.asn1gen.runtime.codec._
+import _root_.org.junit.Assert._
+import _root_.org.asn1gen.junit.Assert._
 
-class TestOctetWindow extends org.asn1gen.junit.Assert {
+class TestOctetWindow {
   @Test
   def test_constructor_01(): Unit = {
     OctetWindow(Array[Byte](1, 2, 3), 0, 3)
@@ -48,27 +49,27 @@ class TestOctetWindow extends org.asn1gen.junit.Assert {
   
   @Test
   def test_constructor_09x(): Unit = {
-    assertThrows[AssertionError] { OctetWindow(Array[Byte](1, 2, 3), -1, 3) }
+    assertThrows(classOf[AssertionError]) { OctetWindow(Array[Byte](1, 2, 3), -1, 3) }
   }
   
   @Test
   def test_constructor_10x(): Unit = {
-    assertThrows[AssertionError] { OctetWindow(Array[Byte](1, 2, 3), 1, 3) }
+    assertThrows(classOf[AssertionError]) { OctetWindow(Array[Byte](1, 2, 3), 1, 3) }
   }
   
   @Test
   def test_constructor_11x(): Unit = {
-    assertThrows[AssertionError] { OctetWindow(Array[Byte](1, 2, 3), 0, -1) }
+    assertThrows(classOf[AssertionError]) { OctetWindow(Array[Byte](1, 2, 3), 0, -1) }
   }
   
   @Test
   def test_constructor_12x(): Unit = {
-    assertThrows[AssertionError] { OctetWindow(Array[Byte](1, 2, 3), 4, 0) }
+    assertThrows(classOf[AssertionError]) { OctetWindow(Array[Byte](1, 2, 3), 4, 0) }
   }
   
   @Test
   def test_constructor_13x(): Unit = {
-    assertThrows[AssertionError] { OctetWindow(Array[Byte](1, 2, 3), -1, 0) }
+    assertThrows(classOf[AssertionError]) { OctetWindow(Array[Byte](1, 2, 3), -1, 0) }
   }
   
   @Test
@@ -170,7 +171,7 @@ class TestOctetWindow extends org.asn1gen.junit.Assert {
     val data = Array[Byte](1, 2, 3, 4)
     val window1 = OctetWindow(data, 0, 4)
     val window2 = window1.zoomAbsolute(0, 2)
-    assertThrows[AssertionError] { window2.zoomAbsolute(2, 2) }
+    assertThrows(classOf[AssertionError]) { window2.zoomAbsolute(2, 2) }
   }
   
   @Test
@@ -178,7 +179,7 @@ class TestOctetWindow extends org.asn1gen.junit.Assert {
     val data = Array[Byte](1, 2, 3, 4)
     val window1 = OctetWindow(data, 0, 4)
     val window2 = window1.zoomAbsolute(2, 2)
-    assertThrows[AssertionError] { window2.zoomAbsolute(0, 2) }
+    assertThrows(classOf[AssertionError]) { window2.zoomAbsolute(0, 2) }
   }
   
   @Test
@@ -202,7 +203,7 @@ class TestOctetWindow extends org.asn1gen.junit.Assert {
     val data = Array[Byte](1, 2, 3, 4)
     val window1 = OctetWindow(data, 0, 4)
     val window2 = window1.zoom(0, 2)
-    assertThrows[AssertionError] { window2.zoom(2, 2) }
+    assertThrows(classOf[AssertionError]) { window2.zoom(2, 2) }
   }
   
   @Test
@@ -247,13 +248,13 @@ class TestOctetWindow extends org.asn1gen.junit.Assert {
   def test_from_3x(): Unit = {
     val data = Array[Byte](1, 2, 3, 4)
     val window1 = OctetWindow(data, 4, 0)
-    assertThrows[AssertionError] { window1.from(1) }
+    assertThrows(classOf[AssertionError]) { window1.from(1) }
   }
   
   @Test
   def test_from_4x(): Unit = {
     val data = Array[Byte](1, 2, 3, 4)
     val window1 = OctetWindow(data, 3, 0)
-    assertThrows[AssertionError] { window1.from(1) }
+    assertThrows(classOf[AssertionError]) { window1.from(1) }
   }
 }

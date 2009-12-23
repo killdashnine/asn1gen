@@ -27,4 +27,13 @@ class DecodingInputStream(private _is: InputStream, private var _index: Int = 0)
       assert(_index == newIndex)
     }
   }
+  
+  def spanComponent[T](length: Int)(f: (() => Boolean) => T): T = {
+    val newIndex = _index + length
+    try {
+      f(() => _index < newIndex)
+    } finally {
+      assert(_index == newIndex)
+    }
+  }
 }
