@@ -98,23 +98,14 @@ package test.asn1.genruntime {
     var triplet: Option[Triplet] = None
     
     def decode(f: PartialFunction[Option[Triplet], Unit]) = {
-      println("rtd 1")
       assert(is.index <= endIndex)
       if (triplet == None && is.index < endIndex) {
-      println("rtd 2")
         triplet = Some(decodeTriplet(is))
-      println("rtd 3")
       }
-      println("rtd 4")
       val result = f.lift(triplet)
-      println("==> " + result)
       if (result != None) {
-      println("rtd 5")
         triplet = None
-        println("reset " + is.index)
-      println("rtd 6")
       }
-      println("rtd 7")
     }
   }
 
