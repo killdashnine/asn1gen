@@ -254,5 +254,5 @@ package test.asn1.genruntime {
     }
   }
   
-  object OnMySequence extends OnMySequence(null)
+  object OnMySequence extends OnMySequence(OnAsnInteger)
 }
