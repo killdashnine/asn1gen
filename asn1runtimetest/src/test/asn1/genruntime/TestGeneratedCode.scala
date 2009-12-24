@@ -214,9 +214,12 @@ package test.asn1.genruntime {
   object OnAsnInteger extends OnAsnInteger({_=>}){
   }
   
-  case class OnMySequence(field0: OnAsnInteger) extends BerDecoder with Decodable {
+  case class OnMySequence(field0: OnAsnInteger, field1: OnAsnInteger) extends BerDecoder with Decodable {
     def field0(transform: OnAsnInteger => OnAsnInteger): OnMySequence =
-      OnMySequence(transform(this.field0))
+      OnMySequence(transform(this.field0), this.field1)
+    
+    def field1(transform: OnAsnInteger => OnAsnInteger): OnMySequence =
+      OnMySequence(this.field0, transform(this.field1))
     
     def decode(is: DecodingInputStream, length: Int): Unit = {
       decodeTriplets(is, length) { tripletsDecoder =>
@@ -226,9 +229,15 @@ package test.asn1.genruntime {
             Some(true)
           case None => None
         }
+        tripletsDecoder.decode {
+          case Some(triplet) if triplet.tagType == 1 =>
+            this.field1.decode(is, triplet.length)
+            Some(true)
+          case None => None
+        }
       }
     }
   }
   
-  object OnMySequence extends OnMySequence(OnAsnInteger)
+  object OnMySequence extends OnMySequence(OnAsnInteger, OnAsnInteger)
 }
