@@ -94,21 +94,6 @@ package test.asn1.genruntime {
     def value3: MyEnum = MyEnum(3)
   }
   
-  class RepeatingTripletDecoder(is: DecodingInputStream, endIndex: Int) extends BerDecoder {
-    var triplet: Option[Triplet] = None
-    
-    def decode(f: PartialFunction[Option[Triplet], Unit]) = {
-      assert(is.index <= endIndex)
-      if (triplet == None && is.index < endIndex) {
-        triplet = Some(decodeTriplet(is))
-      }
-      val result = f.lift(triplet)
-      if (result != None) {
-        triplet = None
-      }
-    }
-  }
-
   trait BerDecoder extends org.asn1gen.runtime.codec.BerDecoderBase {
     def decodeTriplets(is: DecodingInputStream, length: Int)(f: RepeatingTripletDecoder => Unit): Unit = {
       val newIndex = is.index + length
