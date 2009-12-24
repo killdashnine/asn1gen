@@ -62,7 +62,7 @@ trait BerDecoderBase {
     val tagConstructed = (firstTagByte & 0x20) != 0
     var tagValue = firstTagByte & 0x1f
     
-    if ((firstTagByte & 0x1f) > 30) {
+    if (tagValue == 31) {
       var tagByte = is.readByte
       while (tagByte definesBit 7) {
         tagValue = (tagValue << 7) | (tagByte & 0x7f)

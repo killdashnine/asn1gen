@@ -95,19 +95,26 @@ package test.asn1.genruntime {
   }
   
   class RepeatingTripletDecoder(is: DecodingInputStream, endIndex: Int) extends BerDecoder {
-    var triplet: Triplet = null
+    var triplet: Option[Triplet] = None
     
     def decode(f: PartialFunction[Option[Triplet], Unit]) = {
+      println("rtd 1")
       assert(is.index <= endIndex)
-      if (triplet == null && is.index < endIndex) {
-        triplet = decodeTriplet(is)
+      if (triplet == None && is.index < endIndex) {
+      println("rtd 2")
+        triplet = Some(decodeTriplet(is))
+      println("rtd 3")
       }
-      val g = f.andThen { _ => triplet = null }
-      if (triplet == null) {
-        g(None)
-      } else {
-        g(Some(triplet))
+      println("rtd 4")
+      val result = f.lift(triplet)
+      println("==> " + result)
+      if (result != None) {
+      println("rtd 5")
+        triplet = None
+        println("reset " + is.index)
+      println("rtd 6")
       }
+      println("rtd 7")
     }
   }
 
@@ -115,19 +122,45 @@ package test.asn1.genruntime {
     def decodeTriplets(is: DecodingInputStream, length: Int)(f: RepeatingTripletDecoder => Unit): Unit = {
       val newIndex = is.index + length
       f(new RepeatingTripletDecoder(is, newIndex))
+      println(is.index + " vs " + newIndex + " vs " + length)
       assert(is.index == newIndex)
     }
-    
-    def decode[T](is: DecodingInputStream, template: MySequence)(ff: (Option[Long], Double, String) => T): T = {
+  }
+  
+  object MySequenceWindow {
+    def decode[T](is: DecodingInputStream)(ff: (Option[AsnIntegerRaw], Double, String, MyChoiceWindow) => T): T = {
+      new MySequenceWindow(is).decode(ff)
+    }
+  }
+  
+  class AsnIntegerRaw(is: DecodingInputStream, length: Int) {
+    def decode[T](f: Long => T): T = {
+      val value =
+        if (length == 0) {
+          0
+        } else {
+          val buffer = new Array[Byte](length)
+          is.read(buffer)
+          var acc = if (buffer(0) >= 0) 0L else -1L
+          buffer foreach { byte =>
+            acc = (acc << 8) | byte
+          }
+          acc
+        }
+      f(value)
+    }
+  }
+  
+  class MySequenceWindow(is: DecodingInputStream) extends BerDecoder {
+    def decode[T](ff: (Option[AsnIntegerRaw], Double, String, MyChoiceWindow) => T): T = {
       val triplet = decodeTriplet(is)
-      assert(triplet.describes(template))
-      var fieldTriplet = decodeTriplet(is)
-      var field0: Option[Long] = None
+      var field0: Option[AsnIntegerRaw] = None
       var field1: Option[Double] = None
       var field2: Option[String] = None
+      var field3: Option[MyChoiceWindow] = None
       decodeTriplets(is, triplet.length) { tripletsDecoder =>
         tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 0 => field0 = Some(0)
+          case Some(triplet) if triplet.tagType == 0 => field0 = Some(new AsnIntegerRaw(is, triplet.length))
           case None => None
         }
         tripletsDecoder.decode {
@@ -136,36 +169,35 @@ package test.asn1.genruntime {
         tripletsDecoder.decode {
           case Some(triplet) if triplet.tagType == 2 => field2 = Some("")
         }
-      }
-      return ff(field0, field1.get, field2.get)
-    }
-    
-    def moo(is: DecodingInputStream): Unit = {
-      def decode[T](ff: (Option[Long], Double, String) => T): T = {
-        val triplet = decodeTriplet(is)
-        var fieldTriplet = decodeTriplet(is)
-        var field0: Option[Long] = None
-        var field1: Option[Double] = None
-        var field2: Option[String] = None
-        decodeTriplets(is, triplet.length) { tripletsDecoder =>
-          tripletsDecoder.decode {
-            case Some(triplet) if triplet.tagType == 0 => field0 = Some(0)
-            case None => None
-          }
-          tripletsDecoder.decode {
-            case Some(triplet) if triplet.tagType == 1 => field1 = Some(0)
-          }
-          tripletsDecoder.decode {
-            case Some(triplet) if triplet.tagType == 2 => field2 = Some("")
-          }
+        tripletsDecoder.decode {
+          case Some(triplet) if triplet.tagType == 3 => field3 = Some(new MyChoiceWindow(is))
         }
-        return ff(field0, field1.get, field2.get)
       }
+      return ff(field0, field1.get, field2.get, field3.get)
     }
   }
   
-  class MySequenceWindow(is: DecodingInputStream, start: Int, end: Int) {
-    
+  class MyChoiceWindow(is: DecodingInputStream) extends BerDecoder {
+    def decode[T](ff: (Empty, Int, Double) => T): T = {
+      val triplet = decodeTriplet(is)
+      var fieldTriplet = decodeTriplet(is)
+      var field0: Option[Empty] = None
+      var field1: Option[Int] = None
+      var field2: Option[Double] = None
+      decodeTriplets(is, triplet.length) { tripletsDecoder =>
+        tripletsDecoder.decode {
+          case Some(triplet) if triplet.tagType == 0 => field0 = Some(Empty)
+          case None => None
+        }
+        tripletsDecoder.decode {
+          case Some(triplet) if triplet.tagType == 1 => field1 = Some(0)
+        }
+        tripletsDecoder.decode {
+          case Some(triplet) if triplet.tagType == 2 => field2 = Some(0.0)
+        }
+      }
+      return ff(field0.get, field1.get, field2.get)
+    }
   }
   
   object BerDecoder extends BerDecoder
