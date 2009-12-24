@@ -206,6 +206,8 @@ class TestBerDecoder {
   
   @Test
   def test_mine_01(): Unit = {
+    import test.asn1.genruntime._
+    
     val data = Array[Byte](
         tag(0, 1, 16), 26, // Sequence
           tag(2, 0, 0), 2, 0x9646.toByte,     // Field#0#Integer: -27066
@@ -213,13 +215,93 @@ class TestBerDecoder {
           tag(2, 0, 2), 3, 65, 66, 67, // Field#2#String: ABC
           tag(2, 0, 3), 4,             // Field#3#Choice:
             tag(2, 0, 1), 2, 0x9646.toByte)   //   Field#1#Integer: -27066
+  }
+  
+  @Test
+  def test_mine_02(): Unit = {
+    import test.asn1.genruntime._
+    
+    val data = Array[Byte](0x96.toByte, 0x46.toByte)     // Integer: -27066
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
-    test.asn1.genruntime.MySequenceWindow.decode(is) { (field0, field1, field2, field3w) =>
-      println(field0)
-      println(field1)
-      println(field2)
-      println(field3w)
-    }
+    var recordedValue = -1L
+    val decoder =
+      ( OnAsnInteger
+        .value { _ => { value: Long => recordedValue = value } }
+      )
+    decoder.decode(is, data.length)
+    assertEquals(-27066, recordedValue)
+  }
+  
+  @Test
+  def test_mine_03(): Unit = {
+    import test.asn1.genruntime._
+    
+    val data = Array[Byte](
+        tag(2, 0, 0), 2, 0x9646.toByte)     // Field#0#Integer: -27066
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    
+    val decoder2 =
+      ( OnMySequence
+        .field0 { _.value { _: (Long => Unit) => { value: Long =>
+              println(value)
+            } }
+         }
+      )
+    
+    /*
+    val x =
+      ( OnMySequence
+          .field0 { _ =>
+            { field0: OnAsnInteger =>
+              ( field0
+                  .value { value: Int =>
+                    println("field0: " + value)
+                  }
+              )
+            }
+          }
+          .field1 { field1 =>
+            { field1: OnAsnReal =>
+              ( field1
+                  .value { value: Double =>
+                    println("field1: " + value)
+                  }
+              )
+            }
+          }
+          .field2 { field2 =>
+            { field2: OnAsnPrintableString =>
+              ( field2
+                  .value { value: String =>
+                    println("field2: " + value)
+                  }
+              )
+            }
+          }
+          .field3 { field3 =>
+            { field3: OnMyChoice =>
+              ( field3
+                  .field0 { field0 =>
+                    { field0: OnAsnInteger =>
+                      ( field0
+                          .value { value: Int =>
+                            println("field0: " + value)
+                          }
+                      )
+                    }
+                  }
+                  .field1 { field1 =>
+                    { field1: OnAsnReal =>
+                      ( field1
+                          .value { value: Double =>
+                            println("field1: " + value)
+                          }
+                      )
+                    }
+                  }
+              )
+            }
+            )*/
   }
   
   @Test
