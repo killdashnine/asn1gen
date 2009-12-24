@@ -237,20 +237,27 @@ class TestBerDecoder {
     import test.asn1.genruntime._
     
     val data = Array[Byte](
-        tag(2, 0, 0), 2, 0x96.toByte, 0x46.toByte)     // Field#0#Integer: -27066
+        tag(2, 0, 0), 2, 0x96.toByte, 0x46.toByte,     // Field#0#Integer: -27066
+        tag(2, 0, 1), 2, 0x96.toByte, 0x47.toByte)     // Field#1#Integer: -27067
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
-    var recordedValue = -1L
+    var recordedValue1 = -1L
+    var recordedValue2 = -1L
     val decoder =
       ( OnMySequence
         .field0 { _.value { _: (Long => Unit) => { value: Long =>
-              recordedValue = value
+              recordedValue1 = value
             } }
-         }
+        }
+        .field1 { _.value { _: (Long => Unit) => { value: Long =>
+              recordedValue2 = value
+            } }
+        }
       )
     
     decoder.decode(is, data.length)
     
-    assertEquals(-27066, recordedValue)
+    assertEquals(-27066, recordedValue1)
+    assertEquals(-27065, recordedValue2)
     /*
     val x =
       ( OnMySequence
