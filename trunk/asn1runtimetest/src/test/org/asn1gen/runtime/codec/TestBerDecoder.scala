@@ -194,4 +194,42 @@ class TestBerDecoder {
     val stream = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte) 
     stream.print
   }
+  
+  def tag(tc: Int, c: Int, t: Int): Byte = {
+    assert(tc < 4)
+    assert(c < 2)
+    assert(t < 32)
+    val result = ((tc << 6) | (c << 5) | t).toByte
+    println("tag: " + result)
+    return result
+  }
+  
+  @Test
+  def test_mine_01(): Unit = {
+    val data = Array[Byte](
+        tag(0, 1, 16), 26, // Sequence
+          tag(2, 0, 0), 2, 0x9646.toByte,     // Field#0#Integer: -27066
+          tag(2, 0, 1), 0,             // Field#1#Real: 0
+          tag(2, 0, 2), 3, 65, 66, 67, // Field#2#String: ABC
+          tag(2, 0, 3), 4,             // Field#3#Choice:
+            tag(2, 0, 1), 2, 0x9646.toByte)   //   Field#1#Integer: -27066
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    test.asn1.genruntime.MySequenceWindow.decode(is) { (field0, field1, field2, field3w) =>
+      println(field0)
+      println(field1)
+      println(field2)
+      println(field3w)
+    }
+  }
+  
+  @Test
+  def test_me_01(): Unit = {
+    def foo(f: PartialFunction[Int, Boolean]) = {
+      println(f.lift(1))
+    }
+    
+    foo {
+      case 2 => true
+    }
+  }
 }
