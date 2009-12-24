@@ -244,6 +244,28 @@ class TestBerDecoder {
     var recordedValue2 = -1L
     val decoder =
       ( OnMySequence
+        .field0 { _.value { _ => { recordedValue1 = _ } } }
+        .field1 { _.value { _ => { recordedValue2 = _ } } }
+      )
+    
+    decoder.decode(is, data.length)
+    
+    assertEquals(-27066, recordedValue1)
+    assertEquals(-27065, recordedValue2)
+  }
+  
+  @Test
+  def test_mine_04(): Unit = {
+    import test.asn1.genruntime._
+
+    val data = Array[Byte](
+        tag(2, 0, 0), 2, 0x96.toByte, 0x46.toByte,     // Field#0#Integer: -27066
+        tag(2, 0, 1), 2, 0x96.toByte, 0x47.toByte)     // Field#1#Integer: -27067
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    var recordedValue1 = -1L
+    var recordedValue2 = -1L
+    val decoder =
+      ( OnMySequence
         .field0 { _.value { _: (Long => Unit) => { value: Long =>
               recordedValue1 = value
             } }
