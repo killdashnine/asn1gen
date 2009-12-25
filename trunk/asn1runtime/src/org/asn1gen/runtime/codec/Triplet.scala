@@ -9,7 +9,7 @@ case class Triplet(
     length: Int) {
   def primitive = !constructed
   
-  def contextSpecific = tagType == TagClass.ContextSpecific
+  def contextSpecific = tagClass == TagClass.ContextSpecific
   
   def describes(template: AsnNull): Boolean =
     primitive && tagType == 5 && length == 0
