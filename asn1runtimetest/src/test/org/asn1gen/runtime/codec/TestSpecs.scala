@@ -3,7 +3,7 @@ package test.org.asn1gen.runtime.codec
 import org.specs._
 import org.specs.runner._
 
-class TestSpecsRunner extends JUnit4(TestSpecs)
+class TestSpecs extends JUnit4(TestSpecs)
 
 object TestSpecs extends Specification with JUnit {
   "'hello world' has 11 characters" in {

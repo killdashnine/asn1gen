@@ -7,7 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses(Array
     ( classOf[TestBerDecoder]
     , classOf[TestOctetWindow]
-    , classOf[TestSpecsRunner]
+    , classOf[TestSpecs]
     )
 )
 class Test_ {
