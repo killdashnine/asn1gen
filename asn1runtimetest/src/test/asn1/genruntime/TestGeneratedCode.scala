@@ -99,7 +99,6 @@ package test.asn1.genruntime {
     def decodeTriplets(is: DecodingInputStream, length: Int)(f: RepeatingTripletDecoder => Unit): Unit = {
       val newIndex = is.index + length
       f(new RepeatingTripletDecoder(is, newIndex))
-      println(is.index + " vs " + newIndex + " vs " + length)
       assert(is.index == newIndex)
     }
   }
