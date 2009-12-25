@@ -4,7 +4,7 @@ import org.asn1gen.runtime.codec.DecodingInputStream
 
 case class OnAsnInteger(value: Long => Unit) extends Decodable {
   def value(transform: (Long => Unit) => (Long => Unit)): OnAsnInteger =
-    OnAsnInteger(transform(this.value))
+    this.copy(value = transform(this.value))
   
   def decode(is: DecodingInputStream, length: Int): Unit = {
     require(length != 0, {"Zero length integer found."})
