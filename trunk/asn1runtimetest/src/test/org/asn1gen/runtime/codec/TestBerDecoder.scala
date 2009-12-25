@@ -293,4 +293,62 @@ class TestBerDecoder {
       decoder.decode(is, data.length)
     }
   }
+  
+  @Test
+  def test_OnAsnBoolean_true_pure(): Unit = {
+    import test.asn1.genruntime._
+    
+    val data = Array[Byte](0xff.toByte)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    var recordedValue: Option[Boolean] = None
+    val decoder =
+      ( OnAsnBoolean
+        .value { _ => { value: Boolean => recordedValue = Some(value) } }
+      )
+    decoder.decode(is, data.length)
+    assertEquals(Some(true), recordedValue)
+  }
+  
+  @Test
+  def test_OnAsnBoolean_false_pure(): Unit = {
+    import test.asn1.genruntime._
+    
+    val data = Array[Byte](0x0.toByte)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    var recordedValue: Option[Boolean] = None
+    val decoder =
+      ( OnAsnBoolean
+        .value { _ => { value: Boolean => recordedValue = Some(value) } }
+      )
+    decoder.decode(is, data.length)
+    assertEquals(Some(false), recordedValue)
+  }
+  
+  @Test
+  def test_OnAsnBoolean_true_mixed(): Unit = {
+    import test.asn1.genruntime._
+    
+    val data = Array[Byte](0x10.toByte)
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    var recordedValue: Option[Boolean] = None
+    val decoder =
+      ( OnAsnBoolean
+        .value { _ => { value: Boolean => recordedValue = Some(value) } }
+      )
+    decoder.decode(is, data.length)
+    assertEquals(Some(true), recordedValue)
+  }
+  
+  @Test
+  def test_OnAsnBoolean_zeroLength(): Unit = {
+    import test.asn1.genruntime._
+
+    val data = Array[Byte]()     // Integer: -27066
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    var recordedValue: Option[Boolean] = None
+    val decoder = OnAsnBoolean.value { _ => { v => recordedValue = Some(v) } }
+    assertThrows(classOf[DecodingException]) {
+      decoder.decode(is, data.length)
+    }
+  }
 }
