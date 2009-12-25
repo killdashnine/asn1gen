@@ -187,14 +187,6 @@ class TestBerDecoder {
     }
   }
   
-  @Test
-  def test_scalaStream_01(): Unit = {
-    val data = Array[Byte](31, 0x80.toByte, 0, 3, 100, 101)
-    val is = new ByteArrayInputStream(data)
-    val stream = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte) 
-    stream.print
-  }
-  
   def tag(tc: Int, c: Int, t: Int): Byte = {
     assert(tc < 4)
     assert(c < 2)
