@@ -2,6 +2,7 @@ package test.org.asn1gen.runtime.codec
 
 import org.asn1gen.runtime._
 import org.asn1gen.runtime.codec._
+import org.asn1gen.runtime.codec.async._
 import java.io._
 import org.junit._
 import org.junit.Assert._
@@ -334,16 +335,5 @@ class TestBerDecoder {
               )
             }
             )*/
-  }
-  
-  @Test
-  def test_me_01(): Unit = {
-    def foo(f: PartialFunction[Int, Boolean]) = {
-      println(f.lift(1))
-    }
-    
-    foo {
-      case 2 => true
-    }
   }
 }
