@@ -336,4 +336,17 @@ class TestBerDecoder {
             }
             )*/
   }
+  
+  @Test
+  def test_OnAsnInteger_zeroLength(): Unit = {
+    import test.asn1.genruntime._
+
+    val data = Array[Byte]()     // Integer: -27066
+    val is = new DecodingInputStream(new ByteArrayInputStream(data))
+    var recordedValue = -1L
+    val decoder = OnAsnInteger.value { _ => { recordedValue = _ } }
+    assertThrows(classOf[DecodingException]) {
+      decoder.decode(is, data.length)
+    }
+  }
 }
