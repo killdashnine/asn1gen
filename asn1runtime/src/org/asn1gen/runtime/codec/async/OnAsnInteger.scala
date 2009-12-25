@@ -2,11 +2,17 @@ package org.asn1gen.runtime.codec.async
 
 import org.asn1gen.runtime.codec.DecodingInputStream
 
-case class OnAsnInteger(value: Long => Unit) extends Decodable {
+case class OnAsnInteger(
+    decoder: (OnAsnInteger, DecodingInputStream, Int) => Unit,
+    value: Long => Unit) extends Decodable {
   def value(transform: (Long => Unit) => (Long => Unit)): OnAsnInteger =
     this.copy(value = transform(this.value))
   
   def decode(is: DecodingInputStream, length: Int): Unit = {
+    this.decoder(this, is, length)
+  }
+  
+  def decodeToValue(is: DecodingInputStream, length: Int): Unit = {
     require(length != 0, {"Zero length integer found."})
     val intValue = {
       val buffer = new Array[Byte](length)
@@ -23,5 +29,5 @@ case class OnAsnInteger(value: Long => Unit) extends Decodable {
   }
 }
 
-object OnAsnInteger extends OnAsnInteger({_=>}){
+object OnAsnInteger extends OnAsnInteger({_.decodeToValue(_, _)}, {_=>}){
 }
