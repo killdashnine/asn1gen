@@ -5,6 +5,11 @@ import org.asn1gen.runtime.codec.DecodingInputStream
 case class OnAsnInteger(
     decoder: (OnAsnInteger, DecodingInputStream, Int) => Unit,
     value: Long => Unit) extends Decodable {
+  type Decoder = (OnAsnInteger, DecodingInputStream, Int) => Unit
+  
+  def decoder(transform: Decoder => Decoder): OnAsnInteger =
+    this.copy(decoder = transform(this.decoder))
+  
   def value(transform: (Long => Unit) => (Long => Unit)): OnAsnInteger =
     this.copy(value = transform(this.value))
   
