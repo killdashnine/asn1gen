@@ -94,7 +94,6 @@ class TestBerDecoder {
     val data = Array[Byte](2, 2, bb(10010110), bb(1000110))
     val is = new DecodingInputStream(new ByteArrayInputStream(data))
     val value = BerDecoder.decode(is, AsnInteger)
-    println(value)
     assertEquals(AsnInteger(-27066), value)
   }
   
@@ -201,7 +200,6 @@ class TestBerDecoder {
     assert(c < 2)
     assert(t < 32)
     val result = ((tc << 6) | (c << 5) | t).toByte
-    println("tag: " + result)
     return result
   }
   
@@ -281,60 +279,6 @@ class TestBerDecoder {
     
     assertEquals(-27066, recordedValue1)
     assertEquals(-27065, recordedValue2)
-    /*
-    val x =
-      ( OnMySequence
-          .field0 { _ =>
-            { field0: OnAsnInteger =>
-              ( field0
-                  .value { value: Int =>
-                    println("field0: " + value)
-                  }
-              )
-            }
-          }
-          .field1 { field1 =>
-            { field1: OnAsnReal =>
-              ( field1
-                  .value { value: Double =>
-                    println("field1: " + value)
-                  }
-              )
-            }
-          }
-          .field2 { field2 =>
-            { field2: OnAsnPrintableString =>
-              ( field2
-                  .value { value: String =>
-                    println("field2: " + value)
-                  }
-              )
-            }
-          }
-          .field3 { field3 =>
-            { field3: OnMyChoice =>
-              ( field3
-                  .field0 { field0 =>
-                    { field0: OnAsnInteger =>
-                      ( field0
-                          .value { value: Int =>
-                            println("field0: " + value)
-                          }
-                      )
-                    }
-                  }
-                  .field1 { field1 =>
-                    { field1: OnAsnReal =>
-                      ( field1
-                          .value { value: Double =>
-                            println("field1: " + value)
-                          }
-                      )
-                    }
-                  }
-              )
-            }
-            )*/
   }
   
   @Test
