@@ -1,14 +1,11 @@
-package test.org.asn1gen
+package test.org.asn1gen.scratch
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
  
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array
-    ( classOf[extra.Test_]
-    , classOf[runtime.Test_]
-    , classOf[scratch.Test_]
+    ( classOf[TestStream]
     )
 )
-class Test_ {
-}
+class Test_
