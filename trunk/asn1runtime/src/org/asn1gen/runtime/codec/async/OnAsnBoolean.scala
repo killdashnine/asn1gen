@@ -6,6 +6,11 @@ import org.asn1gen.runtime.codec.DecodingInputStream
 case class OnAsnBoolean(
     decoder: (OnAsnBoolean, DecodingInputStream, Int) => Unit,
     value: Boolean => Unit) extends Decodable {
+  type Decoder = (OnAsnBoolean, DecodingInputStream, Int) => Unit
+  
+  def decoder(transform: Decoder => Decoder): OnAsnBoolean =
+    this.copy(decoder = transform(this.decoder))
+  
   def value(transform: (Boolean => Unit) => (Boolean => Unit)): OnAsnBoolean =
     this.copy(value = transform(this.value))
   
