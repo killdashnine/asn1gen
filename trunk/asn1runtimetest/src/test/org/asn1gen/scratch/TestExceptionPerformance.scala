@@ -10,6 +10,7 @@ class TestExceptionPerformance {
     println(msg + ": " + (after - before))
   }
   
+  @Ignore("Don't run expensive test")
   @Test
   def test_noexceptions_01(): Unit = {
     var collection = new scala.collection.mutable.Stack[Int]()
@@ -29,6 +30,7 @@ class TestExceptionPerformance {
     }
   }
 
+  @Ignore("Don't run expensive test")
   @Test
   def test_exceptions_01(): Unit = {
     def noop() {
@@ -50,6 +52,7 @@ class TestExceptionPerformance {
     }
   }
 
+  @Ignore("Don't run expensive test")
   @Test
   def test_sameexception_01(): Unit = {
     val exception = new Exception()
