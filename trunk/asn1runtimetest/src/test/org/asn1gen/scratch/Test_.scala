@@ -5,7 +5,8 @@ import org.junit.runners.Suite;
  
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array
-    ( classOf[TestStream]
+    ( classOf[TestExceptionPerformance]
+    , classOf[TestStream]
     )
 )
 class Test_
