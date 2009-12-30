@@ -240,4 +240,24 @@ class TestPackratBerDecoder {
       case x => fail("Parse failure: " + x)
     }
   }
+  
+  @Test
+  def test_null_00(): Unit = {
+    val data = Array[Byte](0)
+    parse(length >> _null, data) match {
+      case Success(result, _) => assertEquals((), result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_null_01(): Unit = {
+    val data = Array[Byte](1)
+    assertThrows(classOf[DecodingException]) {
+      parse(length >> _null, data) match {
+        case Success(result, _) => assertEquals((), result)
+        case x => fail("Parse failure: " + x)
+      }
+    }
+  }
 }
