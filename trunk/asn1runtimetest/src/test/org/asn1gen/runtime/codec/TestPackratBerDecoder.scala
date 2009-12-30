@@ -149,6 +149,84 @@ class TestPackratBerDecoder {
     }
   }
   
+  @Test
+  def test_tlTag_04(): Unit = {
+    val data = Array[Byte](0x20.toByte)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(true, triplet.constructed)
+        assertEquals(0, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_05(): Unit = {
+    val data = Array[Byte](24)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(24, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_06(): Unit = {
+    val data = Array[Byte](31, 42)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(42, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_07(): Unit = {
+    val data = Array[Byte](31, 0x80.toByte, 42)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(42, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_08(): Unit = {
+    val data = Array[Byte](31, 0x81.toByte, 0x7f)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(255, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_09(): Unit = {
+    val data = Array[Byte](31, 0xd4.toByte, 0xd5.toByte, 0x55.toByte)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(1387221, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
   
   @Test
   def test_tl_01(): Unit = {
