@@ -20,7 +20,8 @@ trait PackratBerDecoder extends PackratParsers {
     elem("Leading tag-length byte", c => (c & 31) == 31)
 
   def tlTagContinuingByte: Parser[Byte] =
-    elem("Continuing tag-length byte", c => (c & 0x80) != 0)
+    ( elem("Continuing tag-length byte", c => (c & 0x80) != 0)
+    ) ^^ { v => (v & 0x7f).toByte }
 
   def tlTagEndingByte: Parser[Byte] =
     elem("Ending tag-length byte", c => (c & 0x80) == 0)
@@ -47,8 +48,8 @@ trait PackratBerDecoder extends PackratParsers {
           case 3 => TagClass.Private
         }
         val tagConstructed = (firstTagByte & 0x20) != 0
-        var tagValue =
-          (continuing.foldLeft(firstTagByte & 0x1f)((a, b) => a | (b << 7)) << 7) | ending
+        val init = continuing.foldLeft(0)((a, b) => (a << 7) | b)
+        var tagValue = (init << 7) | ending
         Triplet(tagClass, tagConstructed, tagValue, 0)
       }
     )
