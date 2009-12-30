@@ -1,17 +1,12 @@
 package org.asn1gen.runtime.codec
 
 import scala.util.parsing.combinator._
+import org.asn1gen.parsing.ParsersUtil
 
-trait PackratBerDecoder extends PackratParsers {
+trait PackratBerDecoder extends PackratParsers with ParsersUtil {
   type Elem = Byte
   
-  /*def byte(value: Byte): Parser[Byte] = elem("byte " + value) {
-    case `value` => value
-  }
-  
-  def byte: Parser[Byte] = elem("byte") {
-    case value: Byte => value
-  }*/
+  // Tag-Length Header
   
   def tlTagLoneByte: Parser[Byte] =
     elem("Lone tag-length byte", c => (c & 31) != 31)
@@ -73,4 +68,29 @@ trait PackratBerDecoder extends PackratParsers {
   def tl =
     ( tlTag ~ tlLength
     ) ^^ { case tag ~ length => tag.copy(length = length) }
+  
+  // Value Length
+  def length = tlLength
+  
+  def length[T](p: Int => Parser[T]): Parser[T] = length >> p
+  
+  def require(f: => Boolean, errorMessage: String): Parser[Unit] =
+    if (f) {
+      success(())
+    } else {
+      throw new DecodingException(errorMessage)
+    }
+  
+  // Null
+  def _null(length: Int): Parser[Unit] =
+    ( require(length == 0, "Null value encoding must be zero length")
+    ~>success(())
+    )
+  
+  // Boolean
+  def boolean(length: Int): Parser[Boolean] = {
+    ( require(length == 1, "Boolean encoding must have length of 1 byte")
+    ~>anyElem ^^ { v => v != 0 }
+    )
+  }
 }
