@@ -98,10 +98,65 @@ class TestPackratBerDecoder {
   }
   
   @Test
-  def test_decodeTriplet_01(): Unit = {
+  def test_tlTag_00(): Unit = {
+    val data = Array[Byte](0)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(0, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_01(): Unit = {
+    val data = Array[Byte](0x40)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Application, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(0, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_02(): Unit = {
+    val data = Array[Byte](0x80.toByte)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.ContextSpecific, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(0, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_tlTag_03(): Unit = {
+    val data = Array[Byte](0xc0.toByte)
+    parse(tlTag, data) match {
+      case Success(triplet, _) =>
+        assertEquals(TagClass.Private, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
+        assertEquals(0, triplet.tagType)
+        assertEquals(0, triplet.length)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  
+  @Test
+  def test_tl_01(): Unit = {
     val data = Array[Byte](0, 1)
     parse(tl, data) match {
       case Success(triplet, _) =>
+        assertEquals(TagClass.Universal, triplet.tagClass)
+        assertEquals(false, triplet.constructed)
         assertEquals(0, triplet.tagType)
         assertEquals(1, triplet.length)
       case x => fail("Parse failure: " + x)
