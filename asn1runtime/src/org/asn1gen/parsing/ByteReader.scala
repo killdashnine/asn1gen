@@ -11,7 +11,13 @@ class ByteReader(val bytes: Array[Byte], override val offset: Int) extends Reade
 
   override def source = bytes map (_.toChar)
 
-  def first: Byte = if (offset < bytes.length) bytes(offset) else EofCh.toByte
+  def first: Byte = {
+    if (offset < bytes.length) {
+      bytes(offset)
+    } else {
+      throw EofException
+    }
+  }
   def rest: ByteReader = if (offset < bytes.length) new ByteReader(bytes, offset + 1) else this
   def pos: Position = ByteOffsetPosition(offset)
   def atEnd = offset >= bytes.length

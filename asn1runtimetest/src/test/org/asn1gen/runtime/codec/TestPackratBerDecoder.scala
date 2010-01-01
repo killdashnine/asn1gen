@@ -260,4 +260,95 @@ class TestPackratBerDecoder {
       }
     }
   }
+  
+  @Test
+  def test_boolean_00(): Unit = {
+    val data = Array[Byte](0)
+    assertThrows(classOf[DecodingException]) {
+      parse(length >> boolean, data) match {
+        case Success(result, _) => assertEquals((), result)
+        case x => fail("Parse failure: " + x)
+      }
+    }
+  }
+  
+  @Test
+  def test_boolean_01(): Unit = {
+    val data = Array[Byte](1)
+    assertThrows(classOf[DecodingException]) {
+      parse(length >> boolean, data) match {
+        case Success(result, _) => assertEquals((), result)
+        case x => throw new DecodingException("EOF unexpected")
+      }
+    }
+  }
+  
+  @Test
+  def test_boolean_02(): Unit = {
+    val data = Array[Byte](2)
+    assertThrows(classOf[DecodingException]) {
+      parse(length >> boolean, data) match {
+        case Success(result, _) => assertEquals((), result)
+        case x => fail("Parse failure: " + x)
+      }
+    }
+  }
+  
+  @Test
+  def test_boolean_03(): Unit = {
+    val data = Array[Byte](1, 0)
+    parse(length >> boolean, data) match {
+      case Success(result, _) => assertEquals(false, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_boolean_04(): Unit = {
+    val data = Array[Byte](1, 1)
+    parse(length >> boolean, data) match {
+      case Success(result, _) => assertEquals(true, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_boolean_05(): Unit = {
+    val data = Array[Byte](1, 8)
+    parse(length >> boolean, data) match {
+      case Success(result, _) => assertEquals(true, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_boolean_06(): Unit = {
+    val data = Array[Byte](1, 0xff.toByte)
+    parse(length >> boolean, data) match {
+      case Success(result, _) => assertEquals(true, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_boolean_07(): Unit = {
+    val data = Array[Byte](2)
+    assertThrows(classOf[DecodingException]) {
+      parse(length >> boolean, data) match {
+        case Success(result, _) => assertEquals((), result)
+        case x => fail("Parse failure: " + x)
+      }
+    }
+  }
+  
+  @Test
+  def test_boolean_08(): Unit = {
+    val data = Array[Byte](2, 0, 0)
+    assertThrows(classOf[DecodingException]) {
+      parse(length >> boolean, data) match {
+        case Success(result, _) => assertEquals((), result)
+        case x => fail("Parse failure: " + x)
+      }
+    }
+  }
 }

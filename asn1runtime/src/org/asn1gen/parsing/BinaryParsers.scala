@@ -12,6 +12,30 @@ trait BinaryParsers extends Parsers with ParsersUtil {
     case _ => new ByteReader(x)
   }
 
+  override def acceptIf(p: Elem => Boolean)(err: Elem => String): Parser[Elem] = Parser { in =>
+    try {
+      if (p(in.first)) {
+        Success(in.first, in.rest)
+      } else {
+        Failure(err(in.first), in)
+      }
+    } catch {
+      case e if e eq EofException => Failure("EOF unexpected", in)
+    }
+  }
+  
+  override def acceptMatch[U](expected: String, f: PartialFunction[Elem, U]): Parser[U] = Parser{ in =>
+    try {
+      if (f.isDefinedAt(in.first)) {
+        Success(f(in.first), in.rest)
+      } else {
+        Failure(expected + " expected", in)
+      }
+    } catch {
+      case e if e eq EofException => Failure("EOF unexpected: " + expected + " expected", in)
+    }
+  }
+  
   def toInt(bytes: Seq[Byte]): Int = bytes.foldLeft(0)((x, b) => (x << 8) + (b & 0xFF))
   def toLong(bytes: Seq[Byte]): Long = bytes.foldLeft(0L)((x, b) => (x << 8) + (b & 0xFF))
 

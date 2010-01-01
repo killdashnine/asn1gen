@@ -3,7 +3,7 @@ package org.asn1gen.parsing
 import scala.util.parsing.combinator._
 
 trait ParsersUtil extends Parsers {
-  lazy val anyElem: Parser[Elem] = elem("anyElem", _ => true)
+  lazy val anyElem: Parser[Elem] = elem("anyElem", {_ => true})
   def elemExcept(xs: Elem*): Parser[Elem] = elem("elemExcept", x => !(xs contains x))
   def elemOf(xs: Elem*): Parser[Elem] = elem("elemOf", xs contains _)
 
