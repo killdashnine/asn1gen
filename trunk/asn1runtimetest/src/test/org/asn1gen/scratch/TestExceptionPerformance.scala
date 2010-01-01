@@ -10,13 +10,13 @@ class TestExceptionPerformance {
     println(msg + ": " + (after - before))
   }
   
-  @Ignore("Don't run expensive test")
+  //@Ignore("Don't run expensive test")
   @Test
   def test_noexceptions_01(): Unit = {
     var collection = new scala.collection.mutable.Stack[Int]()
     def a(i: Int) {
       if (i > 0) a(i - 1) else 0
-      collection.push(i)
+      //collection.push(i)
       if (collection.size > 100) {
         collection = new scala.collection.mutable.Stack[Int]()
       }
@@ -30,7 +30,7 @@ class TestExceptionPerformance {
     }
   }
 
-  @Ignore("Don't run expensive test")
+  //@Ignore("Don't run expensive test")
   @Test
   def test_exceptions_01(): Unit = {
     def noop() {
@@ -52,7 +52,7 @@ class TestExceptionPerformance {
     }
   }
 
-  @Ignore("Don't run expensive test")
+  //@Ignore("Don't run expensive test")
   @Test
   def test_sameexception_01(): Unit = {
     val exception = new Exception()
@@ -74,4 +74,38 @@ class TestExceptionPerformance {
       }
     }
   }
+
+  //@Ignore("Don't run expensive test")
+  @Test
+  def test_catch_only_08(): Unit = {
+    val exception = new Exception()
+    var collection = new scala.collection.mutable.Stack[Int]()
+    var x = 0
+    def a(i: Int) {
+      try {
+        if (i > 0) {
+          a(i - 1)
+        } else {
+          x += 1
+          if (x % 1000 == 0) {
+            throw exception
+          }
+        }
+        //collection.push(i)
+        if (collection.size > 100) {
+          collection = new scala.collection.mutable.Stack[Int]()
+        }
+      } catch {
+        case e => ()
+      }
+    }
+    
+    measure("catch only") {
+      val before = 1
+      0 to 100000 foreach { i =>
+        a(100)
+      }
+    }
+  }
+
 }

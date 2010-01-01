@@ -2,10 +2,9 @@ package org.asn1gen.runtime.codec
 
 import scala.util.parsing.combinator._
 import org.asn1gen.parsing.ParsersUtil
+import org.asn1gen.parsing.BinaryParsers
 
-trait PackratBerDecoder extends PackratParsers with ParsersUtil {
-  type Elem = Byte
-  
+trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUtil {
   // Tag-Length Header
   
   def tlTagLoneByte: Parser[Byte] =
@@ -61,7 +60,6 @@ trait PackratBerDecoder extends PackratParsers with ParsersUtil {
     ) ^^ { case continuing ~ ending =>
       val init = continuing.foldLeft(0.toInt)((a, b) => (a << 7) | b)
       val result = (init << 7) | ending.toInt
-      println("result = " + result)
       result
     }
   
@@ -93,4 +91,12 @@ trait PackratBerDecoder extends PackratParsers with ParsersUtil {
     ~>anyElem ^^ { v => v != 0 }
     )
   }
+  
+  // Integer
+  def integer(length: Int): Parser[Long] =
+    ( require(length == 1, "Boolean encoding must have length of 1 byte")
+    ~>repN(length, anyElem)
+    ) ^^ { bytes =>
+      bytes.tail.foldLeft(bytes.head.toLong) { (a, b) => (a << 8) | b }
+    }
 }
