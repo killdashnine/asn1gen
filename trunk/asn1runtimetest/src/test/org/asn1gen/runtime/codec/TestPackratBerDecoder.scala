@@ -427,4 +427,103 @@ class TestPackratBerDecoder {
       case _ => fail("Error expected")
     }
   }
+  
+  @Test
+  def test_real_00(): Unit = {
+    val data = Array[Byte]()
+    parse(real(0), data) match {
+      case Success(result, _) => assertEquals(0.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_01(): Unit = {
+    val data = Array[Byte](64.toByte)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(Double.PositiveInfinity, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_02(): Unit = {
+    val data = Array[Byte](65.toByte)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(Double.NegativeInfinity, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_03(): Unit = {
+    val data = Array.concat(Array[Byte](1), "3".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(3.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_04(): Unit = {
+    val data = Array.concat(Array[Byte](1), "-1".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(-1.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_05(): Unit = {
+    val data = Array.concat(Array[Byte](1), "+1000".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(1000.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_06(): Unit = {
+    val data = Array.concat(Array[Byte](2), "3.0".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(3.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_07(): Unit = {
+    val data = Array.concat(Array[Byte](2), "-1.3".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(-1.3, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_08(): Unit = {
+    val data = Array.concat(Array[Byte](2), "-.3".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(-0.3, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_09(): Unit = {
+    val data = Array.concat(Array[Byte](2), "3.0E1".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(30.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_10(): Unit = {
+    val data = Array.concat(Array[Byte](2), "123E+100".map{c => c.toByte}.toArray)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(123e+100, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
 }
