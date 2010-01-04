@@ -526,4 +526,15 @@ class TestPackratBerDecoder {
       case x => fail("Parse failure: " + x)
     }
   }
+  
+  @Test
+  def test_real_11(): Unit = {
+    // length     header     exponent   number
+    // 0000 0011  1000 0000  0000 0000  0000 0001
+    val data = Array[Byte](3, 0x80.toByte, 0, 1)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(123e+100, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
 }
