@@ -106,6 +106,13 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
   // Real
   def realSpecByte: Parser[Byte] = anyElem
   
+  def realDataNumber(length: Int): Parser[Int] =
+    ( require(length > 0, "Integer encoding must have length of at least 1 byte")
+    ~>repN(length, anyElem)
+    ) ^^ { bytes =>
+      bytes.foldLeft(0) { (a, b) => (a << 8) | (b & 0xff) }
+    }
+  
   def realData(length: Int)(spec: Byte): Parser[Double] = {
     if ((spec & 0xc0) == 0) {
       if (spec == 1) {
@@ -124,8 +131,31 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
         // This needs to be properly coded to reject more possibilities.
         failure("Not a valid NR encoding")
       }
-    } else if ((spec & 0x80) != 0) {
-      failure("Not a valid NR encoding")
+    } else if ((spec & 0x80.toByte) != 0) {
+      val sign = if ((spec & 0x40.toByte) != 0) -1 else 1
+      val base = ((spec >> 4) & 0x3) match {
+        case 0 => 2
+        case 1 => 8
+        case 2 => 16
+        case _ => 32 // TODO: This should be decoding error.
+      }
+      val scale = (spec >> 2) & 0x3
+      val exponent = (spec & 0x3) + 1
+      if (exponent == 4) {
+        ( realDataNumber(length)
+        ) ^^ { number =>
+          sign * Math.pow(2, scale) * base * exponent * number 
+        }
+      } else {
+        ( anyElem
+        >>{ exponentLength =>
+            ( realDataNumber(exponentLength) ~ realDataNumber(length - exponentLength)
+            ) ^^ { case exponent ~ number =>
+              sign * Math.pow(2, scale) * base * exponent * number
+            }
+          }
+        )
+      }
     } else {
       failure("Not a valid NR encoding")
     }
