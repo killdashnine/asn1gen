@@ -351,4 +351,80 @@ class TestPackratBerDecoder {
       }
     }
   }
+  
+  @Test
+  def test_integer_00(): Unit = {
+    val data = Array[Byte](100.toByte)
+    parse(integer(1), data) match {
+      case Success(result, _) => assertEquals(100, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_integer_01(): Unit = {
+    val data = Array[Byte](156.toByte)
+    parse(integer(1), data) match {
+      case Success(result, _) => assertEquals(-100, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_integer_02(): Unit = {
+    val data = Array[Byte](105.toByte, 186.toByte)
+    parse(integer(2), data) match {
+      // 0110 1001 1011 1010
+      case Success(result, _) => assertEquals(27066, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_integer_03(): Unit = {
+    val data = Array[Byte](150.toByte, 70.toByte)
+    parse(integer(2), data) match {
+      case Success(result, _) => assertEquals(-27066, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_integer_04(): Unit = {
+    val data = Array[Byte](8.toByte, 4.toByte, 2.toByte, 1.toByte)
+    parse(integer(4), data) match {
+      case Success(result, _) => assertEquals(134480385, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_integer_05(): Unit = {
+    // 1000 0000 0100 0000 0010 0000 0010 0000
+    val data = Array[Byte](127.toByte, 191.toByte, 223.toByte, 240.toByte)
+    parse(integer(4), data) match {
+      case Success(result, _) => assertEquals(2143281136, result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_integer_06(): Unit = {
+    // 1000 0000 0100 0000 0010 0000 0010 0000
+    val data = Array[Byte](127.toByte, 191.toByte, 223.toByte, 240.toByte)
+    parse(integer(3), data) match {
+      case Failure("end of input expected", _) => ()
+      case _ => fail("Error expected")
+    }
+  }
+  
+  @Test
+  def test_integer_07(): Unit = {
+    // 1000 0000 0100 0000 0010 0000 0010 0000
+    val data = Array[Byte](127.toByte, 191.toByte, 223.toByte, 240.toByte)
+    parse(integer(5), data) match {
+      case Failure("EOF unexpected", y) => ()
+      case _ => fail("Error expected")
+    }
+  }
 }

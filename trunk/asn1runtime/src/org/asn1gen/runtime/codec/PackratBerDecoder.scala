@@ -94,9 +94,26 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
   
   // Integer
   def integer(length: Int): Parser[Long] =
-    ( require(length == 1, "Boolean encoding must have length of 1 byte")
+    ( require(length > 0, "Integer encoding must have length of at least 1 byte")
     ~>repN(length, anyElem)
     ) ^^ { bytes =>
-      bytes.tail.foldLeft(bytes.head.toLong) { (a, b) => (a << 8) | b }
+      bytes.tail.foldLeft(bytes.head.toLong) { (a, b) => (a << 8) | (b & 0xff) }
     }
+  
+  // Enumeration
+  def enumeration(length: Int): Parser[Long] = integer(length)
+  
+  // Real
+  def real(length: Int): Parser[Double] = {
+    if (length == 0) {
+      success(0)
+    } else if (length == 1) {
+      ( anyElem
+      ) ^^ { value =>
+        value // TODO: plus minus infinity
+      }
+    } else {
+      success(0)
+    }
+  }
 }
