@@ -104,16 +104,45 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
   def enumeration(length: Int): Parser[Long] = integer(length)
   
   // Real
+  def realSpecByte: Parser[Byte] = anyElem
+  
+  def realData(length: Int)(spec: Byte): Parser[Double] = {
+    if ((spec & 0xc0) == 0) {
+      if (spec == 1) {
+        // This needs to be properly coded to reject more possibilities.
+        ( repN(length, anyElem)
+        ) ^^ { bytes => java.lang.Double.parseDouble(new String(bytes.toArray)) }
+      } else if (spec == 2) {
+        // This needs to be properly coded to reject more possibilities.
+        ( repN(length, anyElem)
+        ) ^^ { bytes => java.lang.Double.parseDouble(new String(bytes.toArray)) }
+      } else if (spec == 3) {
+        // This needs to be properly coded to reject more possibilities.
+        ( repN(length, anyElem)
+        ) ^^ { bytes => java.lang.Double.parseDouble(new String(bytes.toArray)) }
+      } else {
+        // This needs to be properly coded to reject more possibilities.
+        failure("Not a valid NR encoding")
+      }
+    } else if ((spec & 0x80) != 0) {
+      failure("Not a valid NR encoding")
+    } else {
+      failure("Not a valid NR encoding")
+    }
+  }
+  
   def real(length: Int): Parser[Double] = {
     if (length == 0) {
       success(0)
     } else if (length == 1) {
       ( anyElem
-      ) ^^ { value =>
-        value // TODO: plus minus infinity
+      ) ^? {
+        case value if value == 64.toByte => Double.PositiveInfinity
+        case value if value == 65.toByte => Double.NegativeInfinity
       }
     } else {
-      success(0)
+      ( anyElem >> realData(length - 1)
+      )
     }
   }
 }
