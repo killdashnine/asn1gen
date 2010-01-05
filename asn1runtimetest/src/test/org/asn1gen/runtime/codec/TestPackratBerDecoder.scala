@@ -529,11 +529,66 @@ class TestPackratBerDecoder {
   
   @Test
   def test_real_11(): Unit = {
-    // length     header     exponent   number
-    // 0000 0011  1000 0000  0000 0000  0000 0001
-    val data = Array[Byte](3, 0x80.toByte, 0, 1)
+    // header     exponent   number
+    // 1000 0000  0000 0000  0000 0001
+    val data = Array[Byte](0x80.toByte, 0, 1)
     parse(real(data.length), data) match {
-      case Success(result, _) => assertEquals(123e+100, result, 0.0)
+      case Success(result, _) => assertEquals(1.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_12(): Unit = {
+    // header     exponent   number
+    // 1000 0000  0000 0000  0000 0001
+    val data = Array[Byte](0x80.toByte, 1, 1)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(2.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_13(): Unit = {
+    // header     exponent   number
+    // 1000 0000  0000 0000  0000 0001
+    val data = Array[Byte](0x80.toByte, 2, 1)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(4.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_15(): Unit = {
+    // header     exponent   number
+    // 1000 0000  0000 0000  0000 0001
+    val data = Array[Byte](0x83.toByte, 1, 0, 1)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(1.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_16(): Unit = {
+    // header     exponent   number
+    // 1000 0000  0000 0000  0000 0001
+    val data = Array[Byte](0x83.toByte, 1, 1, 1)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(2.0, result, 0.0)
+      case x => fail("Parse failure: " + x)
+    }
+  }
+  
+  @Test
+  def test_real_17(): Unit = {
+    // header     exponent   number
+    // 1000 0000  0000 0000  0000 0001
+    val data = Array[Byte](0x83.toByte, 1, 2, 1)
+    parse(real(data.length), data) match {
+      case Success(result, _) => assertEquals(4.0, result, 0.0)
       case x => fail("Parse failure: " + x)
     }
   }

@@ -140,18 +140,31 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
         case _ => 32 // TODO: This should be decoding error.
       }
       val scale = (spec >> 2) & 0x3
-      val exponent = (spec & 0x3) + 1
-      if (exponent == 4) {
-        ( realDataNumber(length)
-        ) ^^ { number =>
-          sign * Math.pow(2, scale) * base * exponent * number 
+      val exponentLength = (spec & 0x3) + 1
+      if (exponentLength != 4) {
+        println("AAA")
+        ( realDataNumber(exponentLength) ~ realDataNumber(length - 1)
+        ) ^^ { case exponent ~ number =>
+          println("sign: " + sign)
+          println("scale: " + scale)
+          println("base: " + base)
+          println("exponent: " + exponent)
+          println("number: " + number)
+          sign * Math.pow(2, scale) * Math.pow(base, exponent) * number 
         }
       } else {
+        println("BBB: " + spec)
         ( anyElem
         >>{ exponentLength =>
-            ( realDataNumber(exponentLength) ~ realDataNumber(length - exponentLength)
+            println("exponentLength: " + exponentLength)
+            ( realDataNumber(exponentLength) ~ realDataNumber(length - exponentLength - 1)
             ) ^^ { case exponent ~ number =>
-              sign * Math.pow(2, scale) * base * exponent * number
+              println("sign: " + sign)
+              println("scale: " + scale)
+              println("base: " + base)
+              println("exponent: " + exponent)
+              println("number: " + number)
+              sign * Math.pow(2, scale) * Math.pow(base, exponent) * number
             }
           }
         )
