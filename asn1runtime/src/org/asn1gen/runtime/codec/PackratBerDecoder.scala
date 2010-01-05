@@ -5,6 +5,12 @@ import org.asn1gen.parsing.ParsersUtil
 import org.asn1gen.parsing.BinaryParsers
 
 trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUtil {
+  type AsnBoolean
+  type AsnInteger
+  type AsnNull
+  type AsnOctetString
+  type AsnReal
+  
   // Tag-Length Header
   
   def tlTagLoneByte: Parser[Byte] =
@@ -80,20 +86,19 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
     }
   
   // Null
-  def _null(length: Int): Parser[Unit] =
+  def rawNull(length: Int): Parser[Unit] =
     ( require(length == 0, "Null value encoding must be zero length")
     ~>success(())
     )
   
   // Boolean
-  def boolean(length: Int): Parser[Boolean] = {
+  def rawBoolean(length: Int): Parser[Boolean] =
     ( require(length == 1, "Boolean encoding must have length of 1 byte")
     ~>anyElem ^^ { v => v != 0 }
     )
-  }
   
   // Integer
-  def integer(length: Int): Parser[Long] =
+  def rawInteger(length: Int): Parser[Long] =
     ( require(length > 0, "Integer encoding must have length of at least 1 byte")
     ~>repN(length, anyElem)
     ) ^^ { bytes =>
@@ -101,19 +106,19 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
     }
   
   // Enumeration
-  def enumeration(length: Int): Parser[Long] = integer(length)
+  def rawEnumeration(length: Int): Parser[Long] = rawInteger(length)
   
   // Real
-  def realSpecByte: Parser[Byte] = anyElem
+  def rawRealSpecByte: Parser[Byte] = anyElem
   
-  def realDataNumber(length: Int): Parser[Int] =
+  def rawRealDataNumber(length: Int): Parser[Int] =
     ( require(length > 0, "Integer encoding must have length of at least 1 byte")
     ~>repN(length, anyElem)
     ) ^^ { bytes =>
       bytes.foldLeft(0) { (a, b) => (a << 8) | (b & 0xff) }
     }
   
-  def realData(length: Int)(spec: Byte): Parser[Double] = {
+  def rawRealData(length: Int)(spec: Byte): Parser[Double] = {
     if ((spec & 0xc0) == 0) {
       if (spec == 1) {
         // This needs to be properly coded to reject more possibilities.
@@ -143,7 +148,7 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
       val exponentLength = (spec & 0x3) + 1
       if (exponentLength != 4) {
         println("AAA")
-        ( realDataNumber(exponentLength) ~ realDataNumber(length - 1)
+        ( rawRealDataNumber(exponentLength) ~ rawRealDataNumber(length - 1)
         ) ^^ { case exponent ~ number =>
           println("sign: " + sign)
           println("scale: " + scale)
@@ -157,7 +162,7 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
         ( anyElem
         >>{ exponentLength =>
             println("exponentLength: " + exponentLength)
-            ( realDataNumber(exponentLength) ~ realDataNumber(length - exponentLength - 1)
+            ( rawRealDataNumber(exponentLength) ~ rawRealDataNumber(length - exponentLength - 1)
             ) ^^ { case exponent ~ number =>
               println("sign: " + sign)
               println("scale: " + scale)
@@ -174,7 +179,7 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
     }
   }
   
-  def real(length: Int): Parser[Double] = {
+  def rawReal(length: Int): Parser[Double] = {
     if (length == 0) {
       success(0)
     } else if (length == 1) {
@@ -184,8 +189,23 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
         case value if value == 65.toByte => Double.NegativeInfinity
       }
     } else {
-      ( anyElem >> realData(length - 1)
+      ( anyElem >> rawRealData(length - 1)
       )
     }
   }
+  
+  // OctetString
+  def rawOctetString(length: Int): Parser[List[Byte]] = repN(length, anyElem)
+  
+  def asnBoolean(length: Int): Parser[AsnBoolean] = rawBoolean(length) ^^ mkAsnBoolean
+  def asnInteger(length: Int): Parser[AsnInteger] = rawInteger(length) ^^ mkAsnInteger
+  def asnNull(length: Int): Parser[AsnNull] = rawNull(length) ^^ mkAsnNull
+  def asnOctetString(length: Int): Parser[AsnOctetString] = rawOctetString(length) ^^ mkAsnOctetString
+  def asnReal(length: Int): Parser[AsnReal] = rawReal(length) ^^ mkAsnReal
+  
+  def mkAsnBoolean(value: Boolean): AsnBoolean
+  def mkAsnInteger(value: Long): AsnInteger
+  def mkAsnNull(value: Unit): AsnNull
+  def mkAsnOctetString(value: List[Byte]): AsnOctetString
+  def mkAsnReal(value: Double): AsnReal
 }
