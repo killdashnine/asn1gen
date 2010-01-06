@@ -210,4 +210,19 @@ package test.asn1.genruntime {
   }
   
   object OnMySequence extends OnMySequence(OnAsnInteger, OnAsnInteger)
+  
+  import org.asn1gen.runtime.codec.PackratBerDecoder
+  
+  trait MyPackratBerDecoder extends PackratBerDecoder {
+    type MySequence
+    
+    def mySequence(length: Int): Parser[MySequence] = {
+      ( tl >> { triplet => 
+          asnInteger(triplet.length)
+        }
+      )
+    } ^^ mkMySequence
+    
+    def mkMySequence(field0: AsnInteger): MySequence
+  }
 }
