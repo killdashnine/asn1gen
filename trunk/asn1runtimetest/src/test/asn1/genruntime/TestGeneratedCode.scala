@@ -217,12 +217,24 @@ package test.asn1.genruntime {
     type MySequence
     
     def mySequence(length: Int): Parser[MySequence] = {
-      ( tl >> { triplet => 
-          asnInteger(triplet.length)
+      ( offset
+      >>{ offset =>
+          val wall = offset + length
+          ( ( tl
+            >>{ triplet => 
+                asnInteger(triplet.length)
+              } <~ offsetWall(wall)
+            )
+          ~ ( tl
+            >>{ triplet => 
+                asnInteger(triplet.length)
+              } <~ offsetWall(wall)
+            )
+          ) <~ atOffset(wall)
         }
       )
     } ^^ mkMySequence
     
-    def mkMySequence(field0: AsnInteger): MySequence
+    def mkMySequence(data: AsnInteger ~ AsnInteger): MySequence
   }
 }
