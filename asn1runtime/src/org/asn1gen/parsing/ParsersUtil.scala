@@ -11,4 +11,20 @@ trait ParsersUtil extends Parsers {
   def takeUntil(cond: Parser[Elem]): Parser[Seq[Elem]] = takeUntil(cond, anyElem)
   def takeUntil(cond: Parser[Elem], p: Parser[Elem]): Parser[Seq[Elem]] = rep(not(cond) ~> p)
   def takeWhile(p: Parser[Elem]): Parser[Seq[Elem]] = rep(p)
+  
+  def offsetWall(value: Int): Parser[Unit] = Parser { in =>
+    if (value - in.offset < 0) {
+      Success((), in)
+    } else {
+      Failure("Offset wall exceeded", in)
+    }
+  }
+  
+  def offset(value: Int): Parser[Unit] = Parser { in =>
+    if (value == in.offset) {
+      Success((), in)
+    } else {
+      Failure("Not at expected offset", in)
+    }
+  }
 }
