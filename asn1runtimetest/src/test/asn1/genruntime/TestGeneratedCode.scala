@@ -2,6 +2,7 @@ package test.asn1.genruntime {
   import org.asn1gen.runtime._
   import org.asn1gen.runtime.codec._
   import org.asn1gen.runtime.codec.async._
+  import scala.util.parsing.combinator.Parsers
 
   case class Empty() extends AsnSequence {
   }
@@ -236,5 +237,10 @@ package test.asn1.genruntime {
     } ^^ mkMySequence
     
     def mkMySequence(data: AsnInteger ~ AsnInteger): MySequence
+  }
+  
+  trait MyPackratBerRealiser extends PackratBerRealiser with Parsers {
+    type MySequence = (Long, Long)
+    def mkMySequence(value: Long ~ Long): MySequence = value match { case a ~ b => (a, b) }
   }
 }
