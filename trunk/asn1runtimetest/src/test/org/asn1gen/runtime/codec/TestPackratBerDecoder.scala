@@ -592,4 +592,15 @@ class TestPackratBerDecoder {
       case x => fail("Parse failure: " + x)
     }
   }
+  
+  @Test
+  def test_asnOctetString_00(): Unit = {
+    // header     exponent   number
+    // 1000 0000  0000 0000  0000 0001
+    val data = Array[Byte]('a'.toByte, 'b'.toByte, 'c'.toByte)
+    parse(asnOctetString(data.length), data) match {
+      case Success(result, _) => assertEquals(List('a'.toByte, 'b'.toByte, 'c'.toByte), result)
+      case x => fail("Parse failure: " + x)
+    }
+  }
 }
