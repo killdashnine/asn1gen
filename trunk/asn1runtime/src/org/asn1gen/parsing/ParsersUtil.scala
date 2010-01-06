@@ -15,7 +15,7 @@ trait ParsersUtil extends Parsers {
   def offset: Parser[Int] = Parser { in => Success(in.offset, in) }
   
   def offsetWall(offset: Int): Parser[Unit] = Parser { in =>
-    if (offset - in.offset <= 0) {
+    if (offset - in.offset >= 0) {
       Success((), in)
     } else {
       Failure("Offset wall breached", in)
