@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses(Array
     ( classOf[TestBerDecoder]
     , classOf[TestOctetWindow]
+    , classOf[TestMyPackratBerDecoder]
     , classOf[TestPackratBerDecoder]
     , classOf[TestSpecs]
     )
