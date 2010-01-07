@@ -1,6 +1,6 @@
 package org.asn1gen.runtime
 
-sealed class AsnNull {
+sealed case class AsnNull {
 }
 
 object AsnNull extends AsnNull

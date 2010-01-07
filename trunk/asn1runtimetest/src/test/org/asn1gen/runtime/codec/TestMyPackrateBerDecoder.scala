@@ -22,7 +22,7 @@ class TestMyPackratBerDecoder {
   @Test
   def test_tlLength_00(): Unit = {
     val data = Array[Byte](0)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(0, length)
       case x => fail("Parse failure: " + x)
@@ -36,10 +36,12 @@ class TestMyPackratBerDecoder {
     // 1000 0000  0000 0000  0000 0001
     val data = Array[Byte](
       0x80.toByte, 1, 42,
-      0x81.toByte, 1, 43
+      0x81.toByte, 4, 0x83.toByte, 1, 1, 1,
+      0x82.toByte, 3, 'a'.toByte, 'b'.toByte, 'c'.toByte,
+      0x83.toByte, 2, 0x80.toByte, 0
     )
     parse(mySequence(data.length), data) match {
-      case Success(result, _) => assertEquals((42, 43), result)
+      case Success(result, _) => assertEquals((Some(42), 2.0, "abc", test.asn1.genruntime.MyChoice_choice0(AsnNull)), result)
       case x => fail("Parse failure: " + x)
     }
   }

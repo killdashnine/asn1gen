@@ -1,5 +1,6 @@
 package org.asn1gen.parsing
 
+import org.asn1gen.extra.ParsersExtra
 import scala.util.parsing.combinator._
 
 trait ParsersUtil extends Parsers {
@@ -12,7 +13,7 @@ trait ParsersUtil extends Parsers {
   def takeUntil(cond: Parser[Elem], p: Parser[Elem]): Parser[Seq[Elem]] = rep(not(cond) ~> p)
   def takeWhile(p: Parser[Elem]): Parser[Seq[Elem]] = rep(p)
   
-  def offset: Parser[Int] = Parser { in => Success(in.offset, in) }
+  def getOffset: Parser[Int] = Parser { in => Success(in.offset, in) }
   
   def offsetWall(offset: Int): Parser[Unit] = Parser { in =>
     if (offset - in.offset >= 0) {
@@ -27,6 +28,14 @@ trait ParsersUtil extends Parsers {
       Success((), in)
     } else {
       Failure("Not at expected offset", in)
+    }
+  }
+
+  def where[T](f: T => Boolean)(v: T): Parser[T] = {
+    if (f(v)) {
+      success(v)
+    } else {
+      failure("Requirement failed")
     }
   }
 }

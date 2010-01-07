@@ -3,31 +3,35 @@ package org.asn1gen.runtime.codec
 import scala.util.parsing.combinator._
 import org.asn1gen.parsing.ParsersUtil
 import org.asn1gen.parsing.BinaryParsers
+import org.asn1gen.extra.ParsersExtra
 
 trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUtil {
   type AsnBoolean
   type AsnInteger
   type AsnNull
   type AsnOctetString
+  type AsnPrintableString
   type AsnReal
   
+  implicit def parsersToParsersExtra(parsers: Parsers) = ParsersExtra(parsers)
+
   // Tag-Length Header
   
-  def tlTagLoneByte: Parser[Byte] =
+  def rawTagHeaderLoneByte: Parser[Byte] =
     elem("Lone tag-length byte", c => (c & 31) != 31)
 
-  def tlTagLeadingByte: Parser[Byte] =
+  def rawTagHeaderLeadingByte: Parser[Byte] =
     elem("Leading tag-length byte", c => (c & 31) == 31)
 
-  def tlTagContinuingByte: Parser[Byte] =
+  def rawTagHeaderContinuingByte: Parser[Byte] =
     ( elem("Continuing tag-length byte", c => (c & 0x80) != 0)
     ) ^^ { v => (v & 0x7f).toByte }
 
-  def tlTagEndingByte: Parser[Byte] =
+  def rawTagHeaderEndingByte: Parser[Byte] =
     elem("Ending tag-length byte", c => (c & 0x80) == 0)
 
-  def tlTag: Parser[Triplet] =
-    ( ( tlTagLoneByte
+  lazy val rawTagHeader: Parser[TagHeader] =
+    ( ( rawTagHeaderLoneByte
       ) ^^ { firstTagByte =>
         val tagClass = ((firstTagByte >> 6) & 0x3) match {
           case 0 => TagClass.Universal
@@ -37,9 +41,9 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
         }
         val tagConstructed = (firstTagByte & 0x20) != 0
         var tagValue = firstTagByte & 0x1f
-        Triplet(tagClass, tagConstructed, tagValue, 0)
+        TagHeader(tagClass, tagConstructed, tagValue)
       }
-    | ( tlTagLeadingByte ~ tlTagContinuingByte.* ~ tlTagEndingByte
+    | ( rawTagHeaderLeadingByte ~ rawTagHeaderContinuingByte.* ~ rawTagHeaderEndingByte
       ) ^^ { case firstTagByte ~ continuing ~ ending =>
         val tagClass = ((firstTagByte >> 6) & 0x3) match {
           case 0 => TagClass.Universal
@@ -50,33 +54,27 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
         val tagConstructed = (firstTagByte & 0x20) != 0
         val init = continuing.foldLeft(0)((a, b) => (a << 7) | b)
         var tagValue = (init << 7) | ending
-        Triplet(tagClass, tagConstructed, tagValue, 0)
+        TagHeader(tagClass, tagConstructed, tagValue)
       }
     )
   
-  def tlLengthContinuingByte: Parser[Byte] =
+  def rawLengthContinuingByte: Parser[Byte] =
     ( elem("Leading tag-length length byte", c => (c & 0x80) != 0)
     ) ^^ { byte => (byte & 0x7f).toByte }
   
-  def tlLengthEndingByte: Parser[Byte] =
+  def rawLengthEndingByte: Parser[Byte] =
     elem("Leading tag-length length byte", c => (c & 0x80) == 0)
   
-  def tlLength: Parser[Int] =
-    ( tlLengthContinuingByte.* ~ tlLengthEndingByte
+  def rawLength: Parser[Int] =
+    ( rawLengthContinuingByte.* ~ rawLengthEndingByte
     ) ^^ { case continuing ~ ending =>
       val init = continuing.foldLeft(0.toInt)((a, b) => (a << 7) | b)
       val result = (init << 7) | ending.toInt
       result
     }
   
-  def tl =
-    ( tlTag ~ tlLength
-    ) ^^ { case tag ~ length => tag.copy(length = length) }
-  
   // Value Length
-  def length = tlLength
-  
-  def length[T](p: Int => Parser[T]): Parser[T] = length >> p
+  def rawLength[T](p: Int => Parser[T]): Parser[T] = rawLength >> p
   
   def require(f: => Boolean, errorMessage: String): Parser[Unit] =
     if (f) {
@@ -196,16 +194,19 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
   
   // OctetString
   def rawOctetString(length: Int): Parser[List[Byte]] = repN(length, anyElem)
+  def rawPrintableString(length: Int): Parser[List[Byte]] = repN(length, anyElem)
   
   def asnBoolean(length: Int): Parser[AsnBoolean] = rawBoolean(length) ^^ mkAsnBoolean
   def asnInteger(length: Int): Parser[AsnInteger] = rawInteger(length) ^^ mkAsnInteger
   def asnNull(length: Int): Parser[AsnNull] = rawNull(length) ^^ mkAsnNull
   def asnOctetString(length: Int): Parser[AsnOctetString] = rawOctetString(length) ^^ mkAsnOctetString
+  def asnPrintableString(length: Int): Parser[AsnPrintableString] = rawPrintableString(length) ^^ mkAsnPrintableString
   def asnReal(length: Int): Parser[AsnReal] = rawReal(length) ^^ mkAsnReal
   
   def mkAsnBoolean(value: Boolean): AsnBoolean
   def mkAsnInteger(value: Long): AsnInteger
   def mkAsnNull(value: Unit): AsnNull
   def mkAsnOctetString(value: List[Byte]): AsnOctetString
+  def mkAsnPrintableString(value: List[Byte]): AsnPrintableString
   def mkAsnReal(value: Double): AsnReal
 }
