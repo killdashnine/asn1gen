@@ -8,7 +8,7 @@ object ScalaCodeUser {
         Some(AsnInteger(1)),
         AsnReal(1.0),
         AsnPrintableString("Hello world"),
-        MyChoice_choice1(AsnInteger(2)))
+        MyChoice.Choice1(AsnInteger(2)))
     val mySequence2 =
       ( mySequence
           .field0{
