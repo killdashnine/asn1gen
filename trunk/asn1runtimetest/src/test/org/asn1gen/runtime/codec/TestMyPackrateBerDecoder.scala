@@ -41,7 +41,7 @@ class TestMyPackratBerDecoder {
       0x83.toByte, 2, 0x80.toByte, 0
     )
     parse(mySequence(data.length), data) match {
-      case Success(result, _) => assertEquals((Some(42), 2.0, "abc", test.asn1.genruntime.MyChoice_choice0(AsnNull)), result)
+      case Success(result, _) => assertEquals((Some(42), 2.0, "abc", test.asn1.genruntime.MyChoice.Choice0(AsnNull)), result)
       case x => fail("Parse failure: " + x)
     }
   }

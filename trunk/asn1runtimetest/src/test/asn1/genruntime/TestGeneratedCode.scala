@@ -22,7 +22,7 @@ package test.asn1.genruntime {
     Some(AsnInteger),
     AsnReal,
     AsnPrintableString,
-    MyChoice
+    MyChoice.default
   ) {
   }
 
@@ -38,37 +38,35 @@ package test.asn1.genruntime {
     def choice2: Option[AsnReal] = None
 
     def choice0(f: (MyChoice => AsnNull)): MyChoice =
-      MyChoice_choice0(f(this))
+      MyChoice.Choice0(f(this))
 
     def choice1(f: (MyChoice => AsnInteger)): MyChoice =
-      MyChoice_choice1(f(this))
+      MyChoice.Choice1(f(this))
 
     def choice2(f: (MyChoice => AsnReal)): MyChoice =
-      MyChoice_choice2(f(this))
+      MyChoice.Choice2(f(this))
   }
+
+  object MyChoice {
+    object default extends Choice0(AsnNull)
+    
+    case class Choice0(_element: AsnNull) extends MyChoice {
+      def _choice: Int = 0
+      
+      override def choice0: Option[AsnNull] = Some(_element)
+    }
   
-  case class MyChoice_choice0(_element: AsnNull) extends MyChoice {
-    def _choice: Int = 0
-    
-    override def choice0: Option[AsnNull] = Some(_element)
-  }
-
-  case class MyChoice_choice1(_element: AsnInteger) extends MyChoice {
-    def _choice: Int = 1
-    
-    override def choice1: Option[AsnInteger] = Some(_element)
-  }
-
-  case class MyChoice_choice2(_element: AsnReal) extends MyChoice {
-    def _choice: Int = 2
-    
-    override def choice2: Option[AsnReal] = Some(_element)
-  }
-
-  object MyChoice extends MyChoice_choice0(AsnNull) {
-    type Choice0 = MyChoice_choice0
-    type Choice1 = MyChoice_choice1
-    type Choice2 = MyChoice_choice2
+    case class Choice1(_element: AsnInteger) extends MyChoice {
+      def _choice: Int = 1
+      
+      override def choice1: Option[AsnInteger] = Some(_element)
+    }
+  
+    case class Choice2(_element: AsnReal) extends MyChoice {
+      def _choice: Int = 2
+      
+      override def choice2: Option[AsnReal] = Some(_element)
+    }
   }
 
   import org.asn1gen.runtime._
@@ -91,86 +89,7 @@ package test.asn1.genruntime {
     }
   }
   
-  /*object MySequenceWindow {
-    def decode[T](is: DecodingInputStream)(ff: (Option[AsnIntegerRaw], Double, String, MyChoiceWindow) => T): T = {
-      new MySequenceWindow(is).decode(ff)
-    }
-  }*/
-  
-  /*class MySequenceHandler(field0: AsnIntegerHandler) {
-  }*/
-  
-  /*class AsnIntegerHandler {
-    def apply(is: DecodingInputStream)(handler: Long => Unit): Unit = {
-      val value =
-        if (length == 0) {
-          0
-        } else {
-          val buffer = new Array[Byte](length)
-          is.read(buffer)
-          var acc = if (buffer(0) >= 0) 0L else -1L
-          buffer foreach { byte =>
-            acc = (acc << 8) | byte
-          }
-          acc
-        }
-      handler(value)
-    }
-  }*/
-  /*
-  class MySequenceWindow(is: DecodingInputStream) extends BerDecoder {
-    def decode(handlers: MySequenceHandler): Unit = {
-      val triplet = decodeTriplet(is)
-      var field0: Option[Boolean] = None
-      var field1: Option[Double] = None
-      var field2: Option[String] = None
-      var field3: Option[MyChoiceWindow] = None
-      decodeTriplets(is, triplet.length) { tripletsDecoder =>
-        tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 0 =>
-            handlers.field0(is)
-            Some(true)
-          case None => None
-        }
-        tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 1 => field1 = Some(0)
-        }
-        tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 2 => field2 = Some("")
-        }
-        tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 3 => field3 = Some(new MyChoiceWindow(is))
-        }
-      }
-    }
-  }
-  
-  class MyChoiceWindow(is: DecodingInputStream) extends BerDecoder {
-    def decode[T](ff: (Empty, Int, Double) => T): T = {
-      val triplet = decodeTriplet(is)
-      var fieldTriplet = decodeTriplet(is)
-      var field0: Option[Empty] = None
-      var field1: Option[Int] = None
-      var field2: Option[Double] = None
-      decodeTriplets(is, triplet.length) { tripletsDecoder =>
-        tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 0 => field0 = Some(Empty)
-          case None => None
-        }
-        tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 1 => field1 = Some(0)
-        }
-        tripletsDecoder.decode {
-          case Some(triplet) if triplet.tagType == 2 => field2 = Some(0.0)
-        }
-      }
-      return ff(field0.get, field1.get, field2.get)
-    }
-  }*/
-  
   object BerDecoder extends BerDecoder
-  
-  //case class OnMySequence(field0: )
   
   case class OnMySequence(field0: OnAsnInteger, field1: OnAsnInteger) extends BerDecoder with Decodable {
     def field0(transform: OnAsnInteger => OnAsnInteger): OnMySequence =
@@ -250,7 +169,7 @@ package test.asn1.genruntime {
     }
 
     def mkMyChoice_choice0(data: AsnNull): MyChoice = {
-      test.asn1.genruntime.MyChoice_choice0(data)
+      test.asn1.genruntime.MyChoice.Choice0(data)
     }
   }
 }
