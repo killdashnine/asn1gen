@@ -20,7 +20,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_00(): Unit = {
     val data = Array[Byte](0)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(0, length)
       case x => fail("Parse failure: " + x)
@@ -30,7 +30,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_01(): Unit = {
     val data = Array[Byte](1)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(1, length)
       case x => fail("Parse failure: " + x)
@@ -40,7 +40,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_02(): Unit = {
     val data = Array[Byte](2)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(2, length)
       case x => fail("Parse failure: " + x)
@@ -50,7 +50,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_03(): Unit = {
     val data = Array[Byte](0xff.toByte, 0x7f)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(16383, length)
       case x => fail("Parse failure: " + x)
@@ -60,7 +60,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_04(): Unit = {
     val data = Array[Byte](0xd5.toByte, 0xd5.toByte, 0x55.toByte)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(1403605, length)
       case x => fail("Parse failure: " + x)
@@ -70,7 +70,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_05(): Unit = {
     val data = Array[Byte](0xd5.toByte, 0xd5.toByte, 0x54.toByte)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(1403604, length)
       case x => fail("Parse failure: " + x)
@@ -80,7 +80,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_06(): Unit = {
     val data = Array[Byte](0xd5.toByte, 0xd4.toByte, 0x55.toByte)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(1403477, length)
       case x => fail("Parse failure: " + x)
@@ -90,7 +90,7 @@ class TestPackratBerDecoder {
   @Test
   def test_tlLength_07(): Unit = {
     val data = Array[Byte](0xd4.toByte, 0xd5.toByte, 0x55.toByte)
-    parse(tlLength, data) match {
+    parse(rawLength, data) match {
       case Success(length, _) =>
         assertEquals(1387221, length)
       case x => fail("Parse failure: " + x)
@@ -100,12 +100,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_00(): Unit = {
     val data = Array[Byte](0)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(0, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(0, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -113,12 +112,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_01(): Unit = {
     val data = Array[Byte](0x40)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Application, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(0, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Application, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(0, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -126,12 +124,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_02(): Unit = {
     val data = Array[Byte](0x80.toByte)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.ContextSpecific, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(0, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.ContextSpecific, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(0, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -139,12 +136,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_03(): Unit = {
     val data = Array[Byte](0xc0.toByte)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Private, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(0, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Private, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(0, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -152,12 +148,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_04(): Unit = {
     val data = Array[Byte](0x20.toByte)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(true, triplet.constructed)
-        assertEquals(0, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(true, tagHeader.constructed)
+        assertEquals(0, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -165,12 +160,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_05(): Unit = {
     val data = Array[Byte](24)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(24, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(24, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -178,12 +172,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_06(): Unit = {
     val data = Array[Byte](31, 42)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(42, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(42, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -191,12 +184,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_07(): Unit = {
     val data = Array[Byte](31, 0x80.toByte, 42)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(42, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(42, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -204,12 +196,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_08(): Unit = {
     val data = Array[Byte](31, 0x81.toByte, 0x7f)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(255, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(255, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -217,12 +208,11 @@ class TestPackratBerDecoder {
   @Test
   def test_tlTag_09(): Unit = {
     val data = Array[Byte](31, 0xd4.toByte, 0xd5.toByte, 0x55.toByte)
-    parse(tlTag, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(1387221, triplet.tagType)
-        assertEquals(0, triplet.length)
+    parse(rawTagHeader, data) match {
+      case Success(tagHeader, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(1387221, tagHeader.tagType)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -231,12 +221,12 @@ class TestPackratBerDecoder {
   @Test
   def test_tl_01(): Unit = {
     val data = Array[Byte](0, 1)
-    parse(tl, data) match {
-      case Success(triplet, _) =>
-        assertEquals(TagClass.Universal, triplet.tagClass)
-        assertEquals(false, triplet.constructed)
-        assertEquals(0, triplet.tagType)
-        assertEquals(1, triplet.length)
+    parse(rawTagHeader ~ rawLength, data) match {
+      case Success(tagHeader ~ length, _) =>
+        assertEquals(TagClass.Universal, tagHeader.tagClass)
+        assertEquals(false, tagHeader.constructed)
+        assertEquals(0, tagHeader.tagType)
+        assertEquals(1, length)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -244,8 +234,8 @@ class TestPackratBerDecoder {
   @Test
   def test_asnNull_00(): Unit = {
     val data = Array[Byte](0)
-    parse(length >> asnNull, data) match {
-      case Success(result, _) => assertEquals((), result)
+    parse(rawLength >> asnNull, data) match {
+      case Success(result, _) => assertEquals(AsnNull, result)
       case x => fail("Parse failure: " + x)
     }
   }
@@ -254,7 +244,7 @@ class TestPackratBerDecoder {
   def test_asnNull_01(): Unit = {
     val data = Array[Byte](1)
     assertThrows(classOf[DecodingException]) {
-      parse(length >> asnNull, data) match {
+      parse(rawLength >> asnNull, data) match {
         case Success(result, _) => assertEquals((), result)
         case x => fail("Parse failure: " + x)
       }
@@ -265,7 +255,7 @@ class TestPackratBerDecoder {
   def test_asnBoolean_00(): Unit = {
     val data = Array[Byte](0)
     assertThrows(classOf[DecodingException]) {
-      parse(length >> asnBoolean, data) match {
+      parse(rawLength >> asnBoolean, data) match {
         case Success(result, _) => assertEquals((), result)
         case x => fail("Parse failure: " + x)
       }
@@ -276,7 +266,7 @@ class TestPackratBerDecoder {
   def test_asnBoolean_01(): Unit = {
     val data = Array[Byte](1)
     assertThrows(classOf[DecodingException]) {
-      parse(length >> asnBoolean, data) match {
+      parse(rawLength >> asnBoolean, data) match {
         case Success(result, _) => assertEquals((), result)
         case x => throw new DecodingException("EOF unexpected")
       }
@@ -287,7 +277,7 @@ class TestPackratBerDecoder {
   def test_asnBoolean_02(): Unit = {
     val data = Array[Byte](2)
     assertThrows(classOf[DecodingException]) {
-      parse(length >> asnBoolean, data) match {
+      parse(rawLength >> asnBoolean, data) match {
         case Success(result, _) => assertEquals((), result)
         case x => fail("Parse failure: " + x)
       }
@@ -297,7 +287,7 @@ class TestPackratBerDecoder {
   @Test
   def test_asnBoolean_03(): Unit = {
     val data = Array[Byte](1, 0)
-    parse(length >> asnBoolean, data) match {
+    parse(rawLength >> asnBoolean, data) match {
       case Success(result, _) => assertEquals(false, result)
       case x => fail("Parse failure: " + x)
     }
@@ -306,7 +296,7 @@ class TestPackratBerDecoder {
   @Test
   def test_asnBoolean_04(): Unit = {
     val data = Array[Byte](1, 1)
-    parse(length >> asnBoolean, data) match {
+    parse(rawLength >> asnBoolean, data) match {
       case Success(result, _) => assertEquals(true, result)
       case x => fail("Parse failure: " + x)
     }
@@ -315,7 +305,7 @@ class TestPackratBerDecoder {
   @Test
   def test_asnBoolean_05(): Unit = {
     val data = Array[Byte](1, 8)
-    parse(length >> asnBoolean, data) match {
+    parse(rawLength >> asnBoolean, data) match {
       case Success(result, _) => assertEquals(true, result)
       case x => fail("Parse failure: " + x)
     }
@@ -324,7 +314,7 @@ class TestPackratBerDecoder {
   @Test
   def test_asnBoolean_06(): Unit = {
     val data = Array[Byte](1, 0xff.toByte)
-    parse(length >> asnBoolean, data) match {
+    parse(rawLength >> asnBoolean, data) match {
       case Success(result, _) => assertEquals(true, result)
       case x => fail("Parse failure: " + x)
     }
@@ -334,7 +324,7 @@ class TestPackratBerDecoder {
   def test_asnBoolean_07(): Unit = {
     val data = Array[Byte](2)
     assertThrows(classOf[DecodingException]) {
-      parse(length >> asnBoolean, data) match {
+      parse(rawLength >> asnBoolean, data) match {
         case Success(result, _) => assertEquals((), result)
         case x => fail("Parse failure: " + x)
       }
@@ -345,7 +335,7 @@ class TestPackratBerDecoder {
   def test_asnBoolean_08(): Unit = {
     val data = Array[Byte](2, 0, 0)
     assertThrows(classOf[DecodingException]) {
-      parse(length >> asnBoolean, data) match {
+      parse(rawLength >> asnBoolean, data) match {
         case Success(result, _) => assertEquals((), result)
         case x => fail("Parse failure: " + x)
       }
