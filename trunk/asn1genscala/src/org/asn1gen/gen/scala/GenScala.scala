@@ -6,6 +6,16 @@ import org.asn1gen.io._
 import scala.collection.immutable.Set
 
 class GenScala(out: IndentWriter) {
+  val keywords = Set("yield", "type", "null")
+  
+  def safeId(id: String): String = {
+    if (keywords contains id) {
+      return "`" + id + "`"
+    } else {
+      return id.replaceAll("-", "_")
+    }
+  }
+  
   var moduleName: Option[String] = None
   
   def generate(moduleDefinition: ModuleDefinition): Unit = {
@@ -20,7 +30,7 @@ class GenScala(out: IndentWriter) {
       => {
         out.println("package " + this.moduleName.getOrElse(moduleName) +" {")
         out.indent(2) {
-          out.println("import org.asn1gen.runtime._")
+          out.println("import org.asn1gen.{runtime => _runtime}")
           out.println()
           generate(assignmentList)
         }
@@ -43,7 +53,9 @@ class GenScala(out: IndentWriter) {
         generate(_type , name)
       }
       case va@ValueAssignment(valueReference, _type, value) => {
+        out.println("/*")
         out.println(va)
+        out.println("*/")
       }
     }
   }
@@ -54,12 +66,12 @@ class GenScala(out: IndentWriter) {
         generate(builtinType, name)
       }
       case t@Type(_, _) => {
+        out.println("/*")
         out.println(t)
+        out.println("*/")
       }
     }
   }
-  
-  val keywords = Set("yield")
   
   def generate(builtinType: BuiltinType, assignmentName: String): Unit = {
     builtinType match {
@@ -67,8 +79,8 @@ class GenScala(out: IndentWriter) {
         AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
         out.println(
-            "abstract class " + assignmentName +
-            "(_element: AsnType) extends AsnChoice {")
+            "abstract class " + safeId(assignmentName) +
+            "(_element: _runtime.AsnType) extends _runtime.AsnChoice {")
         out.indent(2) {
           out.println("def _choice: Int")
           generateSimpleGetters(rootAlternativeTypeList)
@@ -80,13 +92,13 @@ class GenScala(out: IndentWriter) {
           rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
         out.println()
         out.println(
-            "object " + assignmentName + " extends " +
-            assignmentName + "_" + firstNamedType.id.name +
+            "object " + safeId(assignmentName) + " extends " +
+            safeId(assignmentName + "_" + firstNamedType.id.name) +
             "(" + typeNameOf(firstNamedType._type) + ") {")
         out.println("}")
       }
       case SequenceType(spec) => {
-        out.print("case class " + assignmentName + "(")
+        out.print("case class " + safeId(assignmentName) + "(")
         spec match {
           case ComponentTypeLists(list1, extension, list2) => {
             out.println()
@@ -102,7 +114,7 @@ class GenScala(out: IndentWriter) {
           }
           case Empty => {}
         }
-        out.println(") extends AsnSequence {")
+        out.println(") extends _runtime.AsnSequence {")
         out.indent(2) {
           spec match {
             case ComponentTypeLists(list1, extension, list2) => {
@@ -118,7 +130,7 @@ class GenScala(out: IndentWriter) {
         }
         out.println("}")
         out.println()
-        out.print("object " + assignmentName + " extends " + assignmentName + "(")
+        out.print("object " + safeId(assignmentName) + " extends " + safeId(assignmentName) + "(")
         out.indent(2) {
           spec match {
             case ComponentTypeLists(list1, extension, list2) => {
@@ -136,10 +148,10 @@ class GenScala(out: IndentWriter) {
                       }
                       optionalDefault match {
                         case Empty => {
-                          out.print(typeNameOf(_type))
+                          out.print(safeId(typeNameOf(_type)))
                         }
                         case Optional => {
-                          out.print("Some(" + typeNameOf(_type) + ")")
+                          out.print("Some(" + safeId(typeNameOf(_type)) + ")")
                         }
                         case Default(value) => {
                           out.print("/* Default(" + value + ") */")
@@ -161,10 +173,10 @@ class GenScala(out: IndentWriter) {
       }
       case EnumeratedType(enumerations)
       => {
-        out.println("case class " + assignmentName + "(_value: Int) extends AsnEnumeration {")
+        out.println("case class " + safeId(assignmentName) + "(_value: Int) extends _runtime.AsnEnumeration {")
         out.println("}")
         out.println()
-        out.println("object " + assignmentName + " extends " + assignmentName + "(0) {")
+        out.println("object " + safeId(assignmentName) + " extends " + safeId(assignmentName) + "(0) {")
         out.indent(2) {
           generate(assignmentName, enumerations)
         }
@@ -184,12 +196,14 @@ class GenScala(out: IndentWriter) {
         items foreach {
           case Identifier(item) => {
             out.println(
-              "def " + item + ": " + assignmentName +
-              " = " + assignmentName + "(" + index + ")")
+              "def " + safeId(item) + ": " + safeId(assignmentName) +
+              " = " + safeId(assignmentName) + "(" + index + ")")
             index = index + 1
           }
           case v@_ => {
-            println(v)
+            out.println("/*")
+            out.println(v)
+            out.println("*/")
           }
         }
         extension match {
@@ -233,7 +247,7 @@ class GenScala(out: IndentWriter) {
         if (!firstTime) {
           out.println(",")
         }
-        out.print(identifier + ": " + typeNameOf(_type, value))
+        out.print(safeId(identifier) + ": " + safeId(typeNameOf(_type, value)))
         firstTime = false
       }
     }
@@ -267,22 +281,22 @@ class GenScala(out: IndentWriter) {
   def typeNameOf(builtinType: BuiltinType): String = {
     builtinType match {
       case BitStringType(_) => {
-        return "AsnBitString"
+        return "_runtime.AsnBitString"
       }
       case BOOLEAN => {
-        return "AsnBoolean"
+        return "_runtime.AsnBoolean"
       }
       case characterString: CharacterStringType => {
         typeNameOf(characterString)
       }
       case _: ChoiceType => {
-        return "AsnChoice"
+        return "_runtime.AsnChoice"
       }
       case EmbeddedPdvType => {
-        return "AsnEmbeddedPdv"
+        return "_runtime.AsnEmbeddedPdv"
       }
       case EnumeratedType(_) => {
-        return "AsnEnumerated"
+        return "_runtime.AsnEnumerated"
       }
       case EXTERNAL => {
         return "ExternalType"
@@ -291,37 +305,37 @@ class GenScala(out: IndentWriter) {
         return "InstanceOfType"
       }
       case IntegerType(_) => {
-        return "AsnInteger"
+        return "_runtime.AsnInteger"
       }
       case NULL => {
-        return "AsnNull"
+        return "_runtime.AsnNull"
       }
       case _: ObjectClassFieldType => {
-        return "AsnObjectClassField"
+        return "_runtime.AsnObjectClassField"
       }
       case ObjectIdentifierType => {
-        return "AsnObjectIdentifier"
+        return "_runtime.AsnObjectIdentifier"
       }
       case OctetStringType => {
-        return "AsnOctetString"
+        return "_runtime.AsnOctetString"
       }
       case REAL => {
-        return "AsnReal"
+        return "_runtime.AsnReal"
       }
       case RelativeOidType => {
-        return "AsnRelativeOidType"
+        return "_runtime.AsnRelativeOidType"
       }
       case SequenceOfType(_) => {
-        return "AsnSequenceOf"
+        return "_runtime.AsnSequenceOf"
       }
       case SequenceType(_) => {
-        return "AsnSequence"
+        return "_runtime.AsnSequence"
       }
       case SetOfType(_) => {
-        return "AsnSetOf"
+        return "_runtime.AsnSetOf"
       }
       case SetType(_) => {
-        return "AsnSet"
+        return "_runtime.AsnSet"
       }
       case TaggedType(_, _, underlyingType) => {
         return typeNameOf(underlyingType)
@@ -335,43 +349,43 @@ class GenScala(out: IndentWriter) {
   def typeNameOf(characterString: CharacterStringType): String = {
     characterString match {
       case BMPString => {
-        return "AsnBmpString"
+        return "_runtime.AsnBmpString"
       }
       case GeneralString => {
-        return "AsnGeneralString"
+        return "_runtime.AsnGeneralString"
       }
       case GraphicString => {
-        return "AsnGraphicString"
+        return "_runtime.AsnGraphicString"
       }
       case IA5String => {
-        return "AsnIa5String"
+        return "_runtime.AsnIa5String"
       }
       case ISO646String => {
-        return "AsnIso646String"
+        return "_runtime.AsnIso646String"
       }
       case NumericString => {
-        return "AsnNumericString"
+        return "_runtime.AsnNumericString"
       }
       case PrintableString => {
-        return "AsnPrintableString"
+        return "_runtime.AsnPrintableString"
       }
       case T61String => {
-        return "AsnT61String"
+        return "_runtime.AsnT61String"
       }
       case TeletexString => {
-        return "AsnTeletexString"
+        return "_runtime.AsnTeletexString"
       }
       case UniversalString => {
-        return "AsnUniversalString"
+        return "_runtime.AsnUniversalString"
       }
       case UTF8String => {
-        return "AsnUtf8String"
+        return "_runtime.AsnUtf8String"
       }
       case VideotexString => {
-        return "AsnVideotexString"
+        return "_runtime.AsnVideotexString"
       }
       case VisibleString => {
-        return "AsnVisibleString"
+        return "_runtime.AsnVisibleString"
       }
       case unknown => {
         return "UnknownCharacterString(" + unknown + ")"
@@ -411,7 +425,7 @@ class GenScala(out: IndentWriter) {
       case Type(builtinType: TypeKind, List()) => {
         val setterType = typeNameOf(builtinType, value)
         out.println(
-            "def " + fieldName + "(f: (" + setterType + " => " +
+            "def " + safeId(fieldName) + "(f: (" + setterType + " => " +
             setterType + ")): " + sequenceName + " = " + sequenceName + "(")
         var firstIteration = true
         out.indent(2) {
@@ -420,9 +434,9 @@ class GenScala(out: IndentWriter) {
               out.println(",")
             }
             if (listedFieldName == fieldName) {
-              out.print("f(this." + fieldName + ")")
+              out.print("f(this." + safeId(fieldName) + ")")
             } else {
-              out.print("this." + listedFieldName)
+              out.print("this." + safeId(listedFieldName))
             }
             firstIteration = false
           }
@@ -460,7 +474,7 @@ class GenScala(out: IndentWriter) {
       => {
         out.println()
         out.println(
-            "case class MyChoice_" + name +
+            "case class " + safeId(assignmentName + "_" + name) +
             "(_element: " + typeNameOf(_type) + ") extends MyChoice(_element) {")
         out.indent(2) {
           out.println("def _choice: Int = " + tagNumber)
@@ -490,9 +504,9 @@ class GenScala(out: IndentWriter) {
       => {
         out.println()
         out.println(
-            "def " + name +
-            "(f: (" + choiceTypeName + " => " + typeNameOf(_type) +
-            ")): " + choiceTypeName + " =")
+            "def " + safeId(name) +
+            "(f: (" + safeId(choiceTypeName) + " => " + safeId(typeNameOf(_type)) +
+            ")): " + safeId(choiceTypeName) + " =")
         out.indent(2) {
           out.println(
               choiceTypeName + "_" + name + "(f(this))")
@@ -519,7 +533,7 @@ class GenScala(out: IndentWriter) {
       => {
         out.println()
         out.println(
-            "def " + name + ": " + typeNameOf(_type) +
+            "def " + safeId(name) + ": " + safeId(typeNameOf(_type)) +
             " = _element.asInstanceOf[" + typeNameOf(_type) + "]")
       }
     }
