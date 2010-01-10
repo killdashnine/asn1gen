@@ -5,6 +5,7 @@ import _root_.org.asn1gen.parsing.asn1._
 import _root_.org.asn1gen.parsing.asn1.ast._
 import _root_.scala.util.parsing.input._
 import _root_.org.asn1gen.gen._
+import _root_.org.asn1gen.gen.scala._
 import _root_.org.asn1gen.io.IndentWriter
 
 package test.org.asn1gen.gen {
