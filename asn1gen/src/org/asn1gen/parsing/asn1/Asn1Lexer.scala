@@ -127,7 +127,7 @@ class Asn1Lexer extends Lexical with ImplicitConversions with Asn1Tokens with Ex
   private def lift2[T](f: String => T)(p: ~[Char, List[Char]]): T = lift(f)(p._1 :: p._2)
 
   def char(c: scala.collection.IndexedSeqView[Char,IndexedSeq[Char]]) = elem(
-    "'" + c.first + "' to '" + c.last + "' ", c.contains(_))
+    "'" + c.head + "' to '" + c.last + "' ", c.contains(_))
   def upper: Parser[Elem] = elem("uppercase letter", c => 'A' <= c && c <= 'Z')
   def lower: Parser[Elem] = elem("lowercase letter", c => 'a' <= c && c <= 'z')
   def hyphen: Parser[Elem] = elem("hyphen", _ == '-')

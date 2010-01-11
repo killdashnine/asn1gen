@@ -269,7 +269,7 @@ class GenJava(out: IndentWriter) {
           TaggedType(_, _, _type),
           _))
       => {
-        val getter = "get" + name.first.toUpperCase + name.substring(1)
+        val getter = "get" + name.head.toUpper + name.substring(1)
         out.println()
         out.println("public " + typeNameOf(_type) + " " + getter + "() {")
         out.indent(2) {
