@@ -1,7 +1,7 @@
 package org.asn1gen.gen.scala
 
 import java.io.PrintWriter
-import org.asn1gen.parsing.asn1.ast._
+import org.asn1gen.parsing.asn1.{ast => ast}
 import org.asn1gen.io._
 import scala.collection.immutable.Set
 
@@ -18,15 +18,15 @@ class GenScala(out: IndentWriter) {
   
   var moduleName: Option[String] = None
   
-  def generate(moduleDefinition: ModuleDefinition): Unit = {
+  def generate(moduleDefinition: ast.ModuleDefinition): Unit = {
     moduleDefinition match {
-      case moduleDefinition@ModuleDefinition(
-        ModuleIdentifier(
-          ModuleReference(moduleName),
-          DefinitiveIdentifier(_)),
+      case moduleDefinition@ast.ModuleDefinition(
+        ast.ModuleIdentifier(
+          ast.ModuleReference(moduleName),
+          ast.DefinitiveIdentifier(_)),
         _,
-        ExtensionDefault(_),
-        ModuleBody(_, _, assignmentList))
+        ast.ExtensionDefault(_),
+        ast.ModuleBody(_, _, assignmentList))
       => {
         out.println("package " + this.moduleName.getOrElse(moduleName) +" {")
         out.indent(2) {
@@ -39,20 +39,20 @@ class GenScala(out: IndentWriter) {
     }
   }
 
-  def generate(assignmentList: AssignmentList): Unit = {
+  def generate(assignmentList: ast.AssignmentList): Unit = {
     assignmentList match {
-      case AssignmentList(assignments) => assignments foreach { assignment =>
+      case ast.AssignmentList(assignments) => assignments foreach { assignment =>
         generate(assignment)
       }
     }
   }
 
-  def generate(assignment: Assignment): Unit = {
+  def generate(assignment: ast.Assignment): Unit = {
     assignment match {
-      case TypeAssignment(TypeReference(name), _type: Type) => {
+      case ast.TypeAssignment(ast.TypeReference(name), _type: ast.Type) => {
         generate(_type , name)
       }
-      case va@ValueAssignment(valueReference, _type, value) => {
+      case va@ast.ValueAssignment(valueReference, _type, value) => {
         out.println("/*")
         out.println(va)
         out.println("*/")
@@ -60,12 +60,12 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def generate(_type: Type, name: String): Unit = {
+  def generate(_type: ast.Type, name: String): Unit = {
     _type match {
-      case Type(builtinType: BuiltinType, _) => {
+      case ast.Type(builtinType: ast.BuiltinType, _) => {
         generate(builtinType, name)
       }
-      case t@Type(_, _) => {
+      case t@ast.Type(_, _) => {
         out.println("/*")
         out.println(t)
         out.println("*/")
@@ -73,10 +73,10 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def generate(builtinType: BuiltinType, assignmentName: String): Unit = {
+  def generate(builtinType: ast.BuiltinType, assignmentName: String): Unit = {
     builtinType match {
-      case ChoiceType(
-        AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
+      case ast.ChoiceType(
+        ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
         out.println(
             "abstract class " + safeId(assignmentName) +
@@ -97,14 +97,14 @@ class GenScala(out: IndentWriter) {
             "(" + typeNameOf(firstNamedType._type) + ") {")
         out.println("}")
       }
-      case SequenceType(spec) => {
+      case ast.SequenceType(spec) => {
         out.print("case class " + safeId(assignmentName) + "(")
         spec match {
-          case ComponentTypeLists(list1, extension, list2) => {
+          case ast.ComponentTypeLists(list1, extension, list2) => {
             out.println()
             out.indent(2) {
               list1 match {
-                case Some(ComponentTypeList(list)) => {
+                case Some(ast.ComponentTypeList(list)) => {
                   generateSequenceConstructor(assignmentName, list)
                 }
                 case None => ()
@@ -112,20 +112,20 @@ class GenScala(out: IndentWriter) {
               out.println()
             }
           }
-          case Empty => {}
+          case ast.Empty => {}
         }
         out.println(") extends _runtime.AsnSequence {")
         out.indent(2) {
           spec match {
-            case ComponentTypeLists(list1, extension, list2) => {
+            case ast.ComponentTypeLists(list1, extension, list2) => {
               list1 match {
-                case Some(ComponentTypeList(list)) => {
+                case Some(ast.ComponentTypeList(list)) => {
                   generateSequenceImmutableSetters(assignmentName, list)
                 }
                 case None => ()
               }
             }
-            case Empty => {}
+            case ast.Empty => {}
           }
         }
         out.println("}")
@@ -133,27 +133,27 @@ class GenScala(out: IndentWriter) {
         out.print("object " + safeId(assignmentName) + " extends " + safeId(assignmentName) + "(")
         out.indent(2) {
           spec match {
-            case ComponentTypeLists(list1, extension, list2) => {
+            case ast.ComponentTypeLists(list1, extension, list2) => {
               out.println()
               list1 match {
-                case Some(ComponentTypeList(list)) => {
+                case Some(ast.ComponentTypeList(list)) => {
                   var firstItem = true
                   list.map {
-                    case NamedComponentType(
-                      NamedType(_, _type),
+                    case ast.NamedComponentType(
+                      ast.NamedType(_, _type),
                       optionalDefault)
                     => {
                       if (!firstItem) {
                         out.println(",")
                       }
                       optionalDefault match {
-                        case Empty => {
+                        case ast.Empty => {
                           out.print(safeId(typeNameOf(_type)))
                         }
-                        case Optional => {
+                        case ast.Optional => {
                           out.print("Some(" + safeId(typeNameOf(_type)) + ")")
                         }
-                        case Default(value) => {
+                        case ast.Default(value) => {
                           out.print("/* Default(" + value + ") */")
                         }
                       }
@@ -165,13 +165,13 @@ class GenScala(out: IndentWriter) {
                 case None => ()
               }
             }
-            case Empty => {}
+            case ast.Empty => {}
           }
         }
         out.println(") {")
         out.println("}")
       }
-      case EnumeratedType(enumerations)
+      case ast.EnumeratedType(enumerations)
       => {
         out.println("case class " + safeId(assignmentName) + "(_value: Int) extends _runtime.AsnEnumeration {")
         out.println("}")
@@ -188,13 +188,13 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def generate(assignmentName: String, enumerations: Enumerations): Unit = {
+  def generate(assignmentName: String, enumerations: ast.Enumerations): Unit = {
     enumerations match {
-      case Enumerations(RootEnumeration(Enumeration(items)), extension)
+      case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
       => {
         var index = 0
         items foreach {
-          case Identifier(item) => {
+          case ast.Identifier(item) => {
             out.println(
               "def " + safeId(item) + ": " + safeId(assignmentName) +
               " = " + safeId(assignmentName) + "(" + index + ")")
@@ -214,10 +214,10 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def typeNameOf(namedComponentType: NamedComponentType): String = {
+  def typeNameOf(namedComponentType: ast.NamedComponentType): String = {
     namedComponentType match {
-      case NamedComponentType(
-        NamedType(Identifier(identifier), _type),
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
         value)
       => {
         typeNameOf(_type, value)
@@ -225,23 +225,23 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def typeNameOf(_type: Type, value: OptionalDefault[Value]): String = {
+  def typeNameOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
     value match {
-      case Empty =>
+      case ast.Empty =>
         return typeNameOf(_type)
-      case Default(value) =>
+      case ast.Default(value) =>
         return typeNameOf(_type)
-      case Optional =>
+      case ast.Optional =>
         return "Option[" + typeNameOf(_type) + "]"
     }
   }
   
   def generateSequenceConstructor(
-      sequenceName: String, list: List[ComponentType]): Unit = {
+      sequenceName: String, list: List[ast.ComponentType]): Unit = {
     var firstTime = true
     list foreach {
-      case NamedComponentType(
-        NamedType(Identifier(identifier), _type),
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
         value)
       => {
         if (!firstTime) {
@@ -253,91 +253,91 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def typeNameOf(_type: Type): String = {
+  def typeNameOf(_type: ast.Type): String = {
     _type match {
-      case Type(typeKind, _) => typeNameOf(typeKind)
+      case ast.Type(typeKind, _) => typeNameOf(typeKind)
     }
   }
   
-  def typeNameOf(typeKind: TypeKind): String = {
+  def typeNameOf(typeKind: ast.TypeKind): String = {
     typeKind match {
-      case builtinType: BuiltinType => typeNameOf(builtinType)
-      case TypeReference(reference) => reference
+      case builtinType: ast.BuiltinType => typeNameOf(builtinType)
+      case ast.TypeReference(reference) => reference
       case unmatched => "Unmatched(" + unmatched + ")"
     }
   }
   
-  def typeNameOf(typeKind: TypeKind, value: OptionalDefault[Value]): String = {
+  def typeNameOf(typeKind: ast.TypeKind, value: ast.OptionalDefault[ast.Value]): String = {
     value match {
-      case Empty =>
+      case ast.Empty =>
         return typeNameOf(typeKind)
-      case Default(value) =>
+      case ast.Default(value) =>
         return typeNameOf(typeKind)
-      case Optional =>
+      case ast.Optional =>
         return "Option[" + typeNameOf(typeKind) + "]"
     }
   }
   
-  def typeNameOf(builtinType: BuiltinType): String = {
+  def typeNameOf(builtinType: ast.BuiltinType): String = {
     builtinType match {
-      case BitStringType(_) => {
+      case ast.BitStringType(_) => {
         return "_runtime.AsnBitString"
       }
-      case BOOLEAN => {
+      case ast.BOOLEAN => {
         return "_runtime.AsnBoolean"
       }
-      case characterString: CharacterStringType => {
+      case characterString: ast.CharacterStringType => {
         typeNameOf(characterString)
       }
-      case _: ChoiceType => {
+      case _: ast.ChoiceType => {
         return "_runtime.AsnChoice"
       }
-      case EmbeddedPdvType => {
+      case ast.EmbeddedPdvType => {
         return "_runtime.AsnEmbeddedPdv"
       }
-      case EnumeratedType(_) => {
+      case ast.EnumeratedType(_) => {
         return "_runtime.AsnEnumerated"
       }
-      case EXTERNAL => {
+      case ast.EXTERNAL => {
         return "ExternalType"
       }
-      case InstanceOfType(_) => {
+      case ast.InstanceOfType(_) => {
         return "InstanceOfType"
       }
-      case IntegerType(_) => {
+      case ast.IntegerType(_) => {
         return "_runtime.AsnInteger"
       }
-      case NULL => {
+      case ast.NULL => {
         return "_runtime.AsnNull"
       }
-      case _: ObjectClassFieldType => {
+      case _: ast.ObjectClassFieldType => {
         return "_runtime.AsnObjectClassField"
       }
-      case ObjectIdentifierType => {
+      case ast.ObjectIdentifierType => {
         return "_runtime.AsnObjectIdentifier"
       }
-      case OctetStringType => {
+      case ast.OctetStringType => {
         return "_runtime.AsnOctetString"
       }
-      case REAL => {
+      case ast.REAL => {
         return "_runtime.AsnReal"
       }
-      case RelativeOidType => {
+      case ast.RelativeOidType => {
         return "_runtime.AsnRelativeOidType"
       }
-      case SequenceOfType(_) => {
+      case ast.SequenceOfType(_) => {
         return "_runtime.AsnSequenceOf"
       }
-      case SequenceType(_) => {
+      case ast.SequenceType(_) => {
         return "_runtime.AsnSequence"
       }
-      case SetOfType(_) => {
+      case ast.SetOfType(_) => {
         return "_runtime.AsnSetOf"
       }
-      case SetType(_) => {
+      case ast.SetType(_) => {
         return "_runtime.AsnSet"
       }
-      case TaggedType(_, _, underlyingType) => {
+      case ast.TaggedType(_, _, underlyingType) => {
         return typeNameOf(underlyingType)
       }
       case unmatched => {
@@ -346,45 +346,45 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def typeNameOf(characterString: CharacterStringType): String = {
+  def typeNameOf(characterString: ast.CharacterStringType): String = {
     characterString match {
-      case BMPString => {
+      case ast.BMPString => {
         return "_runtime.AsnBmpString"
       }
-      case GeneralString => {
+      case ast.GeneralString => {
         return "_runtime.AsnGeneralString"
       }
-      case GraphicString => {
+      case ast.GraphicString => {
         return "_runtime.AsnGraphicString"
       }
-      case IA5String => {
+      case ast.IA5String => {
         return "_runtime.AsnIa5String"
       }
-      case ISO646String => {
+      case ast.ISO646String => {
         return "_runtime.AsnIso646String"
       }
-      case NumericString => {
+      case ast.NumericString => {
         return "_runtime.AsnNumericString"
       }
-      case PrintableString => {
+      case ast.PrintableString => {
         return "_runtime.AsnPrintableString"
       }
-      case T61String => {
+      case ast.T61String => {
         return "_runtime.AsnT61String"
       }
-      case TeletexString => {
+      case ast.TeletexString => {
         return "_runtime.AsnTeletexString"
       }
-      case UniversalString => {
+      case ast.UniversalString => {
         return "_runtime.AsnUniversalString"
       }
-      case UTF8String => {
+      case ast.UTF8String => {
         return "_runtime.AsnUtf8String"
       }
-      case VideotexString => {
+      case ast.VideotexString => {
         return "_runtime.AsnVideotexString"
       }
-      case VisibleString => {
+      case ast.VisibleString => {
         return "_runtime.AsnVisibleString"
       }
       case unknown => {
@@ -393,16 +393,16 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def generateSequenceImmutableSetters(sequenceName: String, list: List[ComponentType]): Unit = {
+  def generateSequenceImmutableSetters(sequenceName: String, list: List[ast.ComponentType]): Unit = {
     val fieldNames = list.map {
-      case NamedComponentType(
-        NamedType(Identifier(identifier), _),
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _),
         _)
       => identifier
     }
     list foreach {
-      case NamedComponentType(
-        NamedType(Identifier(identifier), _type),
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
         value)
       => {
         generateSequenceImmutableSetter(
@@ -414,15 +414,15 @@ class GenScala(out: IndentWriter) {
   def generateSequenceImmutableSetter(
       sequenceName: String,
       fieldName: String,
-      _type: Type,
-      value: OptionalDefault[Value],
+      _type: ast.Type,
+      value: ast.OptionalDefault[ast.Value],
       fieldNames: List[String]): Unit = {
     _type match {
-      case Type(TaggedType(_, _, fieldType), _) => {
+      case ast.Type(ast.TaggedType(_, _, fieldType), _) => {
         generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, value, fieldNames)
         //out.println("// tag " + number)
       }
-      case Type(builtinType: TypeKind, List()) => {
+      case ast.Type(builtinType: ast.TypeKind, List()) => {
         val setterType = typeNameOf(builtinType, value)
         out.println(
             "def " + safeId(fieldName) + "(f: (" + setterType + " => " +
@@ -451,9 +451,9 @@ class GenScala(out: IndentWriter) {
   
   def generateChoices(
       assignmentName: String,
-      rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+      rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
-      case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
+      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
           generateChoices(assignmentName, namedType)
         }
@@ -463,13 +463,13 @@ class GenScala(out: IndentWriter) {
   
   def generateChoices(
       assignmentName: String,
-      namedType: NamedType): Unit = {
+      namedType: ast.NamedType): Unit = {
     namedType match {
-      case NamedType(
-        Identifier(name),
-        Type(
-          TaggedType(
-            Tag(_, Number(tagNumber)), _, _type),
+      case ast.NamedType(
+        ast.Identifier(name),
+        ast.Type(
+          ast.TaggedType(
+            ast.Tag(_, ast.Number(tagNumber)), _, _type),
           _))
       => {
         out.println()
@@ -486,9 +486,9 @@ class GenScala(out: IndentWriter) {
 
   def generateChoiceFieldTransformers(
       choiceTypeName: String,
-      rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+      rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
-      case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
+      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
           generateChoiceFieldTransformer(choiceTypeName, namedType)
         }
@@ -496,10 +496,10 @@ class GenScala(out: IndentWriter) {
     }
   }
 
-  def generateChoiceFieldTransformer(choiceTypeName: String, namedType: NamedType): Unit = {
+  def generateChoiceFieldTransformer(choiceTypeName: String, namedType: ast.NamedType): Unit = {
     namedType match {
-      case NamedType(
-        Identifier(name),
+      case ast.NamedType(
+        ast.Identifier(name),
         _type)
       => {
         out.println()
@@ -515,9 +515,9 @@ class GenScala(out: IndentWriter) {
     }
   }
 
-  def generateSimpleGetters(rootAlternativeTypeList: RootAlternativeTypeList): Unit = {
+  def generateSimpleGetters(rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
     rootAlternativeTypeList match {
-      case RootAlternativeTypeList(AlternativeTypeList(namedTypes)) => {
+      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
           generateSimpleGetters(namedType)
         }
@@ -525,10 +525,10 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  def generateSimpleGetters(namedType: NamedType): Unit = {
+  def generateSimpleGetters(namedType: ast.NamedType): Unit = {
     namedType match {
-      case NamedType(
-        Identifier(name),
+      case ast.NamedType(
+        ast.Identifier(name),
         _type)
       => {
         out.println()
