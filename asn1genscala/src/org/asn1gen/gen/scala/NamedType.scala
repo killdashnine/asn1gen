@@ -6,5 +6,5 @@ case class NamedType(name: String) {
 }
 
 object NamedType {
-  def from(typeAssignment: ast.TypeAssignment): NamedType = NamedType(typeAssignment.name.name)
+  def from(typeAssignment: ast.TypeAssignment): NamedType = NamedType(typeAssignment.name)
 }

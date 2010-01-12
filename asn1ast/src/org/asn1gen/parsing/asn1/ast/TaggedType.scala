@@ -7,4 +7,6 @@ case class TaggedType(
   taggedKind: TaggedKind,
   _type: Type
 ) extends Node with BuiltinType {
+  def typeKind = _type.kind
+  def constraints = _type.constraints
 }

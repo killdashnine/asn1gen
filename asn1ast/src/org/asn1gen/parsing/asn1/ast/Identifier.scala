@@ -1,7 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
 case class Identifier(
-  chars: String
+  name: String
 ) extends Node with IntegerValue with EnumerationItem {
-  def name = chars
 }
