@@ -4,4 +4,5 @@ case class NamedComponentType(
   namedType: NamedType,
   value: OptionalDefault[Value]
 ) extends ComponentType {
+  def name = namedType.name
 }

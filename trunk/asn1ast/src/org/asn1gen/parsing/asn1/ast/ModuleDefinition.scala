@@ -7,5 +7,7 @@ case class ModuleDefinition(
   moduleBody: ModuleBody
 ) extends Node {
   def name = identifier.name
+  def exports = moduleBody.exports
+  def imports = moduleBody.imports
+  def assignmentList = moduleBody.assignmentList
 }
-

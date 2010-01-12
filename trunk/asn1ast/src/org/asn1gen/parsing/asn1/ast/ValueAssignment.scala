@@ -5,4 +5,5 @@ case class ValueAssignment(
   _type: Type,
   value: Value
 ) extends Node with Assignment {
+  def name = valueReference.name
 }

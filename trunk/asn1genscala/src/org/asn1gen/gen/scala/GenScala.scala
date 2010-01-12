@@ -93,7 +93,7 @@ class GenScala(out: IndentWriter) {
         out.println()
         out.println(
             "object " + safeId(assignmentName) + " extends " +
-            safeId(assignmentName + "_" + firstNamedType.id.name) +
+            safeId(assignmentName + "_" + firstNamedType.name) +
             "(" + typeNameOf(firstNamedType._type) + ") {")
         out.println("}")
       }

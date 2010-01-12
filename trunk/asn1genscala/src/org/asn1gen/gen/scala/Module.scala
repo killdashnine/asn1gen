@@ -10,11 +10,11 @@ object Module {
   def from(moduleDefinition: ast.ModuleDefinition): Module = {
     val astAssignments = moduleDefinition.moduleBody.assignmentList.assignments
     val types = HashMap(astAssignments.partialMap { case t: ast.TypeAssignment =>
-      (t.name.name -> NamedType.from(t))
+      (t.name -> NamedType.from(t))
     }: _*)
     val values = (HashMap[String, NamedValue]() /: astAssignments) {
       case (values, va: ast.ValueAssignment) =>
-        values + (va.valueReference.name -> NamedValue(va.valueReference.name))
+        values + (va.name -> NamedValue(va.name))
       case (values, _) => values
     }
     Module(moduleDefinition.name, types, values)
