@@ -5,7 +5,7 @@ import org.asn1gen.parsing.asn1.{ast => ast}
 import org.asn1gen.io._
 import scala.collection.immutable.Set
 
-class GenScala(out: IndentWriter) {
+class GenScala(packageName: String, out: IndentWriter) {
   val keywords = Set("yield", "type", "null")
   
   def safeId(id: String): String = {
@@ -16,19 +16,25 @@ class GenScala(out: IndentWriter) {
     }
   }
   
-  var moduleName: Option[String] = None
+  def generate(module: Module): Unit = {
+    out.println("package " + packageName + " {")
+    out.println()
+    out.println("import org.asn1gen.{runtime => _runtime}")
+    out.println()
+    out.println("object " + safeId(module.name))
+  }
   
   def generate(moduleDefinition: ast.ModuleDefinition): Unit = {
     moduleDefinition match {
       case moduleDefinition@ast.ModuleDefinition(
         ast.ModuleIdentifier(
-          ast.ModuleReference(moduleName),
+          ast.ModuleReference(packageName),
           ast.DefinitiveIdentifier(_)),
         _,
         ast.ExtensionDefault(_),
         ast.ModuleBody(_, _, assignmentList))
       => {
-        out.println("package " + this.moduleName.getOrElse(moduleName) +" {")
+        out.println("package " + packageName +" {")
         out.indent(2) {
           out.println("import org.asn1gen.{runtime => _runtime}")
           out.println()
