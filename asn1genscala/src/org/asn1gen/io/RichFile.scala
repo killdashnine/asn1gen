@@ -1,6 +1,7 @@
 package org.asn1gen.io
 
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.OutputStream
 import java.io.PrintStream
 import org.asn1gen.io.JavaTypes._
@@ -17,6 +18,26 @@ case class RichFile(file: JavaFile) {
       try f(ps) finally ps.flush
     }
   }
+  
+  def child(childName: String) = new JavaFile(file, childName)
+  
+  def children: Array[JavaFile] = file.listFiles
+  
+  def children(filter: JavaFile => Boolean): Array[JavaFile] = this.children.filter(filter)
+  
+  def requireExists = {
+    if (!file.exists) {
+      throw new IOException("Directory does not exist")
+    }
+  }
+  
+  def requireDirectory = {
+    if (!file.isDirectory) {
+      throw new IOException("'" + file.getName + "' is not a directory")
+    }
+  }
+  
+  def name = file.getName
 }
 
 object RichFile {
