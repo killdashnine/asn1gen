@@ -5,13 +5,25 @@ import scala.collection.immutable._
 
 case class Module(
     name: String,
+    imports: List[ast.SymbolsFromModule],
     types: HashMap[String, NamedType],
     values: HashMap[String, NamedValue]) {
 }
 
 object Module {
   def from(moduleDefinition: ast.ModuleDefinition): Module = {
-    val imports = moduleDefinition.imports
+    val imports = moduleDefinition.imports.symbols match {
+      case Some(ast.SymbolsImported(symbolsFromModules)) => {
+        symbolsFromModules foreach { symbolFromModule =>
+          println(symbolFromModule.globalModuleReference)
+          symbolFromModule.symbols.foreach { symbol =>
+            println("> " + symbol)
+          }
+        }
+        symbolsFromModules
+      }
+      case None => List()
+    }
     val exports = moduleDefinition.exports
     println(imports)
     println(exports)
@@ -30,6 +42,6 @@ object Module {
         values + (name -> NamedValue.from(va))
       case (values, _) => values
     }
-    Module(moduleDefinition.name, types, values)
+    Module(moduleDefinition.name, imports, types, values)
   }
 }
