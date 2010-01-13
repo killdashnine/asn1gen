@@ -25,6 +25,10 @@ class GenScala(packageName: String, out: IndentWriter) {
     out.println()
     out.println("object " + safeId(module.name) + " {")
     out.indent(2) {
+      module.imports foreach { symbolsFromModule =>
+        out.println("import " + symbolsFromModule.module + "._")
+      }
+      out.println()
       module.values foreach { value =>
         out.println("/*")
         out.println(value)
@@ -157,8 +161,22 @@ class GenScala(packageName: String, out: IndentWriter) {
         }
         out.println("}")
       }
+      case setOfType: ast.SetOfType => {
+        generate(assignmentName, setOfType)
+      }
       case unmatched => {
-        out.println("// Unmatched: " + unmatched)
+        out.println("// Unmatched " + safeId(assignmentName) + ": " + unmatched)
+      }
+    }
+  }
+  
+  def generate(assignmentName: String, setOfType: ast.SetOfType): Unit = {
+    setOfType match {
+      case ast.SetOfType(ast.Type(ast.TypeReference(referencedType), _)) => {
+        out.println("type " + safeId(assignmentName) + " = List[" + safeId(referencedType) + "]")
+      }
+      case ast.SetOfType(other) => {
+        out.println("type " + safeId(assignmentName) + " // " + other)
       }
     }
   }
@@ -438,7 +456,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.println()
         out.println(
             "case class " + safeId(assignmentName + "_" + name) +
-            "(_element: " + typeNameOf(_type) + ") extends MyChoice(_element) {")
+            "(_element: " + typeNameOf(_type) + ") extends " + safeId(assignmentName) + "(_element) {")
         out.indent(2) {
           out.println("def _choice: Int = " + tagNumber)
         }
@@ -472,7 +490,7 @@ class GenScala(packageName: String, out: IndentWriter) {
             ")): " + safeId(choiceTypeName) + " =")
         out.indent(2) {
           out.println(
-              choiceTypeName + "_" + name + "(f(this))")
+              safeId(choiceTypeName + "_" + name) + "(f(this))")
         }
       }
     }
