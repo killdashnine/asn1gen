@@ -4,5 +4,5 @@ case class GlobalModuleReference(
   moduleReference: ModuleReference,
   assignedIdentifier: AssignedIdentifier
 ) extends Node {
+  def name = moduleReference.name
 }
-

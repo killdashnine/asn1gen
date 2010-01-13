@@ -4,4 +4,5 @@ case class SymbolsFromModule(
   symbols: List[Symbol],
   globalModuleReference: GlobalModuleReference
 ) extends Node {
+  def module = globalModuleReference.name
 }

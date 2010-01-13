@@ -1,8 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
 case class ModuleReference(
-  chars: String
+  name: String
 ) extends Node {
-  def name = chars
 }
-
