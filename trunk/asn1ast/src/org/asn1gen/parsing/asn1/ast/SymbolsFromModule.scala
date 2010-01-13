@@ -1,8 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
 case class SymbolsFromModule(
-  symbol: List[Symbol],
+  symbols: List[Symbol],
   globalModuleReference: GlobalModuleReference
 ) extends Node {
 }
-
