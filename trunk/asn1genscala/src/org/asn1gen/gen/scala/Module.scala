@@ -3,11 +3,18 @@ package org.asn1gen.gen.scala
 import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable._
 
-case class Module(name: String, types: HashMap[String, NamedType], values: HashMap[String, NamedValue]) {
+case class Module(
+    name: String,
+    types: HashMap[String, NamedType],
+    values: HashMap[String, NamedValue]) {
 }
 
 object Module {
   def from(moduleDefinition: ast.ModuleDefinition): Module = {
+    val imports = moduleDefinition.imports
+    val exports = moduleDefinition.exports
+    println(imports)
+    println(exports)
     val astAssignments = moduleDefinition.moduleBody.assignmentList.assignments
     val types = (HashMap[String, NamedType]() /: astAssignments) {
       case (types, ta: ast.TypeAssignment) =>
