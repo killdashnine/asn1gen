@@ -44,8 +44,20 @@ class GenScala(packageName: String, out: IndentWriter) {
       case ast.Type(builtinType: ast.BuiltinType, _) => {
         generate(builtinType, namedType.name)
       }
+      case t@ast.Type(referencedType: ast.ReferencedType, _) => {
+        referencedType match {
+          case ast.TypeReference(name) => {
+            out.println("type " + safeId(namedType.name) + " = " + safeId(name))
+          }
+          case _ => {
+            out.println("/* referencedType")
+            out.println(referencedType)
+            out.println("*/")
+          }
+        }
+      }
       case t@ast.Type(_, _) => {
-        out.println("/*")
+        out.println("/* unknown: " + namedType.name)
         out.println(t)
         out.println("*/")
       }
@@ -164,6 +176,14 @@ class GenScala(packageName: String, out: IndentWriter) {
       case setOfType: ast.SetOfType => {
         generate(assignmentName, setOfType)
       }
+      case bitStringType: ast.BitStringType => {
+        out.println("class " + safeId(assignmentName) + " extends _runtime.AsnBitString {")
+        out.println("}")
+        out.println("object " + safeId(assignmentName) + " extends " + safeId(assignmentName))
+      }
+      case ast.IntegerType(None) => {
+        out.println("type " + safeId(assignmentName) + " = _runtime.AsnInteger")
+      }
       case unmatched => {
         out.println("// Unmatched " + safeId(assignmentName) + ": " + unmatched)
       }
@@ -194,7 +214,7 @@ class GenScala(packageName: String, out: IndentWriter) {
             index = index + 1
           }
           case v@_ => {
-            out.println("/*")
+            out.println("/* unknown enumeration:")
             out.println(v)
             out.println("*/")
           }
