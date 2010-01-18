@@ -157,7 +157,7 @@ class GenJava(out: IndentWriter) {
       case InstanceOfType(_) => {
         return "InstanceOfType"
       }
-      case IntegerType(_) => {
+      case INTEGER(_) => {
         return "AsnInteger"
       }
       case NULL => {
@@ -216,7 +216,7 @@ class GenJava(out: IndentWriter) {
         generateSequenceField(identifier, underlyingType)
         //out.println("// tag " + number)
       }
-      case Type(IntegerType(None), List()) => {
+      case Type(INTEGER(None), List()) => {
         out.println("public final " + typeNameOf(_type) + " " + identifier + ";");
       }
       case unmatched => {

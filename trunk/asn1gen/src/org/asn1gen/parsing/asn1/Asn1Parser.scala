@@ -463,7 +463,7 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     ( kwInteger
     ~ ( op("{") ~> rep1sep(namedNumber, op(",")) <~ op("}")
       ).?
-    ) ^^ { case _ ~ nns => IntegerType(nns) }
+    ) ^^ { case _ ~ nns => INTEGER(nns) }
   
   // ASN1D 10.3.2<6>
   def namedNumber =

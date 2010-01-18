@@ -48,6 +48,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         referencedType match {
           case ast.TypeReference(name) => {
             out.println("type " + safeId(namedType.name) + " = " + safeId(name))
+            out.println("val " + safeId(namedType.name) + " = " + safeId(name))
           }
           case _ => {
             out.println("/* referencedType")
@@ -71,7 +72,7 @@ class GenScala(packageName: String, out: IndentWriter) {
       => {
         out.println(
             "abstract class " + safeId(assignmentName) +
-            "(_element: _runtime.AsnType) extends _runtime.AsnChoice {")
+            "(_element: Any) extends _runtime.AsnChoice {")
         out.indent(2) {
           out.println("def _choice: Int")
           generateSimpleGetters(rootAlternativeTypeList)
@@ -181,8 +182,17 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.println("}")
         out.println("object " + safeId(assignmentName) + " extends " + safeId(assignmentName))
       }
-      case ast.IntegerType(None) => {
+      case ast.INTEGER(None) => {
         out.println("type " + safeId(assignmentName) + " = _runtime.AsnInteger")
+        out.println("val " + safeId(assignmentName) + " = _runtime.AsnInteger")
+      }
+      case ast.BOOLEAN => {
+        out.println("type " + safeId(assignmentName) + " = _runtime.AsnBoolean")
+        out.println("val " + safeId(assignmentName) + " = _runtime.AsnBoolean")
+      }
+      case ast.OctetStringType => {
+        out.println("type " + safeId(assignmentName) + " = _runtime.AsnOctetString")
+        out.println("val " + safeId(assignmentName) + " = _runtime.AsnOctetString")
       }
       case unmatched => {
         out.println("// Unmatched " + safeId(assignmentName) + ": " + unmatched)
@@ -194,9 +204,12 @@ class GenScala(packageName: String, out: IndentWriter) {
     setOfType match {
       case ast.SetOfType(ast.Type(ast.TypeReference(referencedType), _)) => {
         out.println("type " + safeId(assignmentName) + " = List[" + safeId(referencedType) + "]")
+        out.println("val " + safeId(assignmentName) + " = Nil: List[" + safeId(referencedType) + "]")
       }
-      case ast.SetOfType(other) => {
-        out.println("type " + safeId(assignmentName) + " // " + other)
+      case ast.SetOfType(ast.Type(sequenceType: ast.SequenceType, _)) => {
+        out.println("type " + safeId(assignmentName) + " = List[" + safeId(assignmentName + "_element") + "]")
+        out.println("val " + safeId(assignmentName) + " = Nil: List[" + safeId(assignmentName + "_element") + "]")
+        generate(sequenceType, assignmentName + "_element")
       }
     }
   }
@@ -317,7 +330,7 @@ class GenScala(packageName: String, out: IndentWriter) {
       case ast.InstanceOfType(_) => {
         return "InstanceOfType"
       }
-      case ast.IntegerType(_) => {
+      case ast.INTEGER(_) => {
         return "_runtime.AsnInteger"
       }
       case ast.NULL => {
