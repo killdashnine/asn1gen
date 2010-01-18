@@ -1,4 +1,6 @@
 package org.asn1gen.parsing.asn1.ast
 
-object INTEGER {
+case class INTEGER(
+  namedNumbers: Option[List[NamedNumber]]
+) extends Node with BuiltinType {
 }

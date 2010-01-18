@@ -40,7 +40,7 @@ package test.org.asn1gen.parsing.asn1 {
                             Tag(Empty, Number("0")),
                             _,
                             Type(
-                              IntegerType(None), _)),
+                              INTEGER(None), _)),
                           _)),
                       NamedType(
                         Identifier("choice2"),
@@ -48,7 +48,7 @@ package test.org.asn1gen.parsing.asn1 {
                           TaggedType(
                             Tag(Empty, Number("1")),
                             _,
-                            Type(IntegerType(None), _)),
+                            Type(INTEGER(None), _)),
                           _))))),
                   None,None,None)),
             _),
@@ -76,7 +76,7 @@ package test.org.asn1gen.parsing.asn1 {
               RootAlternativeTypeList(
                 AlternativeTypeList(
                   List(
-                    NamedType(Identifier("integer"), Type(IntegerType(None), _)),
+                    NamedType(Identifier("integer"), Type(INTEGER(None), _)),
                     NamedType(Identifier("boolean"), Type(BOOLEAN, _))))),
               None,
               None,
