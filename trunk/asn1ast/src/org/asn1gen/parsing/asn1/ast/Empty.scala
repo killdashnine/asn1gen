@@ -2,8 +2,7 @@ package org.asn1gen.parsing.asn1.ast
 
 import org.asn1gen.parsing.asn1.ast.kind._
 
-object Empty
-  extends Node
+case class Empty() extends Node
   with AssignedIdentifier
   with Class_
   with ExceptionSpec
@@ -15,4 +14,7 @@ object Empty
   with TagDefault
   with ValueConstraint
   with WithSyntaxSpec {
+}
+
+object Empty extends Empty() {
 }
