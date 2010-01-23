@@ -26,11 +26,12 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     val text = Source.fromFile(file).mkString
     parse(root, text) match {
       case Success(moduleDefinition, _) =>
-        val name = moduleDefinition.name
+        val refactoredModuleDefinition = AnonymousTypeNamer.process(moduleDefinition)
+        val name = refactoredModuleDefinition.name
         if (modules.contains(name)) {
           throw new ModuleLoadException("Module " + name + " already exists")
         }
-        Model(modules + (moduleDefinition.name -> Module.from(moduleDefinition)))
+        Model(modules + (refactoredModuleDefinition.name -> Module.from(refactoredModuleDefinition)))
       case failure =>
         throw new ModuleLoadException("Parse failure: " + failure)
     }
