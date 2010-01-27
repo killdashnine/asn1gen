@@ -300,7 +300,7 @@ object GenScalaAst {
               }
             }
           case TypeReference(name: String) => {
-            out.print("TypeReference(" + name + ")")
+            out.print("TypeReference(\"" + name + "\")")
           }
         }
       }
@@ -441,12 +441,16 @@ object GenScalaAst {
   }
   
   def generate(out: IndentWriter, componentTypeList: ComponentTypeList): Unit = {
-    componentTypeList match {
-      case ComponentTypeList(componentTypes: List[ComponentType]) => {
-        generate(out, componentTypes) { componentType =>
-          generate(out, componentType)
+    out.println("ComponentTypeList(")
+    out.indent(2) {
+      componentTypeList match {
+        case ComponentTypeList(componentTypes: List[ComponentType]) => {
+          generate(out, componentTypes) { componentType =>
+            generate(out, componentType)
+          }
         }
       }
+      out.print(")")
     }
   }
   
@@ -578,7 +582,11 @@ object GenScalaAst {
   def generate[T](out: IndentWriter, maybe: Option[T])(f: T => Unit): Unit = {
     maybe match {
       case None => out.print("None")
-      case Some(v) => f(v)
+      case Some(v) => {
+        out.print("Some(")
+        f(v)
+        out.print(")")
+      }
     }
   }
   
