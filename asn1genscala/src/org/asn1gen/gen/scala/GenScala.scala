@@ -194,6 +194,10 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.println("type " + safeId(assignmentName) + " = _runtime.AsnOctetString")
         out.println("val " + safeId(assignmentName) + " = _runtime.AsnOctetString")
       }
+      case ast.REAL => {
+        out.println("type " + safeId(assignmentName) + " = _runtime.AsnReal")
+        out.println("val " + safeId(assignmentName) + " = _runtime.AsnReal")
+      }
       case unmatched => {
         out.println("// Unmatched " + safeId(assignmentName) + ": " + unmatched)
       }
@@ -322,7 +326,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_runtime.AsnEmbeddedPdv"
       }
       case ast.EnumeratedType(_) => {
-        return "_runtime.AsnEnumerated"
+        return "_runtime.AsnEnumeration"
       }
       case ast.EXTERNAL => {
         return "ExternalType"

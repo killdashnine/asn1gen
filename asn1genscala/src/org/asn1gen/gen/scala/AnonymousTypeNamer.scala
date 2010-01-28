@@ -50,11 +50,8 @@ object AnonymousTypeNamer {
           }
           case SequenceType(spec) => {
             val decoupledName = parentName + "_" + name
-            println("a ==> " + decoupledName)
             val decoupledMemberAssignments = decoupleMembers(decoupledName, _type)
-            println("b ==> " + decoupledMemberAssignments)
             val redirectedType = redirectMembers(decoupledName, _type)
-            println("c ==> " + redirectedType)
             val decoupledAssignment = TypeAssignment(TypeReference(decoupledName), redirectedType)
             decoupledAssignment::decoupledMemberAssignments
           }
@@ -75,6 +72,7 @@ object AnonymousTypeNamer {
             val decoupledAssignment = TypeAssignment(TypeReference(decoupledName), redirectedType)
             decoupledAssignment::decoupledMemberAssignments
           }
+          case REAL => Nil
           case _ =>
             println("Unprocessed in decoupleNamedType: " + typeKind)
             throw new Exception("Not implemented");
@@ -95,7 +93,9 @@ object AnonymousTypeNamer {
         typeKind match {
           case BitStringType(_) => Nil
           case EnumeratedType(e) => Nil
-          case SetOfType(t) => Nil
+          case SetOfType(t) => {
+            decoupleNamedType(parentName, "item", t)
+          }
           case ChoiceType(
                 AlternativeTypeLists(
                   RootAlternativeTypeList(
@@ -114,52 +114,55 @@ object AnonymousTypeNamer {
             throw new Exception("Not implemented")
             Nil // TODO
           }
-          case SequenceType(ComponentTypeLists(maybeList1, extension, list2)) => {
-            var assignments = Nil: List[Assignment]
+          case SequenceType(ComponentTypeLists(maybeList1, extension, maybeList2)) => {
             var memberIndex = 0
-            val newList1 = maybeList1.map { list =>
-              val newComponentTypes = list.componentTypes.map { componentType =>
-                componentType match {
-                  case BasicComponentType(t) => {
-                    val newTypeName = parentName + "_" + memberIndex
-                    println("d ==> " + newTypeName)
-                    // TODO: Don't rename
-                    val redirectedType = redirectMembers(newTypeName, t)
-                    assignments = TypeAssignment(TypeReference(newTypeName), redirectedType)::assignments
-                    assignments
+            val newAssignments1 = maybeList1.toList.flatMap { list =>
+              list.componentTypes.flatMap { componentType =>
+                try {
+                  componentType match {
+                    case BasicComponentType(t) => {
+                      decoupleNamedType(parentName, memberIndex.toString, t)
+                    }
+                    case NamedComponentType(ast.NamedType(Identifier(name), t), value) => {
+                      decoupleNamedType(parentName, name, t)
+                    }
                   }
-                  case NamedComponentType(ast.NamedType(Identifier(name), t@Type(tk, c)), value) => {
-                    val newTypeName = parentName + "_" + name
-                    println("e ==> " + newTypeName)
-                    val redirectedType = redirectMembers(newTypeName, t)
-                    assignments = decoupleNamedType(parentName, name, redirectedType):::assignments
-                    assignments
-                  }
+                } finally {
+                  memberIndex += 1
                 }
-                memberIndex += 1
               }
             }
-            val newList2 = list2.map { list =>
-              println(_type)
-              println(list2)
-              throw new Exception("Not implemented")
-              list
+            val newAssignments2 = maybeList2.toList.flatMap { list =>
+              list.componentTypes.flatMap { componentType =>
+                try {
+                  componentType match {
+                    case BasicComponentType(t) => {
+                      decoupleNamedType(parentName, memberIndex.toString, t)
+                    }
+                    case NamedComponentType(ast.NamedType(Identifier(name), t), value) => {
+                      decoupleNamedType(parentName, name, t)
+                    }
+                  }
+                } finally {
+                  memberIndex += 1
+                }
+              }
             }
-            assignments // TODO
+            newAssignments1:::newAssignments2
           }
           case SequenceType(Empty) => Nil
           case SequenceType(spec) => {
-            println(_type)
+            println("c ==> " + _type)
             throw new Exception("Not implemented")
             Nil // TODO
           }
           case SetType(spec) => {
-            println(_type)
+            println("d ==> " + _type)
             throw new Exception("Not implemented")
             Nil // TODO
           }
           case TaggedType(tag, taggedKind, t) => {
-            println(_type)
+            println("e ==> " + _type)
             throw new Exception("Not implemented")
             decoupleMembers(parentName, t)
           }
@@ -169,7 +172,7 @@ object AnonymousTypeNamer {
           case REAL => Nil
           case BOOLEAN => Nil
           case _ => {
-            println(_type)
+            println("f ==> " + _type)
             throw new Exception("Not implemented")
             Nil
           }
@@ -180,13 +183,12 @@ object AnonymousTypeNamer {
   }
   
   def redirect(parentName: String, _type: Type): Type = {
-    println("redirectMembers ==> " + parentName + " " + _type)
     _type match {
       case Type(typeKind, constraints) => {
         val decoupledTypeKind: TypeKind = typeKind match {
           case _: BitStringType => typeKind
-          case _: EnumeratedType => typeKind
-          case _: SetOfType => typeKind
+          case _: EnumeratedType => TypeReference(parentName)
+          case _: SetOfType => TypeReference(parentName)
           case _: ChoiceType => typeKind
           case INTEGER(Some(values)) => {
             throw new Exception("Not implemented")
@@ -197,7 +199,9 @@ object AnonymousTypeNamer {
             throw new Exception("Not implemented")
             // TODO
           }
-          case SequenceType(spec) => TypeReference(parentName)
+          case SequenceType(spec) => {
+            TypeReference(parentName)
+          }
           case _: SetType => TypeReference(parentName)
           case TaggedType(tag, taggedKind, t) => {
             val newType = redirectMembers(parentName, t)
@@ -230,12 +234,10 @@ object AnonymousTypeNamer {
             case BasicComponentType(t) => {
               val newTypeName = parentName + "_" + memberIndex
               val redirectedType = redirect(newTypeName, t)
-              println("g ==> " + newTypeName)
               BasicComponentType(redirectedType) // TODO
             }
             case NamedComponentType(ast.NamedType(Identifier(name), t@Type(tk, c)), value) => {
               val newTypeName = parentName + "_" + name
-              println("h ==> " + newTypeName)
               val redirectedType = redirect(newTypeName, t)
               NamedComponentType(
                 ast.NamedType(Identifier(name), redirectedType),
@@ -259,13 +261,12 @@ object AnonymousTypeNamer {
   }
   
   def redirectMembers(parentName: String, _type: Type): Type = {
-    println("redirectMembers ==> " + parentName + " " + _type)
     _type match {
       case Type(typeKind, constraints) => {
         val decoupledTypeKind: TypeKind = typeKind match {
           case _: BitStringType => typeKind
           case _: EnumeratedType => typeKind
-          case _: SetOfType => typeKind
+          case SetOfType(subType) => SetOfType(redirect(parentName + "_item", subType))
           case _: ChoiceType => typeKind
           case INTEGER(Some(values)) => {
             throw new Exception("Not implemented")
