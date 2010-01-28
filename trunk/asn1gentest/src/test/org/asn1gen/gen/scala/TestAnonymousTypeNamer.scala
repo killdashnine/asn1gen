@@ -243,75 +243,180 @@ class TestAnonymousTypeNamer extends TestCase {
     }
   }
   
-  @Ignore
   @Test def test_3() = {
     println()
-    println("=== test_3 ===")
-    try {
-      val text = """
-        ParentType ::= SEQUENCE {
-          field MyTypeReference
-        }
-        """
-      val sanityAssignments =
-        AssignmentList(List(
-          TypeAssignment(
-            TypeReference("ParentType"),
-            Type(
-              SequenceType(
-                ComponentTypeLists(
-                  Some(ComponentTypeList(
-                    List(
-                      NamedComponentType(
-                        NamedType(
-                          Identifier("field"),
-                          Type(
-                            TypeReference("MyTypeReference"),
-                            List())),
-                        Empty)))),
-                  None,
-                  None)),
-              List()))))
-      val expectedAssignments =
-        AssignmentList(List(
-          TypeAssignment(
-            TypeReference("ParentType"),
-            Type(
-              SequenceType(
-                ComponentTypeLists(
-                  Some(ComponentTypeList(
-                    List(
-                      NamedComponentType(
-                        NamedType(
-                          Identifier("field"),
-                          Type(
-                            TypeReference("MyTypeReference"),
-                            List())),
-                        Empty)))),
-                  None,
-                  None)),
-              List()))))
-  
-      parse(assignmentList, text) match {
-        case Success(assignments, _) => {
-          if (assignments != sanityAssignments) {
-            val indentWriter = new IndentWriter(System.out)
-            GenScalaAst.generate(indentWriter, assignments)
-            indentWriter.flush()
-            assert(false)
-          }
-          val processedAssignments = AnonymousTypeNamer.process(assignments)
-          if (processedAssignments != expectedAssignments) {
-            val indentWriter = new IndentWriter(System.out)
-            GenScalaAst.generate(indentWriter, processedAssignments)
-            indentWriter.flush()
-            assert(false)
-          }
-        }
-        case x => fail("Parse failure: " + x)
+    val text = """
+      ParentType ::= SEQUENCE {
+        field MyTypeReference
       }
-    } finally {
-      println("=== test_3 ===")
+      """
+    val sanityAssignments =
+      AssignmentList(List(
+        TypeAssignment(
+          TypeReference("ParentType"),
+          Type(
+            SequenceType(
+              ComponentTypeLists(
+                Some(ComponentTypeList(
+                  List(
+                    NamedComponentType(
+                      NamedType(
+                        Identifier("field"),
+                        Type(
+                          TypeReference("MyTypeReference"),
+                          List())),
+                      Empty)))),
+                None,
+                None)),
+            List()))))
+    val expectedAssignments =
+      AssignmentList(List(
+        TypeAssignment(
+          TypeReference("ParentType"),
+          Type(
+            SequenceType(
+              ComponentTypeLists(
+                Some(ComponentTypeList(
+                  List(
+                    NamedComponentType(
+                      NamedType(
+                        Identifier("field"),
+                        Type(
+                          TypeReference("MyTypeReference"),
+                          List())),
+                      Empty)))),
+                None,
+                None)),
+            List()))))
+
+    parse(assignmentList, text) match {
+      case Success(assignments, _) => {
+        if (assignments != sanityAssignments) {
+          val indentWriter = new IndentWriter(System.out)
+          GenScalaAst.generate(indentWriter, assignments)
+          indentWriter.flush()
+          assert(false)
+        }
+        val processedAssignments = AnonymousTypeNamer.process(assignments)
+        if (processedAssignments != expectedAssignments) {
+          val indentWriter = new IndentWriter(System.out)
+          GenScalaAst.generate(indentWriter, processedAssignments)
+          indentWriter.flush()
+          assert(false)
+        }
+      }
+      case x => fail("Parse failure: " + x)
+    }
+  }
+
+  @Test def test_4() = {
+    println()
+    val text = """
+      ParentType ::= SEQUENCE {
+        field SET OF SEQUENCE {
+          subField INTEGER
+        }
+      }
+      """
+    val sanityAssignments =
+      AssignmentList(List(
+        TypeAssignment(
+          TypeReference("ParentType"),
+          Type(
+            SequenceType(
+              ComponentTypeLists(
+                Some(ComponentTypeList(
+                  List(
+                    NamedComponentType(
+                      NamedType(
+                        Identifier("field"),
+                        Type(
+                          SetOfType(
+                            Type(
+                              SequenceType(
+                                ComponentTypeLists(
+                                  Some(ComponentTypeList(
+                                    List(
+                                      NamedComponentType(
+                                        NamedType(
+                                          Identifier("subField"),
+                                          Type(
+                                            INTEGER(
+                                              None),
+                                            List())),
+                                        Empty)))),
+                                  None,
+                                  None)),
+                              List())),
+                          List())),
+                      Empty)))),
+                None,
+                None)),
+            List()))))
+
+    val expectedAssignments =
+      AssignmentList(List(
+        TypeAssignment(
+          TypeReference("ParentType"),
+          Type(
+            SequenceType(
+              ComponentTypeLists(
+                Some(ComponentTypeList(
+                  List(
+                    NamedComponentType(
+                      NamedType(
+                        Identifier("field"),
+                        Type(
+                          TypeReference("ParentType_field"),
+                          List())),
+                      Empty)))),
+                None,
+                None)),
+            List())),
+        TypeAssignment(
+          TypeReference("ParentType_field"),
+          Type(
+            SetOfType(
+              Type(
+                TypeReference("ParentType_field_item"),
+                List())),
+            List())),
+        TypeAssignment(
+          TypeReference("ParentType_field_item"),
+          Type(
+            SequenceType(
+              ComponentTypeLists(
+                Some(ComponentTypeList(
+                  List(
+                    NamedComponentType(
+                      NamedType(
+                        Identifier("subField"),
+                        Type(
+                          INTEGER(
+                            None),
+                          List())),
+                      Empty)))),
+                None,
+                None)),
+            List()))))
+    
+    parse(assignmentList, text) match {
+      case Success(assignments, _) => {
+        if (assignments != sanityAssignments) {
+          val indentWriter = new IndentWriter(System.out)
+          GenScalaAst.generate(indentWriter, assignments)
+          indentWriter.flush()
+          assert(false)
+        }
+        val processedAssignments = AnonymousTypeNamer.process(assignments)
+        if (processedAssignments != expectedAssignments) {
+          val indentWriter = new IndentWriter(System.out)
+          GenScalaAst.generate(indentWriter, processedAssignments)
+          indentWriter.flush()
+          assert(false)
+        }
+      }
+      case x => fail("Parse failure: " + x)
     }
   }
 }
