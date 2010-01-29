@@ -129,11 +129,21 @@ class GenScala(packageName: String, out: IndentWriter) {
           }
           out.println("}")
           out.println()
-          //out.println("override def equals(that: Object): Boolean =")
-          //out.indent(2) {
-          //  out.println("this.equals(that.asInstanceOf[" + safeId(assignmentName) + "])")
-          //}
-          //out.println()
+          out.println("override def equals(that: Any): Boolean = {")
+          out.indent(2) {
+            out.println("val other = try {")
+            out.indent(2) {
+              out.println("that.asInstanceOf[" + safeId(assignmentName) + "]")
+            }
+            out.println("} catch {")
+            out.indent(2) {
+              out.println("case e: ClassCastException => return false")
+            }
+            out.println("}")
+            out.println("this.equals(other: " + safeId(assignmentName) + ")")
+          }
+          out.println("}")
+          out.println()
           out.println("def equals(that: " + safeId(assignmentName) + "): Boolean = {")
           out.indent(2) {
             list foreach {
