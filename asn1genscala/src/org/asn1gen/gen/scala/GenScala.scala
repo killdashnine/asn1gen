@@ -89,78 +89,123 @@ class GenScala(packageName: String, out: IndentWriter) {
             "(" + typeNameOf(firstNamedType._type) + ") {")
         out.println("}")
       }
-      case ast.SequenceType(spec) => {
-        out.print("case class " + safeId(assignmentName) + "(")
-        spec match {
-          case ast.ComponentTypeLists(list1, extension, list2) => {
+      case ast.SequenceType(ast.Empty) => {
+                out.print("class " + safeId(assignmentName) + "(")
+        out.println(") extends _runtime.AsnSequence {")
+        out.println("}")
+        out.println()
+        out.print("object " + safeId(assignmentName) + " extends " + safeId(assignmentName) + "() {")
+        out.println("}")
+      }
+      case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
+        val list = (list1.toList:::list2.toList).map { componentTypeList =>
+          componentTypeList.componentTypes
+        }.flatten
+        out.print("class " + safeId(assignmentName) + "(")
+        out.println()
+        out.indent(2) {
+          generateSequenceFieldDefines(assignmentName, list)
+          out.println()
+        }
+        out.println(") extends _runtime.AsnSequence {")
+        out.indent(2) {
+          out.println("def copy(")
+          out.indent(2) {
+            out.indent(2) {
+              generateSequenceCopyParameters(list)
+              out.println(") = {")
+            }
+            out.print(safeId(assignmentName) + "(")
             out.println()
             out.indent(2) {
               list1 match {
                 case Some(ast.ComponentTypeList(list)) => {
-                  generateSequenceConstructor(assignmentName, list)
+                  generateSequenceFieldValues(assignmentName, list)
                 }
                 case None => ()
               }
-              out.println()
+              out.println(")")
             }
           }
-          case ast.Empty => {}
-        }
-        out.println(") extends _runtime.AsnSequence {")
-        out.indent(2) {
-          spec match {
-            case ast.ComponentTypeLists(list1, extension, list2) => {
-              list1 match {
-                case Some(ast.ComponentTypeList(list)) => {
-                  generateSequenceImmutableSetters(assignmentName, list)
+          out.println("}")
+          out.println()
+          //out.println("override def equals(that: Object): Boolean =")
+          //out.indent(2) {
+          //  out.println("this.equals(that.asInstanceOf[" + safeId(assignmentName) + "])")
+          //}
+          //out.println()
+          out.println("def equals(that: " + safeId(assignmentName) + "): Boolean = {")
+          out.indent(2) {
+            list foreach {
+              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
+                out.println("if (this." + safeId(identifier) + " != that." + safeId(identifier) + ")")
+                out.indent(2) {
+                  out.println("return false")
                 }
-                case None => ()
               }
             }
-            case ast.Empty => {}
+            out.println("return true")
           }
+          out.println("}")
+          out.println()
+          out.println("override def hashCode(): Int = return (")
+          out.indent(2) {
+            out.println("0")
+            list foreach {
+              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
+                out.println("^ this." + safeId(identifier) + ".hashCode")
+              }
+            }
+          }
+          out.println(")")
+          out.println()
+          generateSequenceImmutableSetters(assignmentName, list)
         }
         out.println("}")
         out.println()
         out.print("object " + safeId(assignmentName) + " extends " + safeId(assignmentName) + "(")
         out.indent(2) {
-          spec match {
-            case ast.ComponentTypeLists(list1, extension, list2) => {
-              out.println()
-              list1 match {
-                case Some(ast.ComponentTypeList(list)) => {
-                  var firstItem = true
-                  list.map {
-                    case ast.NamedComponentType(
-                      ast.NamedType(_, _type),
-                      optionalDefault)
-                    => {
-                      if (!firstItem) {
-                        out.println(",")
-                      }
-                      optionalDefault match {
-                        case ast.Empty => {
-                          out.print(safeId(typeNameOf(_type)))
-                        }
-                        case ast.Optional => {
-                          out.print("Some(" + safeId(typeNameOf(_type)) + ")")
-                        }
-                        case ast.Default(value) => {
-                          out.print("/* Default(" + value + ") */")
-                        }
-                      }
-                      firstItem = false
-                    }
-                  }
-                  out.println()
-                }
-                case None => ()
+          out.println()
+          var firstItem = true
+          list.map {
+            case ast.NamedComponentType(
+              ast.NamedType(_, _type),
+              optionalDefault)
+            => {
+              if (!firstItem) {
+                out.println(",")
               }
+              optionalDefault match {
+                case ast.Empty => {
+                  out.print(safeId(typeNameOf(_type)))
+                }
+                case ast.Optional => {
+                  out.print("Some(" + safeId(typeNameOf(_type)) + ")")
+                }
+                case ast.Default(value) => {
+                  out.print("/* Default(" + value + ") */")
+                }
+              }
+              firstItem = false
             }
-            case ast.Empty => {}
           }
+          out.println()
         }
         out.println(") {")
+        out.indent(2) {
+          out.println("def apply(")
+          out.indent(2) {
+            out.indent(2) {
+              generateSequenceFieldParameters(assignmentName, list)
+              out.println(") =")
+            }
+            out.println("new " + safeId(assignmentName) + "(")
+            out.indent(2) {
+              generateSequenceFieldValues(assignmentName, list)
+              out.println(")")
+            }
+          }
+        }
         out.println("}")
       }
       case ast.EnumeratedType(enumerations)
@@ -266,7 +311,46 @@ class GenScala(packageName: String, out: IndentWriter) {
     }
   }
   
-  def generateSequenceConstructor(
+  def defaultNameOf(namedComponentType: ast.NamedComponentType): String = {
+    namedComponentType match {
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
+        value)
+      => {
+        defaultNameOf(_type, value)
+      }
+    }
+  }
+  
+  def defaultNameOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return typeNameOf(_type)
+      case ast.Default(value) =>
+        return defaultNameOf(_type)
+      case ast.Optional =>
+        return "None"
+    }
+  }
+  
+  def generateSequenceFieldDefines(
+      sequenceName: String, list: List[ast.ComponentType]): Unit = {
+    var firstTime = true
+    list foreach {
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
+        value)
+      => {
+        if (!firstTime) {
+          out.println(",")
+        }
+        out.print("val " + safeId(identifier) + ": " + safeId(typeNameOf(_type, value)))
+        firstTime = false
+      }
+    }
+  }
+  
+  def generateSequenceFieldParameters(
       sequenceName: String, list: List[ast.ComponentType]): Unit = {
     var firstTime = true
     list foreach {
@@ -279,6 +363,180 @@ class GenScala(packageName: String, out: IndentWriter) {
         }
         out.print(safeId(identifier) + ": " + safeId(typeNameOf(_type, value)))
         firstTime = false
+      }
+    }
+  }
+  
+  def generateSequenceFieldValues(
+      sequenceName: String, list: List[ast.ComponentType]): Unit = {
+    var firstTime = true
+    list foreach {
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
+        value)
+      => {
+        if (!firstTime) {
+          out.println(",")
+        }
+        out.print(safeId(identifier))
+        firstTime = false
+      }
+    }
+  }
+  
+  def generateSequenceCopyParameters(
+      list: List[ast.ComponentType]): Unit = {
+    var firstTime = true
+    list foreach {
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
+        value)
+      => {
+        if (!firstTime) {
+          out.println(",")
+        }
+        out.print(safeId(identifier) + ": " + safeId(typeNameOf(_type, value)) + " = this." + safeId(identifier))
+        firstTime = false
+      }
+    }
+  }
+  
+  def defaultNameOf(_type: ast.Type): String = {
+    _type match {
+      case ast.Type(typeKind, _) => defaultNameOf(typeKind)
+    }
+  }
+  
+  def defaultNameOf(typeKind: ast.TypeKind): String = {
+    typeKind match {
+      case builtinType: ast.BuiltinType => defaultNameOf(builtinType)
+      case ast.TypeReference(reference) => reference
+      case unmatched => "UnmatchedDefaultName(" + unmatched + ")"
+    }
+  }
+  
+  def defaultNameOf(typeKind: ast.TypeKind, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return defaultNameOf(typeKind)
+      case ast.Default(value) =>
+        return defaultNameOf(typeKind)
+      case ast.Optional =>
+        return "None"
+    }
+  }
+  
+  def defaultNameOf(builtinType: ast.BuiltinType): String = {
+    builtinType match {
+      case ast.BitStringType(_) => {
+        return "_runtime.AsnBitString"
+      }
+      case ast.BOOLEAN => {
+        return "_runtime.AsnBoolean"
+      }
+      case characterString: ast.CharacterStringType => {
+        defaultNameOf(characterString)
+      }
+      case _: ast.ChoiceType => {
+        return "_runtime.AsnChoice"
+      }
+      case ast.EmbeddedPdvType => {
+        return "_runtime.AsnEmbeddedPdv"
+      }
+      case ast.EnumeratedType(_) => {
+        return "_runtime.AsnEnumeration"
+      }
+      case ast.EXTERNAL => {
+        return "ExternalType"
+      }
+      case ast.InstanceOfType(_) => {
+        return "InstanceOfType"
+      }
+      case ast.INTEGER(_) => {
+        return "_runtime.AsnInteger"
+      }
+      case ast.NULL => {
+        return "_runtime.AsnNull"
+      }
+      case _: ast.ObjectClassFieldType => {
+        return "_runtime.AsnObjectClassField"
+      }
+      case ast.ObjectIdentifierType => {
+        return "_runtime.AsnObjectIdentifier"
+      }
+      case ast.OctetStringType => {
+        return "_runtime.AsnOctetString"
+      }
+      case ast.REAL => {
+        return "_runtime.AsnReal"
+      }
+      case ast.RelativeOidType => {
+        return "_runtime.AsnRelativeOidType"
+      }
+      case ast.SequenceOfType(_) => {
+        return "_runtime.AsnSequenceOf"
+      }
+      case ast.SequenceType(_) => {
+        return "_runtime.AsnSequence"
+      }
+      case ast.SetOfType(_) => {
+        return "_runtime.AsnSetOf"
+      }
+      case ast.SetType(_) => {
+        return "_runtime.AsnSet"
+      }
+      case ast.TaggedType(_, _, underlyingType) => {
+        return defaultNameOf(underlyingType)
+      }
+      case unmatched => {
+        return "UnknownBuiltinType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def defaultNameOf(characterString: ast.CharacterStringType): String = {
+    characterString match {
+      case ast.BMPString => {
+        return "_runtime.AsnBmpString"
+      }
+      case ast.GeneralString => {
+        return "_runtime.AsnGeneralString"
+      }
+      case ast.GraphicString => {
+        return "_runtime.AsnGraphicString"
+      }
+      case ast.IA5String => {
+        return "_runtime.AsnIa5String"
+      }
+      case ast.ISO646String => {
+        return "_runtime.AsnIso646String"
+      }
+      case ast.NumericString => {
+        return "_runtime.AsnNumericString"
+      }
+      case ast.PrintableString => {
+        return "_runtime.AsnPrintableString"
+      }
+      case ast.T61String => {
+        return "_runtime.AsnT61String"
+      }
+      case ast.TeletexString => {
+        return "_runtime.AsnTeletexString"
+      }
+      case ast.UniversalString => {
+        return "_runtime.AsnUniversalString"
+      }
+      case ast.UTF8String => {
+        return "_runtime.AsnUtf8String"
+      }
+      case ast.VideotexString => {
+        return "_runtime.AsnVideotexString"
+      }
+      case ast.VisibleString => {
+        return "_runtime.AsnVisibleString"
+      }
+      case unknown => {
+        return "UnknownCharacterString(" + unknown + ")"
       }
     }
   }
