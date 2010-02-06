@@ -2,8 +2,9 @@ package org.asn1gen.runtime
 
 import scala.collection.immutable.BitSet
 
-abstract class AsnBitString extends AsnType {
+class AsnBitString extends AsnType {
+  override def _desc: meta.AsnBitString = meta.AsnBitString
 }
 
-object AsnBitString {
+object AsnBitString extends AsnBitString {
 }
