@@ -46,10 +46,20 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
   
   def writeTo(outDirectory: JavaFile): Unit = {
     outDirectory.mkdir
+    val metaDirectory = outDirectory.child("meta")
+    metaDirectory.mkdir
     modules foreach { case (moduleName, module) =>
       val moduleFile = outDirectory.child(moduleName + ".scala")
       moduleFile.openPrintStream { ps =>
         val genScala = new GenScala("moo", new IndentWriter(ps))
+        genScala.generate(module)
+        println("Writing to " + moduleFile)
+      }
+    }
+    modules foreach { case (moduleName, module) =>
+      val moduleFile = metaDirectory.child(moduleName + ".scala")
+      moduleFile.openPrintStream { ps =>
+        val genScala = new GenScalaMeta("moo", new IndentWriter(ps))
         genScala.generate(module)
         println("Writing to " + moduleFile)
       }
