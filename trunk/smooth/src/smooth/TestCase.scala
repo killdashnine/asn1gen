@@ -1,0 +1,39 @@
+package smooth
+
+import java.io._
+import org.asn1gen.parsing.asn1.Asn1Parser
+import org.asn1gen.parsing.asn1.ast._
+import scala.util.parsing.input._
+import scala.io.Source
+import org.asn1gen.gen._
+import org.asn1gen.gen.scala._
+import org.asn1gen.io.IndentWriter
+import org.asn1gen.io.JavaTypes._
+import org.asn1gen.io.RichFile._
+
+object TestCase extends Asn1Parser {
+  def parse[N](root: Parser[N], input: String) =
+    phrase(root)(new lexical.Scanner(input))
+
+  def main(args : Array[String]) : Unit = {
+    // Load model
+    val inputDirectory = new File("asn")
+    inputDirectory.requireExists
+    inputDirectory.requireDirectory
+    val children = inputDirectory.children { file =>
+      file.isFile && file.name.endsWith(".asn1")
+    }
+    
+    var model = (Model.empty /: children) { (model, child) =>
+      println("Loading: " + child.name)
+      model.load(child)
+    }
+    
+    // Output model
+    val outDirectory = new File("out")
+    outDirectory.mkdir
+    model.writeTo(outDirectory)
+    
+    println("Done.")
+  }
+}
