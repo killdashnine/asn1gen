@@ -1,0 +1,5 @@
+package moo
+
+class Moo {
+
+}
