@@ -23,4 +23,6 @@ class AsnInteger(val value: Long) extends AsnType {
 
 object AsnInteger extends AsnInteger(0) {
   def apply(value: Long): AsnInteger = new AsnInteger(value)
+  
+  def unapply(): Option[(Long)] = Some(value)
 }
