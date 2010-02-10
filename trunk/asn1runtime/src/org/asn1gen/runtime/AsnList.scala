@@ -7,16 +7,11 @@ trait AsnList[T <: AsnType] extends AsnType {
 
   def items: List[T]
 
-  override def equals(that: Any): Boolean = {
-    val other = try {
-      that.asInstanceOf[AsnList[T]]
-    } catch {
-      case e: ClassCastException => return false
-    }
-    this.equals(other: AsnList[T])
+  // TODO: Don't define this here.  Define in derived classes.
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnList[T] => this.items.sameElements(that.items)
+    case _ => false
   }
-
-  def equals(that: AsnList[T]): Boolean = this.items.sameElements(that.items)
 
   override def hashCode(): Int = (0 /: this.items)(_ ^ _.hashCode)
 }

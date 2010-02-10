@@ -5,15 +5,16 @@ class AsnOctetString(val value: List[Byte]) extends AsnType {
 
   def copy(value: List[Byte] = this.value) = new AsnOctetString(value)
 
-  def equals(that: AsnOctetString) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      return that.asInstanceOf[AsnOctetString].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnOctetString => this.value == that.value
+    case _ => false
   }
+
+  override def hashCode(): Int = this.value.hashCode
+
+  def value(f: (List[Byte] => List[Byte])): AsnOctetString = this.copy(value = f(this.value))
+
+  def unapply(): Option[(List[Byte])] = Some(value)
 }
 
 object AsnOctetString extends AsnOctetString(Nil) {

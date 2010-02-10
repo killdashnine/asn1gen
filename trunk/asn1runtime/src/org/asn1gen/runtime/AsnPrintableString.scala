@@ -5,14 +5,9 @@ class AsnPrintableString(value: String) extends AsnCharacterString(value) {
 
   def copy(value: String = this.value) = new AsnPrintableString(value)
 
-  def equals(that: AsnPrintableString) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      return that.asInstanceOf[AsnPrintableString].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnPrintableString => this.value == that.value
+    case _ => false
   }
 }
 

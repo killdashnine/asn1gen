@@ -5,14 +5,9 @@ class AsnUtf8String(value: String) extends AsnCharacterString(value) {
 
   def copy(value: String = this.value) = new AsnUtf8String(value)
 
-  def equals(that: AsnUtf8String) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      return that.asInstanceOf[AsnUtf8String].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnUtf8String => this.value == that.value
+    case _ => false
   }
 }
 

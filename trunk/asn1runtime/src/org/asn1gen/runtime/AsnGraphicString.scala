@@ -5,14 +5,9 @@ class AsnGraphicString(value: String) extends AsnCharacterString(value) {
 
   def copy(value: String = this.value) = new AsnGraphicString(value)
 
-  def equals(that: AsnGraphicString) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      return that.asInstanceOf[AsnGraphicString].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnGraphicString => this.value == that.value
+    case _ => false
   }
 }
 

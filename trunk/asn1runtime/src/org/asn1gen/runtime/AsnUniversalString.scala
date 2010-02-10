@@ -5,14 +5,9 @@ class AsnUniversalString(value: String) extends AsnCharacterString(value) {
 
   def copy(value: String = this.value) = new AsnUniversalString(value)
 
-  def equals(that: AsnUniversalString) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      return that.asInstanceOf[AsnUniversalString].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnUniversalString => this.value == that.value
+    case _ => false
   }
 }
 

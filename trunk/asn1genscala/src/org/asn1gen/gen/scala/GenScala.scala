@@ -180,6 +180,17 @@ class GenScala(packageName: String, out: IndentWriter) {
           out.println(")")
           out.println()
           generateSequenceImmutableSetters(assignmentName, list)
+          out.println()
+          out.println("override def _child(name: String): Any = name match {")
+          out.indent(2) {
+            list foreach {
+              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
+                out.println("case \"" + safeId(identifier) + "\" => " + safeId(identifier))
+              }
+            }
+            out.println("case _ => throw new Exception(\"Member '\" + name + \"' does not exist.\")")
+          }
+          out.println("}")
         }
         out.println("}")
         out.println()

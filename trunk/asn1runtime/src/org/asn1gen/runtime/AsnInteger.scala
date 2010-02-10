@@ -5,16 +5,10 @@ class AsnInteger(val value: Long) extends AsnType {
 
   def copy(value: Long = this.value) = AsnInteger(value)
 
-  override def equals(that: Any): Boolean = {
-    val other = try {
-      that.asInstanceOf[AsnInteger]
-    } catch {
-      case e: ClassCastException => return false
-    }
-    this.equals(other: AsnInteger)
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnInteger => this.value == that.value
+    case _ => false
   }
-
-  def equals(that: AsnInteger): Boolean = this.value == that.value
 
   override def hashCode(): Int = this.value.hashCode
 

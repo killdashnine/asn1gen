@@ -5,14 +5,9 @@ class AsnTeletexString(value: String) extends AsnCharacterString(value) {
 
   def copy(value: String = this.value) = new AsnTeletexString(value)
 
-  def equals(that: AsnTeletexString) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      that.asInstanceOf[AsnTeletexString].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnTeletexString => this.value == that.value
+    case _ => false
   }
 }
 
