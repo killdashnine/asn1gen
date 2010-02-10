@@ -5,14 +5,9 @@ class AsnT61String(value: String) extends AsnCharacterString(value) {
 
   def copy(value: String = this.value) = new AsnT61String(value)
 
-  def equals(that: AsnT61String) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      return that.asInstanceOf[AsnT61String].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnT61String => this.value == that.value
+    case _ => false
   }
 }
 

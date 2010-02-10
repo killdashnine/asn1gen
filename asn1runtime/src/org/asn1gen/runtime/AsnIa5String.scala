@@ -5,14 +5,9 @@ class AsnIa5String(value: String) extends AsnCharacterString(value) {
 
   def copy(value: String = this.value) = new AsnIa5String(value)
 
-  def equals(that: AsnIa5String) = this.value == that.value
-
-  override def equals(that: Any): Boolean = {
-    try {
-      return that.asInstanceOf[AsnIa5String].equals(this)
-    } catch {
-      case e: ClassCastException => return false
-    }
+  override def equals(that: Any): Boolean = that match {
+    case that: AsnIa5String => this.value == that.value
+    case _ => false
   }
 }
 

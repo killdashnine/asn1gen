@@ -120,7 +120,7 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
             var firstItem = true
             list.map {
               case ast.NamedComponentType(
-                ast.NamedType(ast.Identifier(identifier), _type), _)
+                ast.NamedType(ast.Identifier(identifier), _type), optionalValue)
               => {
                 val safeIdentifier = safeId(identifier)
                 val safeType = safeId(typeNameOf(_type))
@@ -129,7 +129,9 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
                 }
                 out.print(
                     "\"" + safeIdentifier + "\" -> _meta_.AsnSequenceMember(\"" +
-                    safeIdentifier + "\", " + safeType + ")")
+                    safeIdentifier + "\", " +
+                    safeType + ", " +
+                    (optionalValue == ast.Optional) + ")")
                 firstItem = false
               }
             }
