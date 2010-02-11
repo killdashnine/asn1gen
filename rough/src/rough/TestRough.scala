@@ -1,20 +1,23 @@
 import moo.AMPTYPES._
 
+import org.asn1gen.runtime.printing.SimplePrinter
+import java.io.PrintWriter
+
 package rough {
   object TestRough {
     def main(args: Array[String]): Unit = {
       println("Hello world")
       val secBoardId1 =
         ( AmpSecBoardId
-            .secCode { _ => AmpSecurityCode("xyz".getBytes.toList) }
+            .secCode { _ => AmpSecurityCode("xyz") }
         )
       val secBoardId2 =
         ( AmpSecBoardId
-            .secCode { _ => AmpSecurityCode("xyz".getBytes.toList) }
+            .secCode { _ => AmpSecurityCode("xyz") }
         )
       val secBoardId3 =
         ( AmpSecBoardId
-            .secCode { _ => AmpSecurityCode("abc".getBytes.toList) }
+            .secCode { _ => AmpSecurityCode("abc") }
         )
       println(secBoardId1)
       println(secBoardId1.secCode)
@@ -30,7 +33,13 @@ package rough {
       secBoardId1._desc.children.foreach { case (key, value) =>
         println(key + ": " + value)
       }
-      //println(secBoardId1.inspect())
+      
+      val writer = new PrintWriter(System.out)
+      try {
+        SimplePrinter.print(writer, secBoardId1)
+      } finally {
+        writer.flush()
+      }
     }
   }
 }

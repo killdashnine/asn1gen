@@ -15,8 +15,12 @@ class AsnOctetString(val value: List[Byte]) extends AsnType {
   def value(f: (List[Byte] => List[Byte])): AsnOctetString = this.copy(value = f(this.value))
 
   def unapply(): Option[(List[Byte])] = Some(value)
+  
+  def string: String = new String(this.value.toArray)
 }
 
 object AsnOctetString extends AsnOctetString(Nil) {
   def apply(value: List[Byte]): AsnOctetString = new AsnOctetString(value)
+  
+  def apply(value: String): AsnOctetString = AsnOctetString(value.getBytes.toList)
 }
