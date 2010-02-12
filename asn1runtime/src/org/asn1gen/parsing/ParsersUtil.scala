@@ -1,6 +1,5 @@
 package org.asn1gen.parsing
 
-import org.asn1gen.extra.ParsersExtra
 import scala.util.parsing.combinator._
 
 trait ParsersUtil extends Parsers {
