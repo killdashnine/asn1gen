@@ -3,7 +3,6 @@ package org.asn1gen.runtime.codec
 import scala.util.parsing.combinator._
 import org.asn1gen.parsing.ParsersUtil
 import org.asn1gen.parsing.BinaryParsers
-import org.asn1gen.extra.ParsersExtra
 
 trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUtil {
   type AsnBoolean
@@ -13,8 +12,6 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
   type AsnPrintableString
   type AsnReal
   
-  implicit def parsersToParsersExtra(parsers: Parsers) = ParsersExtra(parsers)
-
   // Tag-Length Header
   
   def rawTagHeaderLoneByte: Parser[Byte] =

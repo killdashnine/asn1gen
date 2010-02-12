@@ -4,12 +4,23 @@ import org.asn1gen.{runtime => _rt_}
 import org.asn1gen.runtime.{meta => _meta_}
 
 import java.io.PrintWriter
+import org.asn1gen.extra.Extras
 
-object SimplePrinter {
+object Moo extends org.asn1gen.extra.Extras {
+  def momoo() = {
+    "".inspect()
+  }
+}
+
+object SimplePrinter extends Extras {
   def print(out: PrintWriter, value: Any): Unit = {
     value match {
-      case value: _rt_.AsnOctetString => {
-        out.print("AsnOctetString(\"" + value.string + "\")")
+      case asnCharacterString: _rt_.AsnCharacterString => {
+        "".inspect()
+        out.print(asnCharacterString._desc.name + "(\"" + asnCharacterString.value.inspect() + "\")")
+      }
+      case asnOctetString: _rt_.AsnOctetString => {
+        out.print("AsnOctetString(\"" + asnOctetString.string.inspect() + "\")")
       }
       case asnSequence: _rt_.AsnSequence => {
         val desc = asnSequence._desc
