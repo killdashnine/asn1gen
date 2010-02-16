@@ -5,43 +5,44 @@ import org.asn1gen.runtime.{meta => _meta_}
 
 import java.io.PrintWriter
 import org.asn1gen.extra.Extras
-
-object Moo extends org.asn1gen.extra.Extras {
-  def momoo() = {
-    "".inspect()
-  }
-}
+import org.asn1gen.io.IndentWriter
 
 object SimplePrinter extends Extras {
-  def print(out: PrintWriter, value: Any): Unit = {
+  def print(out: IndentWriter, value: Option[_rt_.AsnType]): Unit = {
+    
+  }
+  
+  def print(out: IndentWriter, value: _rt_.AsnType): Unit = {
     value match {
       case asnCharacterString: _rt_.AsnCharacterString => {
         "".inspect()
-        out.print(asnCharacterString._desc.name + "(\"" + asnCharacterString.value.inspect() + "\")")
+        out.print(asnCharacterString._desc.name + "(" + asnCharacterString.value.inspect() + ")")
       }
       case asnOctetString: _rt_.AsnOctetString => {
-        out.print("AsnOctetString(\"" + asnOctetString.string.inspect() + "\")")
+        out.print("AsnOctetString(" + asnOctetString.string.inspect() + ")")
       }
       case asnSequence: _rt_.AsnSequence => {
         val desc = asnSequence._desc
-        out.print(desc.name)
-        desc.children.foreach { case (name, _: _meta_.AsnSequenceMember) =>
-          val child = asnSequence._child(name)
-          child match {
-            case None =>
-            case Some(subValue: _rt_.AsnType) => {
-              out.print(".")
-              out.print(name)
-              out.print("{ _ => Some(")
-              this.print(out, subValue)
-              out.print(") }")
-            }
-            case subValue: _rt_.AsnType => {
-              out.print(".")
-              out.print(name)
-              out.print("{ _ => ")
-              this.print(out, subValue)
-              out.print(" }")
+        out.println(desc.name)
+        out.indent {
+          desc.children.foreach { case (name, _: _meta_.AsnSequenceMember) =>
+            val child = asnSequence._child(name)
+            child match {
+              case None =>
+              case Some(subValue: _rt_.AsnType) => {
+                out.print(".")
+                out.print(name)
+                out.print("{ _ => Some(")
+                this.print(out, subValue)
+                out.print(") }")
+              }
+              case subValue: _rt_.AsnType => {
+                out.print(".")
+                out.print(name)
+                out.print("{ _ => ")
+                this.print(out, subValue)
+                out.print(" }")
+              }
             }
           }
         }

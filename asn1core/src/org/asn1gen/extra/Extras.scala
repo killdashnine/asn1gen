@@ -1,11 +1,18 @@
 package org.asn1gen.extra
 
-trait Extras {
-  implicit def toExtra(x: Char) = new ExtraChar(x)
+import java.io.OutputStream
+import java.io.Writer
 
-  implicit def toExtra(x: String) = new ExtraString(x)
+trait Extras {
+  implicit def toExtra(value: Char) = new ExtraChar(value)
+
+  implicit def toExtra(value: String) = new ExtraString(value)
 
   implicit def toExtra(value: Byte) = ByteExtra(value)
+  
+  implicit def toExtra(os: OutputStream) = OutputStreamExtra(os)
+  
+  implicit def toExtra(writer: Writer) = WriterExtra(writer)
 }
 
 object Extras extends Extras
