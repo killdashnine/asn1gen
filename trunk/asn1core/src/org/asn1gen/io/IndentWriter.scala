@@ -5,32 +5,48 @@ import java.io.PrintWriter
 import java.io.Writer
 
 class IndentWriter(out: Writer) extends PrintWriter(out, true) {
-  private var indent_ : Int = 0
-  private var lineStart_ : Boolean = true
+  val defaultIndent: Int = 2
+  var indent: Int = 0
+  var emptyLines: Int = 0
+  
+  def atLineStart: Boolean = emptyLines != 0
   
   def this(out: PrintStream) = this(new PrintWriter(out, true))
   
   def indent[T](offset: Int)(f: => T): T = {
-    indent_ += offset
+    indent += offset
     try {
       return f
     } finally {
-      indent_ -= offset
+      indent -= offset
     }
   }
+  
+  def indent[T](f: => T): T = indent(defaultIndent)(f)
   
   override def println(): Unit = {
     super.println()
-    lineStart_ = true
+    emptyLines += 1
   }
   
   override def print(s: String): Unit = {
-    if (lineStart_) {
-      super.print(" " * indent_)
-      lineStart_ = false
+    if (s.length != 0) {
+      if (atLineStart) {
+        super.print(" " * indent)
+        emptyLines = 0
+      }
     }
     super.print(s)
   }
-  
-  def indent: Int = indent_
+}
+
+object IndentWriter {
+  def wrap[T](printWriter: PrintWriter)(f: IndentWriter => T): T = {
+    val writer = new IndentWriter(printWriter)
+    try {
+      f(writer)
+    } finally {
+      writer.flush()
+    }
+  }
 }

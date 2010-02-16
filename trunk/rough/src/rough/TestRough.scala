@@ -1,6 +1,8 @@
 import moo.AMPTYPES._
 
 import org.asn1gen.runtime.printing.SimplePrinter
+import org.asn1gen.extra.Extras._
+import org.asn1gen.io.IndentWriter
 import java.io.PrintWriter
 
 package rough {
@@ -34,11 +36,8 @@ package rough {
         println(key + ": " + value)
       }
       
-      val writer = new PrintWriter(System.out)
-      try {
+      System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, secBoardId1)
-      } finally {
-        writer.flush()
       }
     }
   }
