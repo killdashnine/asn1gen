@@ -34,11 +34,24 @@ package rough {
         }
         .externalOrderId2 { _ => Some(AsnOctetString("A new external order id")) }
       
+      val orderFixedFields3 = orderFixedFields1
+        .secBoardId { _ map { _
+          .securityIdType { _ map { s =>
+            AsnOctetString(s.string + " modified")
+          } }
+          .secCode { _ => AsnOctetString("A new seccode") }
+          .boardId { _ => None }
+        } }
+        .externalOrderId2 { _ => Some(AsnOctetString("A new external order id")) }
+      
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
         writer.println()
         writer.println()
         SimplePrinter.print(writer, orderFixedFields2)
+        writer.println()
+        writer.println()
+        SimplePrinter.print(writer, orderFixedFields3)
       }
     }
   }
