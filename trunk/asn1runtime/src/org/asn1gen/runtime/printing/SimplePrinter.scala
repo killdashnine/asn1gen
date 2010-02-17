@@ -30,19 +30,26 @@ object SimplePrinter extends Extras {
             val child = asnSequence._child(name)
             child match {
               case None =>
-              case Some(subValue: _rt_.AsnType) => {
+              case Some(subValue: _rt_.AsnSequence) => {
                 out.print(".")
                 out.print(name)
-                out.print(" { _ => Some(")
+                out.print(" { _ => Some apply ")
                 val line = out.line
                 this.print(out, subValue)
-                out.print(")")
                 if (line != out.line) {
                   out.break()
                   out.print("}")
                 } else {
                   out.print(" }")
                 }
+              }
+              case Some(subValue: _rt_.AsnType) => {
+                out.print(".")
+                out.print(name)
+                out.print(" { _ => Some(")
+                val line = out.line
+                this.print(out, subValue)
+                out.print(") }")
               }
               case subValue: _rt_.AsnType => {
                 out.print(".")
