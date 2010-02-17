@@ -10,25 +10,35 @@ import java.io.PrintWriter
 package rough {
   object TestRough {
     def main(args: Array[String]): Unit = {
-      println("Hello world")
       val orderFixedFields1 =
         AmpOrderFixedFields
         .secBoardId { _ => Some apply AmpSecBoardId
-          .securityIdType { _ => Some(AsnOctetString("")) }
+          .securityIdType { _ => Some(AsnOctetString("Security ID")) }
           .secCode { _ => AsnOctetString("") }
           .boardId { _ => Some(AsnOctetString("")) }
         }
-        .isPrivate { _ => Some(AsnBoolean) }
-        .externalOrderId2 { _ => Some(AsnOctetString("")) }
-        .compGenOrder { _ => Some(AsnBoolean) }
       
-      val orderFixedFields2 =
-        orderFixedFields1
+      val orderFixedFields2 = orderFixedFields1
+        .secBoardId {
+          case Some(secBoardId) => { Some apply secBoardId
+            .securityIdType {
+              case Some(s@AsnOctetString(value)) => {
+                Some(AsnOctetString(s.string + " modified"))
+              }
+              case None => None
+            }
+            .secCode { _ => AsnOctetString("A new seccode") }
+            .boardId { _ => None }
+          }
+          case None => None
+        }
+        .externalOrderId2 { _ => Some(AsnOctetString("A new external order id")) }
       
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
         writer.println()
         writer.println()
+        SimplePrinter.print(writer, orderFixedFields2)
       }
     }
   }
