@@ -211,7 +211,7 @@ class GenScala(packageName: String, out: IndentWriter) {
                   out.print(safeId(typeNameOf(_type)))
                 }
                 case ast.Optional => {
-                  out.print("Some(" + safeId(typeNameOf(_type)) + ")")
+                  out.print("None")
                 }
                 case ast.Default(value) => {
                   out.print("/* Default(" + value + ") */")
