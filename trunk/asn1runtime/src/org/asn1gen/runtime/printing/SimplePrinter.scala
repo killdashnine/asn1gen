@@ -23,30 +23,45 @@ object SimplePrinter extends Extras {
       }
       case asnSequence: _rt_.AsnSequence => {
         val desc = asnSequence._desc
-        out.println(desc.name)
+        out.print(desc.name)
         out.indent {
           desc.children.foreach { case (name, _: _meta_.AsnSequenceMember) =>
+            out.break()
             val child = asnSequence._child(name)
             child match {
               case None =>
               case Some(subValue: _rt_.AsnType) => {
                 out.print(".")
                 out.print(name)
-                out.print("{ _ => Some(")
+                out.print(" { _ => Some(")
+                val line = out.line
                 this.print(out, subValue)
-                out.print(") }")
+                out.print(")")
+                if (line != out.line) {
+                  out.break()
+                  out.print("}")
+                } else {
+                  out.print(" }")
+                }
               }
               case subValue: _rt_.AsnType => {
                 out.print(".")
                 out.print(name)
-                out.print("{ _ => ")
+                out.print(" { _ => ")
+                val line = out.line
                 this.print(out, subValue)
-                out.print(" }")
+                if (line != out.line) {
+                  out.break()
+                  out.print("}")
+                } else {
+                  out.print(" }")
+                }
               }
             }
           }
         }
       }
+      case _rt_.AsnBoolean => out.print("AsnBoolean")
       case _ => {
         out.print("/**")
         out.print(value)
