@@ -6,7 +6,7 @@ import org.asn1gen.io._
 import scala.collection.immutable.Set
 
 class GenScala(packageName: String, out: IndentWriter) {
-  val keywords = Set("yield", "type", "null")
+  val keywords = Set("yield", "type", "null", "final")
   
   def safeId(id: String): String = {
     if (keywords contains id) {
@@ -51,6 +51,7 @@ class GenScala(packageName: String, out: IndentWriter) {
       case t@ast.Type(referencedType: ast.ReferencedType, _) => {
         referencedType match {
           case ast.TypeReference(name) => {
+            out.ensureEmptyLines(1)
             out.println("type " + safeId(namedType.name) + " = " + safeId(name))
             out.println("val " + safeId(namedType.name) + " = " + safeId(name))
           }
@@ -95,6 +96,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.println("}")
       }
       case ast.SequenceType(ast.Empty) => {
+        out.ensureEmptyLines(1)
         out.print("class " + safeAssignmentName + " extends _rt_.AsnSequence {")
         out.indent(2) {
           out.println("override def _desc: _meta_." + safeAssignmentName + " = _meta_." + safeAssignmentName)
@@ -109,6 +111,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         val list = (list1.toList:::list2.toList).map { componentTypeList =>
           componentTypeList.componentTypes
         }.flatten
+        out.ensureEmptyLines(1)
         out.print("class " + safeAssignmentName + "(")
         out.println()
         out.indent(2) {
@@ -237,12 +240,35 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
       case ast.EnumeratedType(enumerations)
       => {
+        out.ensureEmptyLines(1)
         out.println("case class " + safeAssignmentName + "(_value: Int) extends _rt_.AsnEnumeration {")
         out.println("}")
         out.println()
         out.println("object " + safeAssignmentName + " extends " + safeAssignmentName + "(0) {")
         out.indent(2) {
-          generate(assignmentName, enumerations)
+          enumerations match {
+            case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
+            => {
+              var index = 0
+              items foreach {
+                case ast.Identifier(item) => {
+                  out.print("def " + safeId(item) + ": " + safeId(assignmentName) + " = ")
+                  out.println(safeId(assignmentName) + "(" + index + ")")
+                  index = index + 1
+                }
+                case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
+                  val value = if (sign) n * -1 else n
+                  out.print("def " + safeId(item) + ": " + safeId(assignmentName) + " = ")
+                  out.println(safeId(assignmentName) + "(" + value + ")")
+                  index = index + 1
+                }
+              }
+              extension match {
+                case None => {}
+                case _ => out.println(extension)
+              }
+            }
+          }
         }
         out.println("}")
       }
@@ -250,31 +276,37 @@ class GenScala(packageName: String, out: IndentWriter) {
         generate(assignmentName, setOfType)
       }
       case bitStringType: ast.BitStringType => {
+        out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = _rt_.AsnBitString")
         out.println()
         out.println("val " + safeAssignmentName + " = _rt_.AsnBitString")
       }
       case ast.INTEGER(None) => {
+        out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = _rt_.AsnInteger")
         out.println()
         out.println("val " + safeAssignmentName + " = _rt_.AsnInteger")
       }
       case ast.BOOLEAN => {
+        out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = _rt_.AsnBoolean")
         out.println()
         out.println("val " + safeAssignmentName + " = _rt_.AsnBoolean")
       }
       case ast.OctetStringType => {
+        out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = _rt_.AsnOctetString")
         out.println()
         out.println("val " + safeAssignmentName + " = _rt_.AsnOctetString")
       }
       case ast.REAL => {
+        out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = _rt_.AsnReal")
         out.println()
         out.println("val " + safeAssignmentName + " = _rt_.AsnReal")
       }
       case unmatched => {
+        out.ensureEmptyLines(1)
         out.println("// Unmatched " + safeAssignmentName + ": " + unmatched)
       }
     }
@@ -285,6 +317,7 @@ class GenScala(packageName: String, out: IndentWriter) {
     setOfType match {
       case ast.SetOfType(ast.Type(ast.TypeReference(referencedType), _)) => {
         val safeReferenceType = safeId(referencedType)
+        out.ensureEmptyLines(1)
         out.print("class " + safeAssignmentName)
         out.print("(val items: List[" + safeReferenceType + "]) ")
         out.println("extends _rt_.AsnList[" + safeReferenceType + "] {")
@@ -307,35 +340,10 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
       case ast.SetOfType(ast.Type(sequenceType: ast.SequenceType, _)) => {
         assert(false)
+        out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = List[" + safeId(assignmentName + "_element") + "]")
         out.println("val " + safeAssignmentName + " = Nil: List[" + safeId(assignmentName + "_element") + "]")
         generate(sequenceType, assignmentName + "_element")
-      }
-    }
-  }
-  
-  def generate(assignmentName: String, enumerations: ast.Enumerations): Unit = {
-    enumerations match {
-      case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-      => {
-        var index = 0
-        items foreach {
-          case ast.Identifier(item) => {
-            out.println(
-              "def " + safeId(item) + ": " + safeId(assignmentName) +
-              " = " + safeId(assignmentName) + "(" + index + ")")
-            index = index + 1
-          }
-          case v@_ => {
-            out.println("/* unknown enumeration:")
-            out.println(v)
-            out.println("*/")
-          }
-        }
-        extension match {
-          case None => {}
-          case _ => out.println(extension)
-        }
       }
     }
   }
@@ -799,7 +807,7 @@ class GenScala(packageName: String, out: IndentWriter) {
             ast.Tag(_, ast.Number(tagNumber)), _, _type),
           _))
       => {
-        out.println()
+        out.ensureEmptyLines(1)
         out.println(
             "case class " + safeId(assignmentName + "_" + name) +
             "(_element: " + typeNameOf(_type) + ") extends " + safeId(assignmentName) + "(_element) {")
