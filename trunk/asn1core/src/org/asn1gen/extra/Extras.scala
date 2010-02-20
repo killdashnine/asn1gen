@@ -9,11 +9,11 @@ trait Extras {
 
   implicit def toExtra(value: String) = new ExtraString(value)
 
-  implicit def toExtra(value: Byte) = ByteExtra(value)
+  implicit def toExtra(value: Byte) = ExtraByte(value)
   
-  implicit def toExtra(os: OutputStream) = OutputStreamExtra(os)
+  implicit def toExtra(os: OutputStream) = ExtraOutputStream(os)
   
-  implicit def toExtra(writer: Writer) = WriterExtra(writer)
+  implicit def toExtra(writer: Writer) = ExtraWriter(writer)
   
   implicit def toExtra(file: File) = ExtraFile(file)
 }
