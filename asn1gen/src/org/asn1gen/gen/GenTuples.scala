@@ -20,15 +20,122 @@ object GenTuples {
     val end: Int = java.lang.Integer.parseInt(args(1))
     val outdir = new File("../asn1tuple/src/scala")
     outdir.mkdirs
-    val outfile = outdir / "Tuples.scala" 
     
-    System.out.withIndentWriter { out =>
-      out.println("package scala")
-      out.println
-      out.println("import scala.collection.{TraversableLike, IterableLike}")
-      out.println("import scala.collection.generic.CanBuildFrom")
-      out.println
-      for (i <- start to end) {
+    for (i <- start to end) {
+      val functionFile = outdir("Function" + i + ".scala")
+      functionFile.withIndentWriter { out =>
+        out.println("package scala")
+        out.println
+        out.println("/**")
+        out.println(" * <p>")
+        out.println(" * Function with " + i + " parameters.")
+        out.println(" * </p>")
+        out.println(" */")
+        out.print("trait Function" + i + "[")
+        for (j <- 1 to i) {
+          out.print("-T" + j + ", ")
+        }
+        out.println("+R] extends AnyRef { self =>")
+        out.indent {
+          out.print("def apply(")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("v" + j + ": T" + j)
+          }
+          out.println("): R")
+          out.println("override def toString() = \"<function" + i + ">\"")
+          out.println
+          out.println("/**")
+          out.print(" * f(")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("x" + j)
+          }
+          out.print(")  == (f.curried)")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("(x" + j + ")")
+          }
+          out.println
+          out.println(" */")
+          out.print("def curried: ")
+          for (j <- 1 to i) {
+            out.print("T" + j + " => ")
+          } 
+          out.println("R = {")
+          out.indent {
+            for (j <- 1 to i) {
+              out.print("(x" + j + ": T" + j + ") => ")
+            } 
+            out.print("apply(")
+            for (j <- 1 to i) {
+              if (j != 1) {
+                out.print(", ")
+              }
+              out.print("x" + j)
+            }
+            out.print(")")
+          }
+          out.println
+          out.println("}")
+          out.println
+          out.println("/**")
+          out.print(" * f(")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("x" + j)
+          }
+          out.print(") == (f.tupled)(Tuple" + i + "(")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("x" + j)
+          }
+          out.println("))")
+          out.println(" */")
+          out.print("def tupled: Tuple" + i + "[")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("T" + j)
+          }
+          out.println("] => R = {")
+          out.indent {
+            out.print("case Tuple" + i + "(")
+            for (j <- 1 to i) {
+              if (j != 1) {
+                out.print(", ")
+              }
+              out.print("x" + j)
+            }
+            out.print(") => apply(")
+            for (j <- 1 to i) {
+              if (j != 1) {
+                out.print(", ")
+              }
+              out.print("x" + j)
+            }
+            out.println(")")
+          }
+          out.println("}")
+        }
+        out.println("}")
+      }
+    
+      val productFile = outdir("Produce" + i + ".scala")
+      productFile.withIndentWriter { out =>
+        out.println("package scala")
+        out.println
         out.println("object Product" + i + " {")
         out.indent {
           out.print("def unapply[")
@@ -43,7 +150,14 @@ object GenTuples {
           }
         }
         out.println("}")
-        out.println("")
+      }
+      val tupleFile = outdir("Tuple" + i + ".scala")
+      tupleFile.withIndentWriter { out =>
+        out.println("package scala")
+        out.println
+        out.println("import scala.collection.{TraversableLike, IterableLike}")
+        out.println("import scala.collection.generic.CanBuildFrom")
+        out.println
         out.println("/**")
         out.println(" * Product" + i + " is a cartesian product of " + i + " components.")
         out.println(" * ")
@@ -58,7 +172,7 @@ object GenTuples {
           out.println(" * @return " + i)
           out.println(" */")
           out.println("override def productArity = " + i)
-          out.println("")
+          out.println
           out.println("/**")
           out.println(" * Returns the n-th projection of this product if 0&lt;=n&lt;arity,")
           out.println(" * otherwise null.")
@@ -77,13 +191,12 @@ object GenTuples {
           }
           out.println("}")
           for (j <- 1 to i) {
-            out.println("")
+            out.println
             out.println("/** projection of this product */")
             out.println("def _" + j + ": T" + j)
           }
         }
         out.println("}")
-        out.println("")
         out.println
         out.println("/**")
         out.println(" * Tuple" + i + " is the canonical representation of a @see Product" + i)
@@ -131,10 +244,16 @@ object GenTuples {
           }
           out.println("/** Reverse the elements of the tuple */")
           out.print("def reverse: Tuple" + i + "[")
-          genN(out, "T", i)
+          for (j <- i.to(1, -1)) {
+            if (j != i) {
+              out.print(", ")
+            }
+            out.print("T")
+            out.print(j)
+          }
           out.print("] = Tuple" + i + "(")
           for (j <- i.to(1, -1)) {
-            if (j == i) {
+            if (j != i) {
               out.print(", ")
             }
             out.print("_")
