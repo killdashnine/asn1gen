@@ -5,7 +5,7 @@ import java.io.PrintWriter
 import org.asn1gen.io.IndentWriter
 import org.asn1gen.extra.Extras._
 
-case class OutputStreamExtra(os: OutputStream) {
+case class ExtraOutputStream(os: OutputStream) {
   def withPrintWriter[T](f: PrintWriter => T) = {
     val printWriter = new PrintWriter(os)
     try {
