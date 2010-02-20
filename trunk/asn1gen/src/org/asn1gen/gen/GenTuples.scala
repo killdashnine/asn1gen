@@ -1,5 +1,6 @@
 package org.asn1gen.gen
 
+import java.io.File
 import org.asn1gen.extra.Extras._
 import org.asn1gen.io._
 
@@ -17,6 +18,9 @@ object GenTuples {
   def main(args : Array[String]) : Unit = {
     val start: Int = java.lang.Integer.parseInt(args(0))
     val end: Int = java.lang.Integer.parseInt(args(1))
+    val outdir = new File("../asn1tuple/src/scala")
+    outdir.mkdirs
+    val outfile = outdir / "Tuples.scala" 
     
     System.out.withIndentWriter { out =>
       out.println("package scala")
@@ -40,77 +44,145 @@ object GenTuples {
         }
         out.println("}")
         out.println("")
-        out.println("/** Product" + i + " is a cartesian product of " + i + " components.")
-        out.println(" *  ")
-        out.println(" *  @since 999.999")
+        out.println("/**")
+        out.println(" * Product" + i + " is a cartesian product of " + i + " components.")
+        out.println(" * ")
+        out.println(" * @since 999.999")
         out.println(" */")
         out.print("trait Product" + i + "[")
         genN(out, "+T", i)
         out.println("] extends Product {")
         out.indent {
           out.println("/**")
-          out.println(" *  The arity of this product.")
-          out.println(" *  @return " + i)
+          out.println(" * The arity of this product.")
+          out.println(" * @return " + i)
           out.println(" */")
           out.println("override def productArity = " + i)
           out.println("")
           out.println("/**")
-          out.println(" *  Returns the n-th projection of this product if 0&lt;=n&lt;arity,")
-          out.println(" *  otherwise null.")
+          out.println(" * Returns the n-th projection of this product if 0&lt;=n&lt;arity,")
+          out.println(" * otherwise null.")
           out.println(" *")
-          out.println(" *  @param n number of the projection to be returned ")
-          out.println(" *  @return  same as _(n+1)")
-          out.println(" *  @throws  IndexOutOfBoundsException")
+          out.println(" * @param n number of the projection to be returned ")
+          out.println(" * @return same as _(n+1)")
+          out.println(" * @throws IndexOutOfBoundsException")
           out.println(" */")
           out.println("@throws(classOf[IndexOutOfBoundsException])")
           out.println("override def productElement(n: Int) = n match { ")
           out.indent {
-            out.println("case 0 => _1")
-            out.println("case 1 => _2")
+            for (j <- 1 to i) {
+              out.println("case " + (j - 1) + " => _" + j)
+            }
             out.println("case _ => throw new IndexOutOfBoundsException(n.toString())")
           }
           out.println("}")
-          out.println("")
-          out.println("/** projection of this product */")
-          out.println("def _1: T1")
-          out.println("")
-          out.println("/** projection of this product */")
-          out.println("def _2: T2")
+          for (j <- 1 to i) {
+            out.println("")
+            out.println("/** projection of this product */")
+            out.println("def _" + j + ": T" + j)
+          }
         }
         out.println("}")
         out.println("")
         out.println
-        out.println("/** Tuple" + i + " is the canonical representation of a @see Product" + i)
-        out.println(" *")
+        out.println("/**")
+        out.println(" * Tuple" + i + " is the canonical representation of a @see Product" + i)
         out.println(" */")
-        out.println("case class Tuple" + i + "[+T1, +T2](_1:T1,_2:T2)")
-        out.indent {
-          out.println("extends Product" + i + "[T1, T2]")
+        out.print("case class Tuple" + i + "[")
+        genN(out, "+T", i)
+        out.print("](")
+        for (j <- 1 to i) {
+          if (j != 1) {
+            out.print(", ")
+          }
+          out.print("_" + j + ": T" + j)
         }
-        out.println("{  ")
+        out.println(")")
         out.indent {
-          out.println("override def toString() = \"(\" + _1 + \",\" + _2 + \")\"")
-          out.println("")
-          out.println("/** Swap the elements of the tuple */")
-          out.println("def swap: Tuple" + i + "[T2,T1] = Tuple" + i + "(_2, _1)")
+          out.print("extends Product" + i + "[")
+          genN(out, "T", i)
+          out.println("]")
+        }
+        out.println("{")
+        out.indent {
+          out.print("override def toString() = \"(")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("\" + _" + j + " + \"")
+          }
+          out.println(")\"")
           out.println
-          out.println("def zip[Repr1, El1, El2, To](")
+          if (i == 2) {
+            out.println("/** Swap the elements of the tuple */")
+            out.print("def swap: Tuple" + i + "[")
+            genN(out, "T", i)
+            out.print("] = Tuple" + i + "(")
+            for (j <- i.to(1, -1)) {
+              if (j == i) {
+                out.print(", ")
+              }
+              out.print("_")
+              out.print(j)
+            }
+            out.println(")")
+            out.println
+          }
+          out.println("/** Reverse the elements of the tuple */")
+          out.print("def reverse: Tuple" + i + "[")
+          genN(out, "T", i)
+          out.print("] = Tuple" + i + "(")
+          for (j <- i.to(1, -1)) {
+            if (j == i) {
+              out.print(", ")
+            }
+            out.print("_")
+            out.print(j)
+          }
+          out.println(")")
+          out.println
+          out.print("def zip[Repr1, ")
+          genN(out, "El", i)
+          out.println(", To](")
           out.indent {
             out.indent {
-              out.println("implicit w1:   T1 => TraversableLike[El1, Repr1],")
-              out.println("w2:   T2 => Iterable[El2],")
-              out.println("cbf1: CanBuildFrom[Repr1, (El1, El2), To]): To = {")
+              out.println("implicit w1: T1 => TraversableLike[El1, Repr1],")
+              for (j <- 2 to i) {
+                out.println("w" + j + ": T" + j + " => Iterable[El" + j + "],")
+              }
+              out.print("cbf1: CanBuildFrom[Repr1, (")
+              genN(out, "El", i)
+              out.println("), To]): To = {")
             }
             out.println("val coll1: TraversableLike[El1, Repr1] = _1")
-            out.println("val coll2: Iterable[El2] = _2")
+            for (j <- 2 to i) {
+              out.println("val coll" + j + ": Iterable[El" + j + "] = _" + j)
+            }
             out.println("val b1 = cbf1(coll1.repr)")
-            out.println("val elems" + i + " = coll" + i + ".iterator")
+            for (j <- 2 to i) {
+              out.println("val elems" + j + " = coll" + j + ".iterator")
+            }
             out.println
             out.println("for (el1 <- coll1) {")
             out.indent {
-              out.println("if (elems" + i + ".hasNext) {")
+              out.print("if (")
+              for (j <- 2 to i) {
+                if (j != 2) {
+                  out.print(" && ")
+                }
+                out.print("elems" + j + ".hasNext")
+              }
+              out.println(") {")
               out.indent {
-                out.println("b1 += ((el1, elems" + i + ".next))")
+                out.print("b1 += ((el1, ")
+                for (j <- 2 to i) {
+                  if (j != 2) {
+                    out.print(", ")
+                  }
+                  out.print("elems" + j + ".next")
+                }
+                out.println("))")
               }
               out.println("}")
             }
@@ -120,23 +192,91 @@ object GenTuples {
           }
           out.println("}")
           out.println
-          out.println("def zipped[Repr1, El1, Repr2, El2](implicit w1: T1 => TraversableLike[El1, Repr1], w2: T2 => IterableLike[El2, Repr2]): Zipped[Repr1, El1, Repr2, El2]")
+          out.print("def zipped[")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("Repr" + j + ", El" + j)
+          }
+          out.println("](")
           out.indent {
-            out.println("= new Zipped[Repr1, El1, Repr2, El2](_1, _2)")
+            out.indent {
+              out.print("implicit w1: T1 => TraversableLike[El1, Repr1]")
+              for (j <- 2 to i) {
+                out.println(",")
+                out.print("w" + j + ": T" + j + " => IterableLike[El" + j + ", Repr" + j + "]")
+              }
+            }
+          }
+          out.print("): Zipped[")
+          for (j <- 1 to i) {
+            if (j != 1) {
+              out.print(", ")
+            }
+            out.print("Repr" + j + ", El" + j)
+          }
+          out.println("]")
+          out.indent {
+            out.print("= new Zipped[")
+            for (j <- 1 to i) {
+              if (j != 1) {
+                out.print(", ")
+              }
+              out.print("Repr" + j + ", El" + j)
+            }
+            out.print("](")
+            genN(out, "_", i)
+            out.println(")")
           }
           out.println
-          out.println("class Zipped[+Repr1, +El1, +Repr2, +El2](coll1: TraversableLike[El1, Repr1], coll2: IterableLike[El2, Repr2]) { // coll2: IterableLike for filter")
+          out.print("class Zipped[")
           out.indent {
-            out.println("def map[B, To](f: (El1, El2) => B)(implicit cbf: CanBuildFrom[Repr1, B, To]): To = {")
+            for (j <- 1 to i) {
+              if (j != 1) {
+                out.print(", ")
+              }
+              out.print("+Repr" + j + ", +El" + j)
+            }
+          }
+          out.println("](")
+          out.indent {
+            out.indent {
+              out.print("coll1: TraversableLike[El1, Repr1]")
+              for (j <- 2 to i) {
+                out.println(",")
+                out.print("coll" + j + ": IterableLike[El" + j + ", Repr" + j + "]")
+              }
+              out.println(") {")
+            }
+            out.print("def map[B, To](f: (")
+            genN(out, "El", i)
+            out.println(") => B)(implicit cbf: CanBuildFrom[Repr1, B, To]): To = {")
             out.indent {
               out.println("val b = cbf(coll1.repr)")
-              out.println("val elems" + i + " = coll" + i + ".iterator")
+              for (j <- 2 to i) {
+                out.println("val elems" + j + " = coll" + j + ".iterator")
+              }
               out.println
               out.println("for (el1 <- coll1) {")
               out.indent {
-                out.println("if (elems" + i + ".hasNext) {")
+                out.print("if (")
+                for (j <- 2 to i) {
+                  if (j != 2) {
+                    out.print(" && ")
+                  }
+                  out.print("elems" + j + ".hasNext")
+                }
+                out.println(") {")
                 out.indent {
-                  out.println("b += f(el1, elems" + i + ".next)")
+                  out.print("b += f(el1, ")
+                  for (j <- 2 to i) {
+                    if (j != 2) {
+                      out.print(", ")
+                    }
+                    out.print("elems" + j + ".next")
+                  }
+                  out.println(")")
                 }
                 out.println("}")
               }
@@ -146,16 +286,31 @@ object GenTuples {
             }
             out.println("}")
             out.println
-            out.println("def flatMap[B, To](f: (El1, El2) => Traversable[B])(implicit cbf: CanBuildFrom[Repr1, B, To]): To = {")
+            out.print("def flatMap[B, To](f: (")
+            genN(out, "El", i)
+            out.println(") => Traversable[B])(implicit cbf: CanBuildFrom[Repr1, B, To]): To = {")
             out.indent {
               out.println("val b = cbf(coll1.repr)")
-              out.println("val elems" + i + " = coll" + i + ".iterator")
+              for (j <- 2 to i) {
+                out.println("val elems" + j + " = coll" + j + ".iterator")
+              }
               out.println
               out.println("for(el1 <- coll1)")
               out.indent {
-                out.println("if(elems" + i + ".hasNext) {")
+                out.print("if(")
+                for (j <- 2 to i) {
+                  if (j != 2) {
+                    out.print(" && ")
+                  }
+                  out.print("elems" + j + ".hasNext")
+                }
+                out.println(") {")
                 out.indent {
-                  out.println("b ++= f(el1, elems" + i + ".next)")
+                  out.print("b ++= f(el1")
+                  for (j <- 2 to i) {
+                    out.print(", elems" + j + ".next")
+                  }
+                  out.println(")")
                 }
                 out.println("}")
               }
@@ -164,21 +319,50 @@ object GenTuples {
             }
             out.println("}")
             out.println
-            out.println("def filter[To1, To2](f: (El1, El2) => Boolean)(implicit cbf1: CanBuildFrom[Repr1, El1, To1], cbf2: CanBuildFrom[Repr2, El2, To2]): (To1, To2) = {")
+            out.print("def filter[")
+            genN(out, "To", i)
+            out.print("](f: (")
+            genN(out, "El", i)
+            out.println(") => Boolean)(")
             out.indent {
-              out.println("val b1 = cbf1(coll1.repr)")
-              out.println("val b2 = cbf2(coll2.repr)")
-              out.println("val elems" + i + " = coll" + i + ".iterator")
+              out.indent {
+                out.print("implicit cbf1: CanBuildFrom[Repr1, El1, To1]")
+                for (j <- 2 to i) {
+                  out.println(",")
+                  out.print("cbf" + j + ": CanBuildFrom[Repr" + j + ", El" + j + ", To" + j + "]")
+                }
+                out.print("): (")
+                genN(out, "To", i)
+                out.println(") = {")
+              }
+              for (j <- 1 to i) {
+                out.println("val b" + j + " = cbf" + j + "(coll" + j + ".repr)")
+              }
+              for (j <- 2 to i) {
+                out.println("val elems" + j + " = coll" + j + ".iterator")
+              }
               out.println
               out.println("for (el1 <- coll1) {")
               out.indent {
-                out.println("if (elems" + i + ".hasNext) {")
+                out.print("if (")
+                for (j <- 2 to i) {
+                  if (j != 2) {
+                    out.print(" && ")
+                  }
+                  out.print("elems" + j + ".hasNext")
+                }
+                out.println(") {")
                 out.indent {
-                  out.println("val el" + i + " = elems" + i + ".next")
-                  out.println("if (f(el1, el2)) {")
+                  for (j <- 2 to i) {
+                    out.println("val el" + j + " = elems" + j + ".next")
+                  }
+                  out.print("if (f(")
+                  genN(out, "el", i)
+                  out.println(")) {")
                   out.indent {
-                    out.println("b1 += el1")
-                    out.println("b2 += el2")
+                    for (j <- 1 to i) {
+                      out.println("b" + j + " += el" + j)
+                    }
                   }
                   out.println("}")
                 }
@@ -186,20 +370,39 @@ object GenTuples {
               }
               out.println("}")
               out.println
-              out.println("(b1.result, b2.result)")
+              out.print("(")
+              for (j <- 1 to i) {
+                if (j != 1) {
+                  out.print(", ")
+                }
+                out.print("b" + j + ".result")
+              }
+              out.println(")")
             }
             out.println("}")
             out.println
-            out.println("def exists(f: (El1, El2) => Boolean): Boolean = {")
+            out.print("def exists(f: (")
+            genN(out, "El", i)
+            out.println(") => Boolean): Boolean = {")
             out.indent {
               out.println("var acc = false")
-              out.println("val elems" + i + " = coll" + i + ".iterator")
+              for (j <- 2 to i) {
+                out.println("val elems" + j + " = coll" + j + ".iterator")
+              }
               out.println
               out.println("for (el1 <- coll1) {")
               out.indent {
-                out.println("if (!acc && elems" + i + ".hasNext) {")
+                out.print("if (!acc")
+                for (j <- 2 to i) {
+                  out.print(" && elems" + j + ".hasNext")
+                }
+                out.println(") {")
                 out.indent {
-                  out.println("acc = f(el1, elems" + i + ".next)")
+                  out.print("acc = f(el1")
+                  for (j <- 2 to i) {
+                    out.print(", elems" + j + ".next")
+                  }
+                  out.println(")")
                 }
                 out.println("}")
               }
@@ -209,17 +412,30 @@ object GenTuples {
             }
             out.println("}")
             out.println
-            out.println("def forall(f: (El1, El2) => Boolean): Boolean = {")
+            out.print("def forall(f: (")
+            genN(out, "El", i)
+            out.println(") => Boolean): Boolean = {")
             out.indent {
               out.println("var acc = true")
-              out.println("val elems" + i + " = coll" + i + ".iterator")
+              for (j <- 2 to i) {
+                out.println("val elems" + j + " = coll" + j + ".iterator")
+              }
               out.println
               out.println("for (el1 <- coll1) {")
               out.indent {
-                out.println("if (acc && elems" + i + ".hasNext) {")
-                out.indent {
-                  out.println("acc = f(el1, elems" + i + ".next)")
+                out.print("if (acc")
+                for (j <- 2 to i) {
+                  out.print(" && elems" + j + ".hasNext")
                 }
+                out.println(") {")
+                out.indent {
+                  out.print("acc = f(el1")
+                  for (j <- 2 to i) {
+                    out.print(", elems" + j + ".next")
+                  }
+                  out.println(")")
+                }
+                out.println("}")
               }
               out.println("}")
               out.println
@@ -227,15 +443,30 @@ object GenTuples {
             }
             out.println("}")
             out.println
-            out.println("def foreach[U](f: (El1, El2) => U): Unit = {")
+            out.print("def foreach[U](f: (")
+            genN(out, "El", i)
+            out.println(") => U): Unit = {")
             out.indent {
-              out.println("val elems" + i + " = coll" + i + ".iterator")
+              for (j <- 2 to i) {
+                out.println("val elems" + j + " = coll" + j + ".iterator")
+              }
               out.println
               out.println("for (el1 <- coll1) {")
               out.indent {
-                out.println("if (elems" + i + ".hasNext) {")
+                out.print("if (")
+                for (j <- 2 to i) {
+                  if (j != 2) {
+                    out.print(" && ")
+                  }
+                  out.print("elems" + j + ".hasNext")
+                }
+                out.println(") {")
                 out.indent {
-                  out.println("f(el1, elems" + i + ".next)")
+                  out.print("f(el1")
+                  for (j <- 2 to i) {
+                    out.print(", elems" + j + ".next")
+                  }
+                  out.println(")")
                 }
                 out.println("}")
               }
