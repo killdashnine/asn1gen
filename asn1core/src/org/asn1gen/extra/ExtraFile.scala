@@ -25,5 +25,5 @@ case class ExtraFile(file: File) {
     this.withPrintWriter { _.withIndentWriter(f) }
   }
   
-  def /(path: String): File = new File(file, path)
+  def apply(path: String): File = new File(file, path)
 }
