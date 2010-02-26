@@ -44,6 +44,13 @@ package rough {
         } }
         .externalOrderId2 { _ => Some(AsnOctetString("A new external order id")) }
       
+      val order = AmpOrder
+        .order { _ => AmpOrderEntry
+          .fixed { _ => orderFixedFields3
+            .externalOrderId2 { _ => Some(AsnOctetString("External order id for my order.")) }
+          }
+        }
+      
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
         writer.println()
@@ -52,6 +59,9 @@ package rough {
         writer.println()
         writer.println()
         SimplePrinter.print(writer, orderFixedFields3)
+        writer.println()
+        writer.println()
+        SimplePrinter.print(writer, order)
       }
     }
   }
