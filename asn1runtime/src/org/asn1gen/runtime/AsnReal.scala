@@ -13,10 +13,10 @@ class AsnReal(val value: Double) extends AsnType {
   override def hashCode(): Int = this.value.hashCode
 
   def value(f: (Double => Double)): AsnReal = this.copy(value = f(this.value))
-
-  def unapply(): Option[(Double)] = Some(value)
 }
 
 object AsnReal extends AsnReal(0.0) {
   def apply(value: Double) = new AsnReal(value)
+
+  def unapply(value: AsnReal) = Some(value.value)
 }
