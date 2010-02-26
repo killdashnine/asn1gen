@@ -14,12 +14,25 @@ object SimplePrinter extends Extras {
   
   def print(out: IndentWriter, value: _rt_.AsnType): Unit = {
     value match {
-      case asnCharacterString: _rt_.AsnCharacterString => {
-        "".inspect()
-        out.print(asnCharacterString._desc.name + "(" + asnCharacterString.value.inspect() + ")")
+      case _rt_.AsnReal(value) => {
+        out.print("AsnReal")
+        if (value != 0.0) {
+          out.print("(")
+          out.print(value)
+          out.print(")")
+        }
       }
-      case asnOctetString: _rt_.AsnOctetString => {
-        out.print("AsnOctetString(" + asnOctetString.string.inspect() + ")")
+      case asnCharacterString: _rt_.AsnCharacterString => {
+        out.print(asnCharacterString._desc.name)
+        if (asnCharacterString.length != 0) {
+          out.print("(" + asnCharacterString.value.inspect() + ")")
+        }
+      }
+      case _rt_.AsnOctetString(value) => {
+        out.print("AsnOctetString")
+        if (value.length != 0) {
+          out.print("(" + value.string.inspect() + ")")
+        }
       }
       case asnSequence: _rt_.AsnSequence => {
         val desc = asnSequence._desc
