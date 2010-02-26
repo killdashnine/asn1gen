@@ -12,6 +12,8 @@ abstract class AsnCharacterString(val value: String) extends AsnType {
   def value(f: (String => String)): AsnCharacterString = this.copy(value = f(this.value))
 
   def unapply(): Option[(String)] = Some(value)
+  
+  def length: Int = this.value.length
 }
 
 object AsnCharacterString {
