@@ -11,6 +11,8 @@ trait Extras {
 
   implicit def toExtra(value: Byte) = ExtraByte(value)
   
+  implicit def toExtra(value: List[Byte]) = ExtraListOfByte(value)
+  
   implicit def toExtra(os: OutputStream) = ExtraOutputStream(os)
   
   implicit def toExtra(writer: Writer) = ExtraWriter(writer)
