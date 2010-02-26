@@ -1,5 +1,8 @@
 package org.asn1gen.runtime
 
+import org.asn1gen.extra.ExtraListOfByte
+import org.asn1gen.extra.Extras._
+
 class AsnOctetString(val value: List[Byte]) extends AsnType {
   override def _desc: meta.AsnOctetString = meta.AsnOctetString
 
@@ -14,7 +17,9 @@ class AsnOctetString(val value: List[Byte]) extends AsnType {
 
   def value(f: (List[Byte] => List[Byte])): AsnOctetString = this.copy(value = f(this.value))
 
-  def string: String = new String(this.value.toArray)
+  def string: String = this.value.string
+  
+  def length: Int = this.value.length
 }
 
 object AsnOctetString extends AsnOctetString(Nil) {
