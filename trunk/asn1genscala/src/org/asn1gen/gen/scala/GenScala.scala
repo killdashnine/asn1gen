@@ -1,8 +1,9 @@
 package org.asn1gen.gen.scala
 
 import java.io.PrintWriter
-import org.asn1gen.parsing.asn1.{ast => ast}
+import org.asn1gen.extra.Extras._
 import org.asn1gen.io._
+import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable.Set
 
 class GenScala(packageName: String, out: IndentWriter) {
@@ -242,6 +243,36 @@ class GenScala(packageName: String, out: IndentWriter) {
       => {
         out.ensureEmptyLines(1)
         out.println("case class " + safeAssignmentName + "(_value: Int) extends _rt_.AsnEnumeration {")
+        out.indent(2) {
+          out.println("override def _desc: _meta_." + safeAssignmentName + " = _meta_." + safeAssignmentName)
+          out.println
+          out.println("override def name: String = {")
+          out.indent(2) {
+            out.println("_value match {")
+            out.indent(2) {
+              enumerations match {
+                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
+                => {
+                  var index = 0
+                  items foreach {
+                    case ast.Identifier(item) => {
+                      out.println("case " + index + " => " + safeId(item).inspect())
+                      index = index + 1
+                    }
+                    case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
+                      val value = if (sign) n * -1 else n
+                      out.println("case " + value + " => " + safeId(item).inspect())
+                      index = index + 1
+                    }
+                  }
+                }
+              }
+              out.println("case _ => \"<\" + _value + \">\"")
+            }
+            out.println("}")
+          }
+          out.println("}")
+        }
         out.println("}")
         out.println()
         out.println("object " + safeAssignmentName + " extends " + safeAssignmentName + "(0) {")
@@ -269,6 +300,70 @@ class GenScala(packageName: String, out: IndentWriter) {
               }
             }
           }
+          out.println
+          out.println("def of(name: String): " + safeId(assignmentName) + " = {")
+          out.indent(2) {
+            out.println("name match {")
+            out.indent(2) {
+              enumerations match {
+                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
+                => {
+                  var index = 0
+                  items foreach {
+                    case ast.Identifier(item) => {
+                      out.println("case " + safeId(item).inspect + " => " + safeId(item))
+                      index = index + 1
+                    }
+                    case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
+                      out.println("case " + safeId(item).inspect + " => " + safeId(item))
+                      index = index + 1
+                    }
+                  }
+                  extension match {
+                    case None => {}
+                    case _ => out.println(extension)
+                  }
+                }
+              }
+              out.println("case _ => throw _rt_.BadEnumerationException(")
+              out.indent(2) {
+                out.println("\"Unrecogonised enumeration value + '\" + name + \"'\")")
+              }
+            }
+            out.println("}")
+          }
+          out.println("}")
+          out.println
+          out.println("def of(value: Int): " + safeId(assignmentName) + " = {")
+          out.indent(2) {
+            out.println("value match {")
+            out.indent(2) {
+              enumerations match {
+                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
+                => {
+                  var index = 0
+                  items foreach {
+                    case ast.Identifier(item) => {
+                      out.println("case " + index + " => " + safeId(item))
+                      index = index + 1
+                    }
+                    case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
+                      val value = if (sign) n * -1 else n
+                      out.println("case " + value + " => " + safeId(item))
+                      index = index + 1
+                    }
+                  }
+                  extension match {
+                    case None => {}
+                    case _ => out.println(extension)
+                  }
+                }
+              }
+              out.println("case _ => " + safeId(assignmentName) + "(value)")
+            }
+            out.println("}")
+          }
+          out.println("}")
         }
         out.println("}")
       }
