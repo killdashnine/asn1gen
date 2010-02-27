@@ -103,7 +103,9 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
         out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
       }
       case ast.SequenceType(ast.Empty) => {
-        out.println("trait " + safeAssignmentName + " extends _meta_.AsnSequence")
+        out.println("trait " + safeAssignmentName + " extends _meta_.AsnSequence {")
+          out.println("override def name: String = \"" + safeAssignmentName + "\"")
+        out.println("}")
         out.println()
         out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
       }
@@ -145,6 +147,7 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
       case ast.EnumeratedType(enumerations)
       => {
         out.println("trait " + safeAssignmentName + " extends _meta_.AsnEnumeration {")
+          out.println("override def name: String = \"" + safeAssignmentName + "\"")
         out.println("}")
         out.println()
         out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
