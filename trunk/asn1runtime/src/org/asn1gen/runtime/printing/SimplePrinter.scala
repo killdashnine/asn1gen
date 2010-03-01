@@ -84,8 +84,17 @@ object SimplePrinter extends Extras {
       case _rt_.AsnBoolean => out.print("AsnBoolean")
       case enumeration: _rt_.AsnEnumeration => {
         out.print(enumeration._desc.name)
-        out.print(".")
-        out.print(enumeration.name)
+        enumeration._shortName match {
+          case Some(shortName) => {
+            out.print(".")
+            out.print(shortName)
+          }
+          case _ => {
+            out.print("(")
+            out.print(enumeration._value)
+            out.print(")")
+          }
+        }
       }
       case _ => {
         out.print("/**")

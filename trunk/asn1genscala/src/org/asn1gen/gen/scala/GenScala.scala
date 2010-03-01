@@ -242,11 +242,11 @@ class GenScala(packageName: String, out: IndentWriter) {
       case ast.EnumeratedType(enumerations)
       => {
         out.ensureEmptyLines(1)
-        out.println("case class " + safeAssignmentName + "(_value: Int) extends _rt_.AsnEnumeration {")
+        out.println("case class " + safeAssignmentName + "(_value: Long) extends _rt_.AsnEnumeration {")
         out.indent(2) {
           out.println("override def _desc: _meta_." + safeAssignmentName + " = _meta_." + safeAssignmentName)
           out.println
-          out.println("override def name: String = {")
+          out.println("override def _shortName: Option[String] = {")
           out.indent(2) {
             out.println("_value match {")
             out.indent(2) {
@@ -256,18 +256,18 @@ class GenScala(packageName: String, out: IndentWriter) {
                   var index = 0
                   items foreach {
                     case ast.Identifier(item) => {
-                      out.println("case " + index + " => " + safeId(item).inspect())
+                      out.println("case " + index + " => Some(" + safeId(item).inspect() + ")")
                       index = index + 1
                     }
                     case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
                       val value = if (sign) n * -1 else n
-                      out.println("case " + value + " => " + safeId(item).inspect())
+                      out.println("case " + value + " => Some(" + safeId(item).inspect() + ")")
                       index = index + 1
                     }
                   }
                 }
               }
-              out.println("case _ => \"<\" + _value + \">\"")
+              out.println("case _ => None")
             }
             out.println("}")
           }
