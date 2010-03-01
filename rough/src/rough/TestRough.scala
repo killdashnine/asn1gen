@@ -49,6 +49,9 @@ package rough {
           .fixed { _ => orderFixedFields3
             .externalOrderId2 { _ => Some(AsnOctetString("External order id for my order.")) }
           }
+          .amendable { x => x
+            .`type` { _ => AmpOrderType.limit }
+          }
         }
       
       System.out.withIndentWriter { writer =>
