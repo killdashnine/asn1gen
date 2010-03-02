@@ -54,6 +54,11 @@ package rough {
           }
         }
       
+      val orderSS = order
+        .order { x => x
+          .siteSpecific { _ => Some(AmpOrderSiteSpecificFields) }
+        }
+      
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
         writer.println()
@@ -65,6 +70,9 @@ package rough {
         writer.println()
         writer.println()
         SimplePrinter.print(writer, order)
+        writer.println()
+        writer.println()
+        SimplePrinter.print(writer, orderSS)
       }
     }
   }
