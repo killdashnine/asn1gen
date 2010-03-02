@@ -22,6 +22,14 @@ object SimplePrinter extends Extras {
           out.print(")")
         }
       }
+      case asnChoice: _rt_.AsnChoice => {
+        out.print(asnChoice._desc.name)
+        out.print(".")
+        out.print(asnChoice._choiceName)
+        out.indent {
+          
+        }
+      }
       case asnCharacterString: _rt_.AsnCharacterString => {
         out.print(asnCharacterString._desc.name)
         if (asnCharacterString.length != 0) {
