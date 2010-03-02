@@ -23,12 +23,24 @@ object SimplePrinter extends Extras {
         }
       }
       case asnChoice: _rt_.AsnChoice => {
+        val line = out.line
         out.print(asnChoice._desc.name)
         out.print(".")
         out.print(asnChoice._choiceName)
-        out.indent {
-          
+        out.print(" { _ => ")
+        asnChoice._element match {
+          case element: _rt_.AsnType => {
+            print(out, element)
+          }
+          case Some(element: _rt_.AsnType) => {
+            out.print("Some apply ")
+            print(out, element)
+          }
         }
+        if (line != out.line) {
+          out.println
+        }
+        out.print("}")
       }
       case asnCharacterString: _rt_.AsnCharacterString => {
         out.print(asnCharacterString._desc.name)
@@ -36,10 +48,10 @@ object SimplePrinter extends Extras {
           out.print("(" + asnCharacterString.value.inspect() + ")")
         }
       }
-      case _rt_.AsnOctetString(value) => {
+      case _rt_.AsnOctetString(bytes) => {
         out.print("AsnOctetString")
-        if (value.length != 0) {
-          out.print("(" + value.string.inspect() + ")")
+        if (bytes.length != 0) {
+          out.print("(" + bytes.string.inspect() + ")")
         }
       }
       case asnSequence: _rt_.AsnSequence => {
@@ -67,10 +79,10 @@ object SimplePrinter extends Extras {
               case Some(subValue: _rt_.AsnType) => {
                 out.print(".")
                 out.print(name)
-                out.print(" { _ => Some(")
+                out.print(" { _ => Some apply ")
                 val line = out.line
                 this.print(out, subValue)
-                out.print(") }")
+                out.print("}")
               }
               case subValue: _rt_.AsnType => {
                 out.print(".")
