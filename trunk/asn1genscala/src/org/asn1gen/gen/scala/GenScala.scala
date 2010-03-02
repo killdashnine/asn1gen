@@ -241,6 +241,7 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
       case ast.EnumeratedType(enumerations)
       => {
+        var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
         out.println("case class " + safeAssignmentName + "(_value: Long) extends _rt_.AsnEnumeration {")
         out.indent(2) {
@@ -253,15 +254,22 @@ class GenScala(packageName: String, out: IndentWriter) {
               enumerations match {
                 case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
                 => {
-                  var index = 0
+                  var index: Long = 0
                   items foreach {
                     case ast.Identifier(item) => {
                       out.println("case " + index + " => Some(" + safeId(item).inspect() + ")")
+                      if (firstIndex == None) {
+                        firstIndex = Some(index)
+                      }
                       index = index + 1
                     }
                     case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
-                      val value = if (sign) n * -1 else n
+                      val number = java.lang.Long.parseLong(n)
+                      val value = if (sign) number * -1 else number
                       out.println("case " + value + " => Some(" + safeId(item).inspect() + ")")
+                      if (firstIndex == None) {
+                        firstIndex = Some(value)
+                      }
                       index = index + 1
                     }
                   }
@@ -275,7 +283,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         }
         out.println("}")
         out.println()
-        out.println("object " + safeAssignmentName + " extends " + safeAssignmentName + "(0) {")
+        out.println("object " + safeAssignmentName + " extends " + safeAssignmentName + "(" + firstIndex.getOrElse(0) + ") {")
         out.indent(2) {
           enumerations match {
             case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
@@ -908,6 +916,8 @@ class GenScala(packageName: String, out: IndentWriter) {
             "(_element: " + typeNameOf(_type) + ") extends " + safeId(assignmentName) + "(_element) {")
         out.indent(2) {
           out.println("def _choice: Int = " + tagNumber)
+          out.println
+          out.println("override def _choiceName: String = " + name.inspect)
         }
         out.println("}")
       }
