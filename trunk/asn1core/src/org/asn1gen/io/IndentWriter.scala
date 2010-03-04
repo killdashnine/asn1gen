@@ -36,15 +36,44 @@ class IndentWriter(out: Writer) extends PrintWriter(out, true) {
     emptyLines += 1
     line += 1
   }
+
+  private def prePrint(): Unit = {
+    if (atLineStart) {
+      super.print(" " * indent)
+      emptyLines = -1
+    }
+  }
   
   override def print(s: String): Unit = {
     if (s.length != 0) {
-      if (atLineStart) {
-        super.print(" " * indent)
-        emptyLines = -1
-      }
+      prePrint()
     }
     super.print(s)
+  }
+  
+  override def print(value: Char): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Int): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Long): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Float): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Double): Unit = {
+    prePrint()
+    super.print(value)
   }
 }
 
