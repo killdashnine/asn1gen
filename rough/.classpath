@@ -5,6 +5,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1runtime"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1core"/>
-	<classpathentry kind="lib" path="/asn1deps/lib/asn1tuple.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
