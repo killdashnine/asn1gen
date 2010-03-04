@@ -55,12 +55,14 @@ package rough {
         }
       
       val orderSS = order
-        .order { _
-          .siteSpecific { _ map { _
-            .swx { _ => AmpOrderSWXFields
-              .prevOrderId { _ => Some apply AmpOrderId }
+        .order { x => x
+          .siteSpecific { _ => Some apply AmpOrderSiteSpecificFields
+            .swx { AmpOrderSWXFields
+              .prevOrderId { _ => Some apply AmpOrderId
+                .orderNo { _ => AmpInteger(123) }
+              }
             }
-          }}
+          }
         }
       
       System.out.withIndentWriter { writer =>
