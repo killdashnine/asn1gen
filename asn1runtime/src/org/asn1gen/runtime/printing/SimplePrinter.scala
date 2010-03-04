@@ -14,6 +14,14 @@ object SimplePrinter extends Extras {
   
   def print(out: IndentWriter, value: _rt_.AsnType): Unit = {
     value match {
+      case _rt_.AsnInteger(value) => {
+        out.print("AsnInteger")
+        if (value != 0) {
+          out.print("(")
+          out.print(value)
+          out.print(")")
+        }
+      }
       case _rt_.AsnReal(value) => {
         out.print("AsnReal")
         if (value != 0.0) {
@@ -25,22 +33,25 @@ object SimplePrinter extends Extras {
       case asnChoice: _rt_.AsnChoice => {
         val line = out.line
         out.print(asnChoice._desc.name)
-        out.print(".")
-        out.print(asnChoice._choiceName)
-        out.print(" { _ => ")
-        asnChoice._element match {
-          case element: _rt_.AsnType => {
-            print(out, element)
+        out.println
+        out.indent {
+          out.print(".")
+          out.print(asnChoice._choiceName)
+          out.print(" { _ => ")
+          asnChoice._element match {
+            case element: _rt_.AsnType => {
+              print(out, element)
+            }
+            case Some(element: _rt_.AsnType) => {
+              out.print("Some apply ")
+              print(out, element)
+            }
           }
-          case Some(element: _rt_.AsnType) => {
-            out.print("Some apply ")
-            print(out, element)
+          if (line != out.line) {
+            out.break()
           }
+          out.println("}")
         }
-        if (line != out.line) {
-          out.println
-        }
-        out.print("}")
       }
       case asnCharacterString: _rt_.AsnCharacterString => {
         out.print(asnCharacterString._desc.name)
