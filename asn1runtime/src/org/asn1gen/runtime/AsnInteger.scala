@@ -16,19 +16,19 @@ class AsnInteger(val value: Long) extends AsnType {
 }
 
 object AsnInteger extends AsnInteger(0) {
-  val minusOne = new AsnInteger(-1)
-  val zero = new AsnInteger(0)
-  val one = new AsnInteger(1)
-  val two = new AsnInteger(2)
-  val three = new AsnInteger(3)
-  val four = new AsnInteger(4)
-  val five = new AsnInteger(5)
-  val six = new AsnInteger(6)
-  val seven = new AsnInteger(7)
-  val eight = new AsnInteger(8)
-  val nine = new AsnInteger(9)
-  val minValue = new AsnInteger(Long.MinValue)
-  val maxValue = new AsnInteger(Long.MaxValue)
+  private val minusOne = new AsnInteger(-1)
+  private val zero = this
+  private val one = new AsnInteger(1)
+  private val two = new AsnInteger(2)
+  private val three = new AsnInteger(3)
+  private val four = new AsnInteger(4)
+  private val five = new AsnInteger(5)
+  private val six = new AsnInteger(6)
+  private val seven = new AsnInteger(7)
+  private val eight = new AsnInteger(8)
+  private val nine = new AsnInteger(9)
+  private val minValue = new AsnInteger(Long.MinValue)
+  private val maxValue = new AsnInteger(Long.MaxValue)
   
   def apply(value: Long): AsnInteger = {
     value match {
