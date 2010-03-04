@@ -59,7 +59,7 @@ package rough {
           .siteSpecific { _ => Some apply AmpOrderSiteSpecificFields
             .swx { AmpOrderSWXFields
               .prevOrderId { _ => Some apply AmpOrderId
-                .orderNo { _ => AmpInteger(123) }
+                .orderNo { _ => 123L }
               }
             }
           }
