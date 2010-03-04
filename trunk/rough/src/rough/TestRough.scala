@@ -65,6 +65,8 @@ package rough {
           }
         }
       
+      val bulkTrans = AmpBulkTransRepChoiceList
+      
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
         writer.println()
@@ -79,6 +81,9 @@ package rough {
         writer.println()
         writer.println()
         SimplePrinter.print(writer, orderSS)
+        writer.println()
+        writer.println()
+        SimplePrinter.print(writer, bulkTrans)
       }
     }
   }

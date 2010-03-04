@@ -398,9 +398,9 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
-        out.println("type " + safeAssignmentName + " = _rt_.AsnBoolean")
+        out.println("type " + safeAssignmentName + " = Boolean")
         out.println()
-        out.println("val " + safeAssignmentName + " = _rt_.AsnBoolean")
+        out.println("val " + safeAssignmentName + " = false")
       }
       case ast.OctetStringType => {
         out.ensureEmptyLines(1)
@@ -410,9 +410,9 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
       case ast.REAL => {
         out.ensureEmptyLines(1)
-        out.println("type " + safeAssignmentName + " = _rt_.AsnReal")
+        out.println("type " + safeAssignmentName + " = Double")
         out.println()
-        out.println("val " + safeAssignmentName + " = _rt_.AsnReal")
+        out.println("val " + safeAssignmentName + " = 0.0")
       }
       case unmatched => {
         out.ensureEmptyLines(1)
@@ -427,23 +427,23 @@ class GenScala(packageName: String, out: IndentWriter) {
       case ast.SetOfType(ast.Type(ast.TypeReference(referencedType), _)) => {
         val safeReferenceType = safeId(referencedType)
         out.ensureEmptyLines(1)
-        out.print("class " + safeAssignmentName)
-        out.print("(val items: List[" + safeReferenceType + "]) ")
-        out.println("extends _rt_.AsnList[" + safeReferenceType + "] {")
+        out.print("case class " + safeAssignmentName)
+        out.print("(items: List[" + safeReferenceType + "]) ")
+        out.println("extends _rt_.AsnList {")
         out.indent(2) {
           out.println("override def _desc: _meta_." + safeAssignmentName + " = _meta_." + safeAssignmentName)
-          out.println()
-          out.println(
-              "def copy(items: List[_Item] = this.items) = " +
-              safeAssignmentName + "(" + safeReferenceType + ")")
         }
         out.println("}")
         out.println()
         out.println("object " + safeAssignmentName + " extends " + safeAssignmentName + "(Nil) {")
         out.indent(2) {
-          out.println("def apply(items: _Item*): " + safeAssignmentName + " = new " + safeAssignmentName + "(items.toList)")
-          out.println()
-          out.println("def apply(items: List[_Item]): " + safeAssignmentName + " = new " + safeAssignmentName + "(items)")
+          out.print("def apply(items: ")
+          out.print(safeReferenceType)
+          out.print("*): ")
+          out.print(safeAssignmentName)
+          out.print(" = ")
+          out.print(safeAssignmentName)
+          out.println("(items.toList)")
         }
         out.println("}")
       }
@@ -600,7 +600,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnBitString"
       }
       case ast.BOOLEAN => {
-        return "_rt_.AsnBoolean"
+        return "false"
       }
       case characterString: ast.CharacterStringType => {
         defaultNameOf(characterString)
@@ -636,7 +636,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnOctetString"
       }
       case ast.REAL => {
-        return "_rt_.AsnReal"
+        return "0.0"
       }
       case ast.RelativeOidType => {
         return "_rt_.AsnRelativeOidType"
@@ -740,7 +740,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnBitString"
       }
       case ast.BOOLEAN => {
-        return "_rt_.AsnBoolean"
+        return "Boolean"
       }
       case characterString: ast.CharacterStringType => {
         typeNameOf(characterString)
@@ -776,7 +776,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnOctetString"
       }
       case ast.REAL => {
-        return "_rt_.AsnReal"
+        return "Double"
       }
       case ast.RelativeOidType => {
         return "_rt_.AsnRelativeOidType"
