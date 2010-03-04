@@ -910,12 +910,41 @@ class GenScala(packageName: String, out: IndentWriter) {
             ast.Tag(_, ast.Number(tagNumber)), _, _type),
           _))
       => {
+        val safeName = safeId(name)
+        val safeElementType = safeId(typeNameOf(_type))
+        val safeChoiceType = safeId(assignmentName)
+        val safeChoiceChoice = safeId(assignmentName + "_" + name)
         out.ensureEmptyLines(1)
         out.println(
-            "case class " + safeId(assignmentName + "_" + name) +
+            "case class " + safeChoiceChoice +
             "(_element: " + typeNameOf(_type) + ") extends " + safeId(assignmentName) + "(_element) {")
         out.indent(2) {
+          out.print("override def _desc: _meta_.")
+          out.print(safeChoiceType)
+          out.print(" = _meta_.")
+          out.print(safeChoiceType)
+          out.println
           out.println("def _choice: Int = " + tagNumber)
+          out.println
+          out.print("override def ")
+          out.print(safeName)
+          out.print(": Option[")
+          out.print(safeElementType)
+          out.print("] = Some(_element)")
+          out.println
+          out.println
+          out.print("override def ")
+          out.print(safeName)
+          out.print("(f: (")
+          out.print(safeElementType)
+          out.print(" => ")
+          out.print(safeElementType)
+          out.print(")): ")
+          out.print(safeChoiceType)
+          out.print(" = ")
+          out.print(safeChoiceChoice)
+          out.print("(f(_element))")
+          out.println
           out.println
           out.println("override def _choiceName: String = " + name.inspect)
         }
@@ -942,15 +971,32 @@ class GenScala(packageName: String, out: IndentWriter) {
         ast.Identifier(name),
         _type)
       => {
+        val safeElementName = safeId(name)
+        val safeChoiceType = safeId(choiceTypeName)
+        val safeChoiceChoice = safeId(choiceTypeName + "_" + name)
+        val safeElementType = safeId(typeNameOf(_type))
         out.println()
-        out.println(
-            "def " + safeId(name) +
-            "(f: (" + safeId(choiceTypeName) + " => " + safeId(typeNameOf(_type)) +
-            ")): " + safeId(choiceTypeName) + " =")
-        out.indent(2) {
-          out.println(
-              safeId(choiceTypeName + "_" + name) + "(f(this))")
-        }
+        out.print("def ")
+        out.print(safeElementName)
+        out.print("(f: (")
+        out.print(safeElementType)
+        out.print(" => ")
+        out.print(safeElementType)
+        out.print(")): ")
+        out.print(safeChoiceType)
+        out.print(" = this")
+        out.println
+        out.println
+        out.print("def ")
+        out.print(safeElementName)
+        out.print("(f: => ")
+        out.print(safeElementType)
+        out.print("): ")
+        out.print(safeChoiceType)
+        out.print(" = ")
+        out.print(safeChoiceChoice)
+        out.print("(f)")
+        out.println
       }
     }
   }
@@ -971,10 +1017,14 @@ class GenScala(packageName: String, out: IndentWriter) {
         ast.Identifier(name),
         _type)
       => {
+    	val safeName = safeId(name)
+    	val safeType = safeId(typeNameOf(_type))
         out.println()
-        out.println(
-            "def " + safeId(name) + ": " + safeId(typeNameOf(_type)) +
-            " = _element.asInstanceOf[" + typeNameOf(_type) + "]")
+        out.print("def ")
+        out.print(safeName)
+        out.print(": Option[")
+        out.print(safeType)
+        out.println("] = None")
       }
     }
   }
