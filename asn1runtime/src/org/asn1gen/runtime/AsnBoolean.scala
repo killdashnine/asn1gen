@@ -13,10 +13,10 @@ class AsnBoolean(val value: Boolean) extends AsnType {
   override def hashCode(): Int = this.value.hashCode
 
   def value(f: (Boolean => Boolean)): AsnBoolean = this.copy(value = f(this.value))
-
-  def unapply(): Option[(Boolean)] = Some(value)
 }
 
 object AsnBoolean extends AsnBoolean(false) {
   def apply(value: Boolean) = new AsnBoolean(value)
+
+  def unapply(value: AsnBoolean) = Some(value.value)
 }
