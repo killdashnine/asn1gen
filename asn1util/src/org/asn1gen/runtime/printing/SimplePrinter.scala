@@ -135,6 +135,9 @@ object SimplePrinter extends Extras {
         out.print(value)
         out.print(")")
       }
+      case list: _rt_.AsnList => {
+        out.print(list._desc.name)
+      }
       case enumeration: _rt_.AsnEnumeration => {
         out.print(enumeration._desc.name)
         enumeration._shortName match {
