@@ -16,19 +16,15 @@ object SimplePrinter extends Extras {
     value match {
       case _rt_.AsnInteger(value) => {
         out.print("AsnInteger")
-        if (value != 0) {
-          out.print("(")
-          out.print(value)
-          out.print(")")
-        }
+        out.print("(")
+        out.print(value)
+        out.print(")")
       }
       case _rt_.AsnReal(value) => {
         out.print("AsnReal")
-        if (value != 0.0) {
-          out.print("(")
-          out.print(value)
-          out.print(")")
-        }
+        out.print("(")
+        out.print(value)
+        out.print(")")
       }
       case asnChoice: _rt_.AsnChoice => {
         val line = out.line
@@ -112,7 +108,12 @@ object SimplePrinter extends Extras {
           }
         }
       }
-      case _rt_.AsnBoolean => out.print("AsnBoolean")
+      case _rt_.AsnBoolean(value) => {
+        out.print("AsnBoolean")
+        out.print("(")
+        out.print(value)
+        out.print(")")
+      }
       case enumeration: _rt_.AsnEnumeration => {
         out.print(enumeration._desc.name)
         enumeration._shortName match {
