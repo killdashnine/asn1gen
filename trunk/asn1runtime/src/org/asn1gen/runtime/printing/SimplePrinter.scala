@@ -104,6 +104,15 @@ object SimplePrinter extends Extras {
                   out.print(" }")
                 }
               }
+              case subValue: Long => {
+                out.print(subValue)
+              }
+              case subValue: Double => {
+                out.print(subValue)
+              }
+              case subValue: String => {
+                out.print(subValue.inspect)
+              }
             }
           }
         }

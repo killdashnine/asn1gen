@@ -212,7 +212,7 @@ class GenScala(packageName: String, out: IndentWriter) {
               }
               optionalDefault match {
                 case ast.Empty => {
-                  out.print(safeId(typeNameOf(_type)))
+                  out.print(safeId(defaultNameOf(_type)))
                 }
                 case ast.Optional => {
                   out.print("None")
@@ -228,13 +228,19 @@ class GenScala(packageName: String, out: IndentWriter) {
         }
         out.println(") {")
         out.indent(2) {
-          out.print("def apply(")
-          generateSequenceFieldParameters(assignmentName, list)
-          out.print("): " + safeAssignmentName + " = new " + safeAssignmentName +"(")
+          out.println("def apply(")
           out.indent(2) {
-            generateSequenceFieldValues(assignmentName, list)
-            out.println(")")
+            out.indent(2) {
+              generateSequenceFieldParameters(assignmentName, list)
+              out.println("): " + safeAssignmentName + " = {")
+            }
+            out.print("new " + safeAssignmentName +"(")
+            out.indent(2) {
+              generateSequenceFieldValues(assignmentName, list)
+              out.println(")")
+            }
           }
+          out.println("}")
         }
         out.println("}")
         out.println()
@@ -386,9 +392,9 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
       case ast.INTEGER(None) => {
         out.ensureEmptyLines(1)
-        out.println("type " + safeAssignmentName + " = _rt_.AsnInteger")
+        out.println("type " + safeAssignmentName + " = Long")
         out.println()
-        out.println("val " + safeAssignmentName + " = _rt_.AsnInteger")
+        out.println("val " + safeAssignmentName + " = 0L")
       }
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
@@ -615,7 +621,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "InstanceOfType"
       }
       case ast.INTEGER(_) => {
-        return "_rt_.AsnInteger"
+        return "0L"
       }
       case ast.NULL => {
         return "_rt_.AsnNull"
@@ -755,7 +761,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "InstanceOfType"
       }
       case ast.INTEGER(_) => {
-        return "_rt_.AsnInteger"
+        return "Long"
       }
       case ast.NULL => {
         return "_rt_.AsnNull"
