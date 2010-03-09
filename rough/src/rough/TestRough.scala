@@ -66,8 +66,18 @@ package rough {
         }
       
       val prices = AmpLegPriceList(
-          AmpLegPriceList_item,
-          AmpLegPriceList_item)
+          AmpLegPriceList_item
+            .price { _ => AmpPrice
+              .value { _ => 1.0 }
+            },
+          AmpLegPriceList_item
+            .price { _ => AmpPrice
+              .value { _ => 2.0 }
+            }
+      )
+          
+      val prices2 = prices
+        //.items { list: List[AmpLegPriceList_item] => list.tail }
       
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
@@ -86,6 +96,9 @@ package rough {
         writer.println()
         writer.println()
         SimplePrinter.print(writer, prices)
+        writer.println()
+        writer.println()
+        SimplePrinter.print(writer, prices2)
       }
     }
   }
