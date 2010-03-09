@@ -65,7 +65,9 @@ package rough {
           }
         }
       
-      val bulkTrans = AmpBulkTransRepChoiceList
+      val prices = AmpLegPriceList(
+          AmpLegPriceList_item,
+          AmpLegPriceList_item)
       
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
@@ -83,7 +85,7 @@ package rough {
         SimplePrinter.print(writer, orderSS)
         writer.println()
         writer.println()
-        SimplePrinter.print(writer, bulkTrans)
+        SimplePrinter.print(writer, prices)
       }
     }
   }
