@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1runtime"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/model"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
