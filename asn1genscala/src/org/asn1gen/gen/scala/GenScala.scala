@@ -432,6 +432,17 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.println("extends _rt_.AsnList {")
         out.indent(2) {
           out.println("override def _desc: _meta_." + safeAssignmentName + " = _meta_." + safeAssignmentName)
+          out.println
+          out.print("def items(f: (List[")
+          out.print(safeReferenceType)
+          out.print("] => List[")
+          out.print(safeReferenceType)
+          out.print("])): ")
+          out.print(safeAssignmentName)
+          out.println(" =")
+          out.indent(2) {
+            out.println("this.copy(items = f(this.items))")
+          }
         }
         out.println("}")
         out.println()
