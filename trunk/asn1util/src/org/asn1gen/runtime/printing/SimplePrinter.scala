@@ -8,11 +8,7 @@ import org.asn1gen.extra.Extras
 import org.asn1gen.io.IndentWriter
 
 object SimplePrinter extends Extras {
-  def print(out: IndentWriter, value: Option[_rt_.AsnType]): Unit = {
-    
-  }
-  
-  def print(out: IndentWriter, value: _rt_.AsnType): Unit = {
+  def print(out: IndentWriter, value: Any): Unit = {
     value match {
       case _rt_.AsnInteger(value) => {
         out.print("AsnInteger")
@@ -137,6 +133,21 @@ object SimplePrinter extends Extras {
       }
       case list: _rt_.AsnList => {
         out.print(list._desc.name)
+        if (list.items.length != 0) {
+          out.println("(")
+          out.indent {
+            var firstItem = true
+            list.items.foreach { item =>
+              if (!firstItem) {
+                out.println(",")
+              }
+              print(out, item)
+              firstItem = false
+            }
+          }
+          out.println
+          out.print(")")
+        }
       }
       case enumeration: _rt_.AsnEnumeration => {
         out.print(enumeration._desc.name)
