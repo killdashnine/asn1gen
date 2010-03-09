@@ -41,6 +41,8 @@ object SimplePrinter extends Extras {
           }
           if (line != out.line) {
             out.break()
+          } else {
+            out.print(" ")
           }
           out.println("}")
         }
@@ -85,6 +87,11 @@ object SimplePrinter extends Extras {
                 out.print(" { _ => Some apply ")
                 val line = out.line
                 this.print(out, subValue)
+                if (line != out.line) {
+                  out.break()
+                } else {
+                  out.print(" ")
+                }
                 out.print("}")
               }
               case subValue: _rt_.AsnType => {
