@@ -54,7 +54,7 @@ class GenScala(packageName: String, out: IndentWriter) {
           case ast.TypeReference(name) => {
             out.ensureEmptyLines(1)
             out.println("type " + safeId(namedType.name) + " = " + safeId(name))
-            out.println("val " + safeId(namedType.name) + " = " + safeId(name))
+            out.println("lazy val " + safeId(namedType.name) + " = " + safeId(name))
           }
           case _ => {
             out.println("/* referencedType")
@@ -388,31 +388,31 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = _rt_.AsnBitString")
         out.println()
-        out.println("val " + safeAssignmentName + " = _rt_.AsnBitString")
+        out.println("lazy val " + safeAssignmentName + " = _rt_.AsnBitString")
       }
       case ast.INTEGER(None) => {
         out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = Long")
         out.println()
-        out.println("val " + safeAssignmentName + " = 0L")
+        out.println("lazy val " + safeAssignmentName + " = 0L")
       }
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = Boolean")
         out.println()
-        out.println("val " + safeAssignmentName + " = false")
+        out.println("lazy val " + safeAssignmentName + " = false")
       }
       case ast.OctetStringType => {
         out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = _rt_.AsnOctetString")
         out.println()
-        out.println("val " + safeAssignmentName + " = _rt_.AsnOctetString")
+        out.println("lazy val " + safeAssignmentName + " = _rt_.AsnOctetString")
       }
       case ast.REAL => {
         out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = Double")
         out.println()
-        out.println("val " + safeAssignmentName + " = 0.0")
+        out.println("lazy val " + safeAssignmentName + " = 0.0")
       }
       case unmatched => {
         out.ensureEmptyLines(1)
@@ -451,7 +451,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         assert(false)
         out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = List[" + safeId(assignmentName + "_element") + "]")
-        out.println("val " + safeAssignmentName + " = Nil: List[" + safeId(assignmentName + "_element") + "]")
+        out.println("lazy val " + safeAssignmentName + " = Nil: List[" + safeId(assignmentName + "_element") + "]")
         generate(sequenceType, assignmentName + "_element")
       }
     }

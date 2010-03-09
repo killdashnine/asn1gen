@@ -15,9 +15,8 @@ object Module {
     val imports = moduleDefinition.imports.symbols match {
       case Some(ast.SymbolsImported(symbolsFromModules)) => {
         symbolsFromModules foreach { symbolFromModule =>
-          println(symbolFromModule.globalModuleReference)
           symbolFromModule.symbols.foreach { symbol =>
-            println("> " + symbol)
+          	// Do nothing for now.
           }
         }
         symbolsFromModules
@@ -25,8 +24,6 @@ object Module {
       case None => List()
     }
     val exports = moduleDefinition.exports
-    println(imports)
-    println(exports)
     val astAssignments = moduleDefinition.moduleBody.assignmentList.assignments
     val types = (HashMap[String, NamedType]() /: astAssignments) {
       case (types, ta: ast.TypeAssignment) =>

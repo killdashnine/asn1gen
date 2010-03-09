@@ -27,7 +27,7 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     parse(root, text) match {
       case Success(moduleDefinition, _) =>
         val refactoredModuleDefinition = AnonymousTypeNamer.process(moduleDefinition)
-        GenScalaAst.generate(new IndentWriter(System.out), refactoredModuleDefinition)
+        //GenScalaAst.generate(new IndentWriter(System.out), refactoredModuleDefinition)
         val name = refactoredModuleDefinition.name
         if (modules.contains(name)) {
           throw new ModuleLoadException("Module " + name + " already exists")
