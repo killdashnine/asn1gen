@@ -7,5 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1deps"/>
 	<classpathentry kind="lib" path="/asn1deps/lib/specs-1.6.1-2.8.0.Beta1-RC2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/asn1core"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
