@@ -5,7 +5,7 @@ import _root_.org.junit.Assert._
 import _root_.junit.framework.TestCase
 import _root_.org.asn1gen.extra._
 
-class TestByteExtra extends Extras {
+class TestExtraByte extends Extras {
   @Test
   def test_definesBit_00(): Unit = {
     assert(!0x0.toByte.definesBit(0))
