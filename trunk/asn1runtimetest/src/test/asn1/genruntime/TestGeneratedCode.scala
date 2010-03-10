@@ -50,17 +50,23 @@ package test.asn1.genruntime {
   case class MyChoice_Choice0(_element: AsnNull) extends MyChoice {
     def _choice: Int = 0
     
+    def _choiceName: String = "choice0"
+    
     override def choice0: Option[AsnNull] = Some(_element)
   }
 
   case class MyChoice_Choice1(_element: AsnInteger) extends MyChoice {
     def _choice: Int = 1
     
+    def _choiceName: String = "choice1"
+    
     override def choice1: Option[AsnInteger] = Some(_element)
   }
 
   case class MyChoice_Choice2(_element: AsnReal) extends MyChoice {
     def _choice: Int = 2
+    
+    def _choiceName: String = "choice2"
     
     override def choice2: Option[AsnReal] = Some(_element)
   }
@@ -71,7 +77,16 @@ package test.asn1.genruntime {
 
   import org.asn1gen.runtime._
 
-  case class MyEnum(_value: Int) extends AsnEnumeration {
+  case class MyEnum(_value: Long) extends AsnEnumeration {
+    def _shortName: Option[String] = {
+      _value match {
+        case 0 => Some("value0")
+        case 1 => Some("value1")
+        case 2 => Some("value2")
+        case 3 => Some("value3")
+        case _ => None
+      }
+    }
   }
 
   object MyEnum extends MyEnum(0) {
