@@ -77,7 +77,11 @@ package rough {
       )
           
       val prices2 = prices
-        //.items { list: List[AmpLegPriceList_item] => list.tail }
+        .items { list => list.tail map { _
+          .price { _
+            .decimals { _ => Some(123L) }
+          }
+        } }
       
       System.out.withIndentWriter { writer =>
         SimplePrinter.print(writer, orderFixedFields1)
