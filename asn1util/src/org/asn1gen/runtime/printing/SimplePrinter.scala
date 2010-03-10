@@ -94,6 +94,13 @@ object SimplePrinter extends Extras {
                 }
                 out.print("}")
               }
+              case Some(x) => {
+                out.print(".")
+                out.print(name)
+                out.print(" { _ => Some(")
+                print(out, x)
+                out.print(") }")
+              }
               case subValue: _rt_.AsnType => {
                 out.print(".")
                 out.print(name)
@@ -169,6 +176,12 @@ object SimplePrinter extends Extras {
             out.print(")")
           }
         }
+      }
+      case value: Long => {
+        out.print(value)
+      }
+      case value: Boolean => {
+        out.print(value)
       }
       case _ => {
         out.print("/**")
