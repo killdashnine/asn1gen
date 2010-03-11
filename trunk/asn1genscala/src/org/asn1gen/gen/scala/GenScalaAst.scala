@@ -69,7 +69,7 @@ object GenScalaAst {
   
   def generate(out: IndentWriter, assignmentList: AssignmentList): Unit = {
     assignmentList match {
-      case AssignmentList(assignments: List[Assignment]) => {
+      case AssignmentList(assignments) => {
           out.print("AssignmentList(")
           generate(out, assignments) { assignment =>
             generate(out, assignment)
@@ -119,7 +119,7 @@ object GenScalaAst {
   
   def generate(out: IndentWriter, _type: Type): Unit = {
     _type match {
-      case Type(kind: TypeKind, constraints: List[Constraint]) => {
+      case Type(kind: TypeKind, constraints) => {
         out.println("Type(")
         out.indent(2) {
           generate(out, kind)
@@ -136,7 +136,7 @@ object GenScalaAst {
   def generate(out: IndentWriter, typeKind: TypeKind): Unit = {
     typeKind match {
       // BuiltinType
-      case BitStringType(maybeNamedBits: Option[List[NamedBit]]) => {
+      case BitStringType(maybeNamedBits) => {
         generate(out, maybeNamedBits) { namedBits =>
           out.println("?namedBits")
         }
@@ -191,7 +191,7 @@ object GenScalaAst {
           out.print(")")
         }
       }
-      case INTEGER(maybeNamedNumbers: Option[List[NamedNumber]]) => {
+      case INTEGER(maybeNamedNumbers) => {
         out.println("INTEGER(")
         out.indent(2) {
           generate(out, maybeNamedNumbers) { namedNumbers =>
@@ -345,9 +345,9 @@ object GenScalaAst {
     typeLists match {
       case AlternativeTypeLists(
         typeList: RootAlternativeTypeList,
-        maybeExtensionAndException: Option[ExtensionAndException],
-        maybeExtensionAdditionAlternatives: Option[ExtensionAdditionAlternatives],
-        maybeOptionalExtensionMarker: Option[OptionalExtensionMarker]) => {
+        maybeExtensionAndException,
+        maybeExtensionAdditionAlternatives,
+        maybeOptionalExtensionMarker) => {
           out.println("AlternativeTypeLists(")
           out.indent(2) {
             generate(out, typeList)
@@ -418,9 +418,9 @@ object GenScalaAst {
   def generate(out: IndentWriter, componentTypeLists: ComponentTypeLists): Unit = {
     componentTypeLists match {
       case ComponentTypeLists(
-        maybeList1: Option[ComponentTypeList],
-        maybeExtension: Option[ComponentTypeListsExtension],
-        maybeList2: Option[ComponentTypeList]) => {
+        maybeList1,
+        maybeExtension,
+        maybeList2) => {
           out.println("ComponentTypeLists(")
           out.indent(2) {
             generate(out, maybeList1) { list =>
@@ -444,7 +444,7 @@ object GenScalaAst {
     out.println("ComponentTypeList(")
     out.indent(2) {
       componentTypeList match {
-        case ComponentTypeList(componentTypes: List[ComponentType]) => {
+        case ComponentTypeList(componentTypes) => {
           generate(out, componentTypes) { componentType =>
             generate(out, componentType)
           }
@@ -469,7 +469,7 @@ object GenScalaAst {
     namedComponentType match {
       case NamedComponentType(
         namedType: ast.NamedType,
-        maybeValue: OptionalDefault[Value]) => {
+        maybeValue) => {
           out.println("NamedComponentType(")
           out.indent(2) {
             generate(out, namedType)
