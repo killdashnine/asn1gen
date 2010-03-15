@@ -6,6 +6,7 @@ import org.junit.runners.Suite;
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array
     ( classOf[TestBerDecoder]
+    , classOf[TestBerEncoder]
     , classOf[TestOctetWindow]
     , classOf[TestMyPackratBerDecoder]
     , classOf[TestPackratBerDecoder]
