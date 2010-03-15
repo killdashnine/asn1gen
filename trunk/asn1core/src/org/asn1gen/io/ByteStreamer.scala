@@ -5,9 +5,10 @@ abstract class ByteStreamer(val length: Int) extends (List[Byte] => List[Byte]) 
     def apply(tail: List[Byte]): List[Byte] = byte :: tail
   }
   
-  def :::(tailStreamer: ByteStreamer): ByteStreamer = {
-    new ByteStreamer(this.length + tailStreamer.length) {
-      def apply(tail: List[Byte]): List[Byte] = this(tailStreamer(tail))
+  def :::(head: ByteStreamer): ByteStreamer = {
+    val tail = this
+    new ByteStreamer(tail.length + head.length) {
+      def apply(rest: List[Byte]): List[Byte] = head(tail(rest))
     }
   }
 }
