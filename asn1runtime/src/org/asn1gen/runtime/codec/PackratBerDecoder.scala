@@ -142,28 +142,28 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
       val scale = (spec >> 2) & 0x3
       val exponentLength = (spec & 0x3) + 1
       if (exponentLength != 4) {
-        println("AAA")
+        //println("AAA")
         ( rawRealDataNumber(exponentLength) ~ rawRealDataNumber(length - 1)
         ) ^^ { case exponent ~ number =>
-          println("sign: " + sign)
-          println("scale: " + scale)
-          println("base: " + base)
-          println("exponent: " + exponent)
-          println("number: " + number)
+          //println("sign: " + sign)
+          //println("scale: " + scale)
+          //println("base: " + base)
+          //println("exponent: " + exponent)
+          //println("number: " + number)
           sign * Math.pow(2, scale) * Math.pow(base, exponent) * number 
         }
       } else {
-        println("BBB: " + spec)
+        //println("BBB: " + spec)
         ( anyElem
         >>{ exponentLength =>
-            println("exponentLength: " + exponentLength)
+            //println("exponentLength: " + exponentLength)
             ( rawRealDataNumber(exponentLength) ~ rawRealDataNumber(length - exponentLength - 1)
             ) ^^ { case exponent ~ number =>
-              println("sign: " + sign)
-              println("scale: " + scale)
-              println("base: " + base)
-              println("exponent: " + exponent)
-              println("number: " + number)
+              //println("sign: " + sign)
+              //println("scale: " + scale)
+              //println("base: " + base)
+              //println("exponent: " + exponent)
+              //println("number: " + number)
               sign * Math.pow(2, scale) * Math.pow(base, exponent) * number
             }
           }
