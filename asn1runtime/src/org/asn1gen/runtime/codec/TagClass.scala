@@ -1,6 +1,6 @@
 package org.asn1gen.runtime.codec
 
-sealed abstract class TagClass(value: Int) {
+sealed abstract class TagClass(val value: Int) {
 }
 
 object TagClass {
