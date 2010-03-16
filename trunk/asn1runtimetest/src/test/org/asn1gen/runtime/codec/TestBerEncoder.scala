@@ -15,7 +15,7 @@ class TestBerEncoder {
   @Test
   def fixedInteger_1(): Unit = {
     val result = encodeFixed(0)
-    val expected = List[Byte]()
+    val expected = List[Byte](0)
     assertEquals(expected, result(Nil))
     assertEquals(expected.length, result.length)
   }
