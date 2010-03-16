@@ -27,4 +27,6 @@ object ByteStreamer {
   }
   
   def bytes(values: Byte*): ByteStreamer = bytes(values.toList)
+  
+  def bytes(values: Array[Byte]): ByteStreamer = bytes(values.toList)
 }
