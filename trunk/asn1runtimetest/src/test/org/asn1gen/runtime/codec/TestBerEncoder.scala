@@ -59,4 +59,52 @@ class TestBerEncoder {
     assertEquals(expected, result(Nil))
     assertEquals(expected.length, result.length)
   }
+
+  @Test
+  def fixedInteger_7(): Unit = {
+    val result = encodeFixed(-256)
+    val expected = List[Byte](-1, 0)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
+
+  @Test
+  def fixedInteger_8(): Unit = {
+    val result = encodeFixed(256)
+    val expected = List[Byte](1, 0)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
+
+  @Test
+  def fixedBoolean_0(): Unit = {
+    val result = encode(false)
+    val expected = List[Byte](0)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
+
+  @Test
+  def fixedBoolean_1(): Unit = {
+    val result = encode(true)
+    val expected = List[Byte](-1)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
+
+  @Test
+  def fixedRaw_0(): Unit = {
+    val result = encodeRaw("")
+    val expected = List[Byte]()
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
+
+  @Test
+  def fixedRaw_1(): Unit = {
+    val result = encodeRaw("abc")
+    val expected = List[Byte](97, 98, 99)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
 }
