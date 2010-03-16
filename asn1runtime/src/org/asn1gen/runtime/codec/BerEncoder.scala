@@ -36,10 +36,12 @@ trait BerEncoder {
     if (value == 0) {
       ByteStreamer.byte(0)
     } else if (value == -1) {
-      ByteStreamer.nil
+      ByteStreamer.byte(-1)
     } else {
       val b: Byte = value.toByte
-      if (value < 128) {
+      if ((value & 0xffffffffffffff80L) == 0) {
+        ByteStreamer.byte(b)
+      } else if ((value & 0xffffffffffffff80L) == 0xffffffffffffff80L) {
         ByteStreamer.byte(b)
       } else {
         encodeFixedMore(value >> 8) ::: ByteStreamer.byte(b)
