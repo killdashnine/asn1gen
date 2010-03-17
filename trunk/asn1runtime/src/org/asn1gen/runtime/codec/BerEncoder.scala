@@ -60,6 +60,27 @@ trait BerEncoder {
   def encodeRaw(value: String): ByteStreamer = {
     ByteStreamer.bytes(value.getBytes)
   }
+  
+  def encodeLengthMore(value: Int): ByteStreamer = {
+    if (value == 0) {
+      ByteStreamer.nil
+    } else if (value >= 256) {
+      encodeLengthMore(value >> 8) ::: ByteStreamer.byte((value & 0xff).toByte)
+    } else {
+      ByteStreamer.byte(value.toByte)
+    }
+  }
+  
+  def encodeLength(value: Int): ByteStreamer = {
+    if (value < 0) {
+      throw new EncodingException("length may not be negative")
+    } else if (value < 128) {
+      ByteStreamer.byte(value.toByte)
+    } else {
+      val lengthPart = encodeLengthMore(value)
+      ByteStreamer.byte((0x80 | lengthPart.length).toByte) ::: lengthPart
+    }
+  }
 }
 
 object BerEncoder extends BerEncoder
