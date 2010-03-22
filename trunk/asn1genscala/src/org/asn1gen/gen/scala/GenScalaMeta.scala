@@ -513,6 +513,7 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
   def typeNameOf(typeKind: ast.TypeKind): String = {
     typeKind match {
       case builtinType: ast.BuiltinType => typeNameOf(builtinType)
+      case usefulType: ast.UsefulType => typeNameOf(usefulType)
       case ast.TypeReference(reference) => reference
       case unmatched => "Unmatched(" + unmatched + ")"
     }
@@ -526,6 +527,23 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
         return typeNameOf(typeKind)
       case ast.Optional =>
         return "Option[" + typeNameOf(typeKind) + "]"
+    }
+  }
+  
+  def typeNameOf(usefulType: ast.UsefulType): String = {
+    usefulType match {
+      case ast.GeneralizedTime => {
+        return "_meta_.AsnGeneralizedTime"
+      }
+      case ast.ObjectDescriptor => {
+        return "_meta_.AsnObjectDescriptor"
+      }
+      case ast.UTCTime => {
+        return "_meta_.AsnUtcTime"
+      }
+      case unmatched => {
+        return "UnknownUsefulType(" + unmatched + ")"
+      }
     }
   }
   
