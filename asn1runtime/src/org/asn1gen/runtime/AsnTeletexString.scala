@@ -11,6 +11,6 @@ class AsnTeletexString(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnTeletexString {
+object AsnTeletexString extends AsnTeletexString("") {
   def apply(value: String): AsnTeletexString = new AsnTeletexString(value)
 }

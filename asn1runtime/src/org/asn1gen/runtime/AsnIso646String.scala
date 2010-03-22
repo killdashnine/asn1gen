@@ -11,6 +11,6 @@ class AsnIso646String(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnIso646String {
+object AsnIso646String extends AsnIso646String("") {
   def apply(value: String): AsnIso646String = new AsnIso646String(value)
 }

@@ -11,6 +11,6 @@ class AsnVideotexString(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnVideotexString {
+object AsnVideotexString extends AsnVideotexString("") {
   def apply(value: String): AsnVideotexString = new AsnVideotexString(value)
 }

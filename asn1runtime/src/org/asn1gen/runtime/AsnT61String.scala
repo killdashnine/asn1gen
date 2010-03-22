@@ -11,6 +11,6 @@ class AsnT61String(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnT61String {
+object AsnT61String extends AsnT61String("") {
   def apply(value: String): AsnT61String = new AsnT61String(value)
 }

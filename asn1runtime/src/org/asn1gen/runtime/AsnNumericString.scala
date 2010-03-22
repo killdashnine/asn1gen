@@ -11,6 +11,6 @@ class AsnNumericString(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnNumericString {
+object AsnNumericString extends AsnNumericString("") {
   def apply(value: String): AsnNumericString = new AsnNumericString(value)
 }
