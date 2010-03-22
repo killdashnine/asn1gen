@@ -11,6 +11,6 @@ class AsnIa5String(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnIa5String {
+object AsnIa5String extends AsnIa5String("") {
   def apply(value: String): AsnIa5String = new AsnIa5String(value)
 }

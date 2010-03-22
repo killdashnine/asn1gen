@@ -11,6 +11,6 @@ class AsnVisibleString(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnVisibleString {
+object AsnVisibleString extends AsnVisibleString("") {
   def apply(value: String): AsnVisibleString = new AsnVisibleString(value)
 }

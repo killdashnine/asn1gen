@@ -11,6 +11,6 @@ class AsnUniversalString(value: String) extends AsnCharacterString(value) {
   }
 }
 
-object AsnUniversalString {
+object AsnUniversalString extends AsnUniversalString("") {
   def apply(value: String): AsnUniversalString = new AsnUniversalString(value)
 }
