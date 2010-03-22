@@ -72,7 +72,8 @@ object AnonymousTypeNamer {
             val decoupledAssignment = TypeAssignment(TypeReference(decoupledName), redirectedType)
             decoupledAssignment::decoupledMemberAssignments
           }
-          case REAL => Nil
+          case _: BuiltinType => Nil
+          case _: UsefulType => Nil
           case _ =>
             println("Unprocessed in decoupleNamedType: " + typeKind)
             throw new Exception("Not implemented");
@@ -167,10 +168,8 @@ object AnonymousTypeNamer {
             decoupleMembers(parentName, t)
           }
           case _: TypeReference => Nil
-          case OctetStringType => Nil
-          case INTEGER(None) => Nil
-          case REAL => Nil
-          case BOOLEAN => Nil
+          case _: BuiltinType => Nil
+          case _: UsefulType => Nil
           case _ => {
             println("f ==> " + _type)
             throw new Exception("Not implemented")
@@ -210,10 +209,8 @@ object AnonymousTypeNamer {
           case _: TypeReference => {
             typeKind
           }
-          case OctetStringType => typeKind
-          case INTEGER(None) => typeKind
-          case REAL => typeKind
-          case BOOLEAN => typeKind
+          case _: BuiltinType => typeKind
+          case _: UsefulType => typeKind
           case _ => {
             println(_type)
             throw new Exception("Not implemented")
@@ -287,9 +284,8 @@ object AnonymousTypeNamer {
             typeKind
           }
           case OctetStringType => typeKind
-          case INTEGER(None) => typeKind
-          case REAL => typeKind
-          case BOOLEAN => typeKind
+          case _: BuiltinType => typeKind
+          case _: UsefulType => typeKind
           case _ => {
             println(_type)
             throw new Exception("Not implemented")

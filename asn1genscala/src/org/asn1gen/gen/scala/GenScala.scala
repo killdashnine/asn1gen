@@ -589,6 +589,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   def defaultNameOf(typeKind: ast.TypeKind): String = {
     typeKind match {
       case builtinType: ast.BuiltinType => defaultNameOf(builtinType)
+      case usefulType: ast.UsefulType => defaultNameOf(usefulType)
       case ast.TypeReference(reference) => reference
       case unmatched => "UnmatchedDefaultName(" + unmatched + ")"
     }
@@ -602,6 +603,23 @@ class GenScala(packageName: String, out: IndentWriter) {
         return defaultNameOf(typeKind)
       case ast.Optional =>
         return "None"
+    }
+  }
+  
+  def defaultNameOf(usefulType: ast.UsefulType): String = {
+    usefulType match {
+      case ast.GeneralizedTime => {
+        return "_rt_.AsnGeneralizedTime"
+      }
+      case ast.ObjectDescriptor => {
+        return "_rt_.AsnObjectDescriptor"
+      }
+      case ast.UTCTime => {
+        return "_rt_.AsnUtcTime"
+      }
+      case unmatched => {
+        return "UnknownUsefulType(" + unmatched + ")"
+      }
     }
   }
   
@@ -729,6 +747,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   def typeNameOf(typeKind: ast.TypeKind): String = {
     typeKind match {
       case builtinType: ast.BuiltinType => typeNameOf(builtinType)
+      case usefulType: ast.UsefulType => typeNameOf(usefulType)
       case ast.TypeReference(reference) => reference
       case unmatched => "Unmatched(" + unmatched + ")"
     }
@@ -742,6 +761,23 @@ class GenScala(packageName: String, out: IndentWriter) {
         return typeNameOf(typeKind)
       case ast.Optional =>
         return "Option[" + typeNameOf(typeKind) + "]"
+    }
+  }
+  
+  def typeNameOf(builtinType: ast.UsefulType): String = {
+    builtinType match {
+      case ast.GeneralizedTime => {
+        return "_rt_.AsnGeneralizedTime"
+      }
+      case ast.ObjectDescriptor => {
+        return "_rt_.AsnObjectDescriptor"
+      }
+      case ast.UTCTime => {
+        return "_rt_.AsnUtcTime"
+      }
+      case unmatched => {
+        return "UnknownUsefulType(" + unmatched + ")"
+      }
     }
   }
   
