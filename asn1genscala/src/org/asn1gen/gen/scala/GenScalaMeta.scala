@@ -209,19 +209,34 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
   def generate(assignmentName: String, setOfType: ast.SetOfType): Unit = {
     val safeAssignmentName = safeId(assignmentName)
     setOfType match {
-      case ast.SetOfType(ast.Type(ast.TypeReference(referencedType), _)) => {
-        out.println("trait " + safeAssignmentName + " extends _meta_.AsnList {")
-        out.indent(2) {
-          out.println("override def name: String = \"" + safeAssignmentName + "\"")
-          out.println()
-          out.println("override def children: Map[String, _meta_.AsnMember] = Map.empty")
+      case ast.SetOfType(ast.Type(elementType, _)) => {
+        elementType match {
+          case ast.TypeReference(referencedType) => {
+            out.println("trait " + safeAssignmentName + " extends _meta_.AsnList {")
+            out.indent(2) {
+              out.println("override def name: String = \"" + safeAssignmentName + "\"")
+              out.println()
+              out.println("override def children: Map[String, _meta_.AsnMember] = Map.empty")
+            }
+            out.println("}")
+            out.println()
+            out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
+          }
+          case sequenceType: ast.SequenceType => {
+            assert(false)
+          }
+          case builtinType: ast.BuiltinType => {
+            out.println("trait " + safeAssignmentName + " extends _meta_.AsnList {")
+            out.indent(2) {
+              out.println("override def name: String = \"" + safeAssignmentName + "\"")
+              out.println()
+              out.println("override def children: Map[String, _meta_.AsnMember] = Map.empty")
+            }
+            out.println("}")
+            out.println()
+            out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
+          }
         }
-        out.println("}")
-        out.println()
-        out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
-      }
-      case ast.SetOfType(ast.Type(sequenceType: ast.SequenceType, _)) => {
-        assert(false)
       }
     }
   }
