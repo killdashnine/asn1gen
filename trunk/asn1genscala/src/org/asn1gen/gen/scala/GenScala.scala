@@ -90,10 +90,13 @@ class GenScala(packageName: String, out: IndentWriter) {
         val firstNamedType =
           rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
         out.println()
-        out.println(
-          "object " + safeAssignmentName + " extends " +
-          safeId(assignmentName + "_" + firstNamedType.name) +
-          "(" + typeNameOf(firstNamedType._type) + ") {")
+        out.print("object ")
+        out.print(safeAssignmentName)
+        out.print(" extends ")
+        out.print(safeId(assignmentName + "_" + firstNamedType.name))
+        out.print("(")
+        out.print(defaultNameOf(firstNamedType._type))
+        out.println(") {")
         out.println("}")
       }
       case ast.SequenceType(ast.Empty) => {
@@ -424,46 +427,55 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generate(assignmentName: String, setOfType: ast.SetOfType): Unit = {
     val safeAssignmentName = safeId(assignmentName)
     setOfType match {
-      case ast.SetOfType(ast.Type(ast.TypeReference(referencedType), _)) => {
-        val safeReferenceType = safeId(referencedType)
-        out.ensureEmptyLines(1)
-        out.print("case class " + safeAssignmentName)
-        out.print("(items: List[" + safeReferenceType + "]) ")
-        out.println("extends _rt_.AsnList {")
-        out.indent(2) {
-          out.println("override def _desc: _meta_." + safeAssignmentName + " = _meta_." + safeAssignmentName)
-          out.println
-          out.print("def items(f: (List[")
-          out.print(safeReferenceType)
-          out.print("] => List[")
-          out.print(safeReferenceType)
-          out.print("])): ")
-          out.print(safeAssignmentName)
-          out.println(" =")
-          out.indent(2) {
-            out.println("this.copy(items = f(this.items))")
+      case ast.SetOfType(ast.Type(elementType, _)) => {
+        elementType match {
+          case ast.TypeReference(referencedType) => {
+            val safeReferenceType = safeId(referencedType)
+            out.ensureEmptyLines(1)
+            out.print("case class " + safeAssignmentName)
+            out.print("(items: List[" + safeReferenceType + "]) ")
+            out.println("extends _rt_.AsnList {")
+            out.indent(2) {
+              out.println("override def _desc: _meta_." + safeAssignmentName + " = _meta_." + safeAssignmentName)
+              out.println
+              out.print("def items(f: (List[")
+              out.print(safeReferenceType)
+              out.print("] => List[")
+              out.print(safeReferenceType)
+              out.print("])): ")
+              out.print(safeAssignmentName)
+              out.println(" =")
+              out.indent(2) {
+                out.println("this.copy(items = f(this.items))")
+              }
+            }
+            out.println("}")
+            out.println()
+            out.println("object " + safeAssignmentName + " extends " + safeAssignmentName + "(Nil) {")
+            out.indent(2) {
+              out.print("def apply(items: ")
+              out.print(safeReferenceType)
+              out.print("*): ")
+              out.print(safeAssignmentName)
+              out.print(" = ")
+              out.print(safeAssignmentName)
+              out.println("(items.toList)")
+            }
+            out.println("}")
+          }
+          case sequenceType: ast.SequenceType => {
+            assert(false)
+            out.ensureEmptyLines(1)
+            out.println("type " + safeAssignmentName + " = List[" + safeId(assignmentName + "_element") + "]")
+            out.println("lazy val " + safeAssignmentName + " = Nil: List[" + safeId(assignmentName + "_element") + "]")
+            generate(sequenceType, assignmentName + "_element")
+          }
+          case builtinType: ast.BuiltinType => {
+            out.ensureEmptyLines(1)
+            out.println("type " + safeAssignmentName + " = List[" + typeNameOf(builtinType) + "]")
+            out.println("lazy val " + safeAssignmentName + " = Nil: List[" + typeNameOf(builtinType) + "]")
           }
         }
-        out.println("}")
-        out.println()
-        out.println("object " + safeAssignmentName + " extends " + safeAssignmentName + "(Nil) {")
-        out.indent(2) {
-          out.print("def apply(items: ")
-          out.print(safeReferenceType)
-          out.print("*): ")
-          out.print(safeAssignmentName)
-          out.print(" = ")
-          out.print(safeAssignmentName)
-          out.println("(items.toList)")
-        }
-        out.println("}")
-      }
-      case ast.SetOfType(ast.Type(sequenceType: ast.SequenceType, _)) => {
-        assert(false)
-        out.ensureEmptyLines(1)
-        out.println("type " + safeAssignmentName + " = List[" + safeId(assignmentName + "_element") + "]")
-        out.println("lazy val " + safeAssignmentName + " = Nil: List[" + safeId(assignmentName + "_element") + "]")
-        generate(sequenceType, assignmentName + "_element")
       }
     }
   }
