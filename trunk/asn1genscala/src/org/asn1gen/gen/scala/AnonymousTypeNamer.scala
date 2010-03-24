@@ -48,6 +48,13 @@ object AnonymousTypeNamer {
           case typeReference: TypeReference => {
             Nil
           }
+          case ChoiceType(_) => {
+            val decoupledName = parentName + "_" + name
+            val decoupledMemberAssignments = decoupleMembers(decoupledName, _type)
+            val redirectedType = redirectMembers(decoupledName, _type)
+            val decoupledAssignment = TypeAssignment(TypeReference(decoupledName), redirectedType)
+            decoupledAssignment::decoupledMemberAssignments
+          }
           case SequenceType(spec) => {
             val decoupledName = parentName + "_" + name
             val decoupledMemberAssignments = decoupleMembers(decoupledName, _type)
@@ -188,7 +195,9 @@ object AnonymousTypeNamer {
           case _: BitStringType => typeKind
           case _: EnumeratedType => TypeReference(parentName)
           case _: SetOfType => TypeReference(parentName)
-          case _: ChoiceType => typeKind
+          case ChoiceType(spec) => {
+            TypeReference(parentName)
+          }
           case INTEGER(Some(values)) => {
             throw new Exception("Not implemented")
             TypeReference(parentName)
@@ -257,6 +266,31 @@ object AnonymousTypeNamer {
     newSequenceTypeSpec
   }
   
+  def redirectMembers(parentName: String, alternativeTypeLists: AlternativeTypeLists): AlternativeTypeLists = {
+    val newAlternativeTypeLists = alternativeTypeLists match {
+      case AlternativeTypeLists(
+          typeList,
+          extensionAndException,
+          extensionAdditionAlternatives,
+          optionalExtensionMarker) => {
+        var memberIndex = 0
+        val newList1 = typeList.namedTypes.map {
+          case ast.NamedType(Identifier(name), t@Type(tk, c)) => {
+            val newTypeName = parentName + "_" + name
+            val redirectedType = redirect(newTypeName, t)
+            ast.NamedType(Identifier(name), redirectedType)
+          }
+        }
+        AlternativeTypeLists(
+            typeList,
+            extensionAndException,
+            extensionAdditionAlternatives,
+            optionalExtensionMarker)
+      }
+    }
+    newAlternativeTypeLists
+  }
+  
   def redirectMembers(parentName: String, _type: Type): Type = {
     _type match {
       case Type(typeKind, constraints) => {
@@ -264,7 +298,7 @@ object AnonymousTypeNamer {
           case _: BitStringType => typeKind
           case _: EnumeratedType => typeKind
           case SetOfType(subType) => SetOfType(redirect(parentName + "_item", subType))
-          case _: ChoiceType => typeKind
+          case ChoiceType(spec) => ChoiceType(redirectMembers(parentName, spec))
           case INTEGER(Some(values)) => {
             throw new Exception("Not implemented")
             TypeReference(parentName)
