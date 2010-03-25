@@ -411,11 +411,23 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.println()
         out.println("lazy val " + safeAssignmentName + " = _rt_.AsnOctetString")
       }
+      case ast.PrintableString => {
+        out.ensureEmptyLines(1)
+        out.println("type " + safeAssignmentName + " = String")
+        out.println()
+        out.println("lazy val " + safeAssignmentName + " = \"\"")
+      }
       case ast.REAL => {
         out.ensureEmptyLines(1)
         out.println("type " + safeAssignmentName + " = Double")
         out.println()
         out.println("lazy val " + safeAssignmentName + " = 0.0")
+      }
+      case ast.UTF8String => {
+        out.ensureEmptyLines(1)
+        out.println("type " + safeAssignmentName + " = String")
+        out.println()
+        out.println("lazy val " + safeAssignmentName + " = \"\"")
       }
       case unmatched => {
         out.ensureEmptyLines(1)
@@ -724,7 +736,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnNumericString"
       }
       case ast.PrintableString => {
-        return "_rt_.AsnPrintableString"
+        return "\"\""
       }
       case ast.T61String => {
         return "_rt_.AsnT61String"
@@ -736,7 +748,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnUniversalString"
       }
       case ast.UTF8String => {
-        return "_rt_.AsnUtf8String"
+        return "\"\""
       }
       case ast.VideotexString => {
         return "_rt_.AsnVideotexString"
@@ -882,7 +894,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnNumericString"
       }
       case ast.PrintableString => {
-        return "_rt_.AsnPrintableString"
+        return "String"
       }
       case ast.T61String => {
         return "_rt_.AsnT61String"
@@ -894,7 +906,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnUniversalString"
       }
       case ast.UTF8String => {
-        return "_rt_.AsnUtf8String"
+        return "String"
       }
       case ast.VideotexString => {
         return "_rt_.AsnVideotexString"

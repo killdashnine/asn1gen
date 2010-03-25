@@ -191,8 +191,26 @@ class GenScalaMeta(packageName: String, out: IndentWriter) {
         out.println()
         out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
       }
+      case ast.PrintableString => {
+        out.println("trait " + safeAssignmentName + " extends _meta_.AsnPrintableString {")
+        out.indent(2) {
+          out.println("override def name: String = \"" + safeAssignmentName + "\"")
+        }
+        out.println("}")
+        out.println()
+        out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
+      }
       case ast.REAL => {
         out.println("trait " + safeAssignmentName + " extends _meta_.AsnReal {")
+        out.indent(2) {
+          out.println("override def name: String = \"" + safeAssignmentName + "\"")
+        }
+        out.println("}")
+        out.println()
+        out.println("object " + safeAssignmentName + " extends " + safeAssignmentName)
+      }
+      case ast.UTF8String => {
+        out.println("trait " + safeAssignmentName + " extends _meta_.AsnUtf8String {")
         out.indent(2) {
           out.println("override def name: String = \"" + safeAssignmentName + "\"")
         }
