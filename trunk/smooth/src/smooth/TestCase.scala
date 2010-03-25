@@ -7,6 +7,7 @@ import scala.util.parsing.input._
 import scala.io.Source
 import org.asn1gen.gen._
 import org.asn1gen.gen.scala._
+import org.asn1gen.extra.Extras._
 import org.asn1gen.io.IndentWriter
 import org.asn1gen.io.JavaTypes._
 import org.asn1gen.io.RichFile._
@@ -27,6 +28,17 @@ object TestCase extends Asn1Parser {
     var model = (Model.empty /: children) { (model, child) =>
       println("Loading: " + child.name)
       model.load(child)
+    }
+    
+    model.modules foreach { case (name, module) =>
+      module.types foreach { case (name, namedType) =>
+        System.out.withIndentWriter { out =>
+          out.print(name)
+          out.print(" = ")
+          GenScalaAst.generate(out, namedType._type)
+          out.println()
+        }
+      }
     }
     
     // Output model
