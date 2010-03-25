@@ -1,5 +1,4 @@
-import moo.AMPTYPES._
-import moo.AMPORDER._
+import moo.ASNEXAMPLES._
 
 import org.asn1gen.runtime._
 import org.asn1gen.runtime.printing.SimplePrinter
@@ -10,14 +9,24 @@ import java.io.PrintWriter
 package rough {
   object TestRough {
     def main(args: Array[String]): Unit = {
-      val orderFixedFields1 =
-        AmpOrderFixedFields
-        .secBoardId { _ => Some apply AmpSecBoardId
-          .securityIdType { _ => Some(AsnOctetString("Security ID")) }
-          .secCode { _ => AsnOctetString("") }
-          .boardId { _ => Some(AsnOctetString("")) }
-        }
+      val book1 = Book
+        .isbn { _ => "123456789" }
+        .title { _ => "Scala Programming" }
+        .author { _ => "Bjarne Stroustrup" }
+
+      val book2 = book1
+        .isbn { _ => "987654321" }
+        .title { _ => "Real World Scala" }
+
+      val bookPrices = BookPrices(
+        BookPrice
+          .isbn { _ => "123456789" }
+          .price { _ => 1234 },
+        BookPrice
+          .isbn { _ => "123456789" }
+      )
       
+      /*
       val orderFixedFields2 = orderFixedFields1
         .secBoardId {
           case Some(secBoardId) => { Some apply secBoardId
@@ -81,28 +90,19 @@ package rough {
           .price { _
             .decimals { _ => Some(123L) }
           }
-        } }
+        } }*/
       
-      System.out.withIndentWriter { writer =>
-        SimplePrinter.print(writer, orderFixedFields1)
-        writer.println()
-        writer.println()
-        SimplePrinter.print(writer, orderFixedFields2)
-        writer.println()
-        writer.println()
-        SimplePrinter.print(writer, orderFixedFields3)
-        writer.println()
-        writer.println()
-        SimplePrinter.print(writer, order)
-        writer.println()
-        writer.println()
-        SimplePrinter.print(writer, orderSS)
-        writer.println()
-        writer.println()
-        SimplePrinter.print(writer, prices)
-        writer.println()
-        writer.println()
-        SimplePrinter.print(writer, prices2)
+      System.out.withIndentWriter { out =>
+        out.print("book1 = ")
+        SimplePrinter.print(out, book1)
+        out.println()
+        out.println()
+        out.print("book2 = ")
+        SimplePrinter.print(out, book2)
+        out.println()
+        out.println()
+        out.print("bookPrices = ")
+        SimplePrinter.print(out, bookPrices)
       }
     }
   }
