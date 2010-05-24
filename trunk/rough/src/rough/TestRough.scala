@@ -10,99 +10,71 @@ package rough {
   object TestRough {
     def main(args: Array[String]): Unit = {
       val book1 = Book
-        .isbn { _ => "123456789" }
-        .title { _ => "Scala Programming" }
-        .author { _ => "Bjarne Stroustrup" }
+        .isbn { _ => AsnOctetString("123456789") }
+        .title { _ => AsnOctetString("Scala Programming") }
+        .author { _ => AsnOctetString("Bjarne Stroustrup") }
 
       val book2 = book1
-        .isbn { _ => "987654321" }
-        .title { _ => "Real World Scala" }
+        .isbn { _ => AsnOctetString("987654321") }
+        .title { _ => AsnOctetString("Real World Scala") }
 
-      val bookPrices = BookPrices(
+      val bookPrice1 =
         BookPrice
-          .isbn { _ => "123456789" }
-          .price { _ => 1234 },
+          .isbn { _ => AsnOctetString("123456789") }
+          .price { _ => 1234 }
+
+      val bookPrice2 =
         BookPrice
-          .isbn { _ => "123456789" }
-      )
-      
-      /*
-      val orderFixedFields2 = orderFixedFields1
-        .secBoardId {
-          case Some(secBoardId) => { Some apply secBoardId
-            .securityIdType {
-              case Some(s@AsnOctetString(value)) => {
-                Some(AsnOctetString(s.string + " modified"))
-              }
-              case None => None
-            }
-            .secCode { _ => AsnOctetString("A new seccode") }
-            .boardId { _ => None }
-          }
-          case None => None
-        }
-        .externalOrderId2 { _ => Some(AsnOctetString("A new external order id")) }
-      
-      val orderFixedFields3 = orderFixedFields1
-        .secBoardId { _ map { _
-          .securityIdType { _ map { s =>
-            AsnOctetString(s.string + " modified")
-          } }
-          .secCode { _ => AsnOctetString("A new seccode") }
-          .boardId { _ => None }
-        } }
-        .externalOrderId2 { _ => Some(AsnOctetString("A new external order id")) }
-      
-      val order = AmpOrder
-        .order { _ => AmpOrderEntry
-          .fixed { _ => orderFixedFields3
-            .externalOrderId2 { _ => Some(AsnOctetString("External order id for my order.")) }
-          }
-          .amendable { x => x
-            .`type` { _ => AmpOrderType.limit }
-          }
-        }
-      
-      val orderSS = order
-        .order { x => x
-          .siteSpecific { _ => Some apply AmpOrderSiteSpecificFields
-            .swx { AmpOrderSWXFields
-              .prevOrderId { _ => Some apply AmpOrderId
-                .orderNo { _ => 123L }
-              }
-            }
-          }
-        }
-      
-      val prices = AmpLegPriceList(
-          AmpLegPriceList_item
-            .price { _ => AmpPrice
-              .value { _ => 1.0 }
-            },
-          AmpLegPriceList_item
-            .price { _ => AmpPrice
-              .value { _ => 2.0 }
-            }
-      )
+          .isbn { _ => AsnOctetString("987654321") }
+          .price { _ => 4321 }
           
-      val prices2 = prices
-        .items { list => list.tail map { _
-          .price { _
-            .decimals { _ => Some(123L) }
-          }
-        } }*/
-      
+      val books = Books(
+          book1,
+          book2,
+          Book
+	        .isbn { _ => AsnOctetString("1010101010") }
+	        .title { _ => AsnOctetString("The Art of Functional Programming") }
+	        .author { _ => AsnOctetString("Someone else") }
+        )
+        
+      val journals = Journals(
+          Journal
+            .title { _ => AsnOctetString("Monologues of a mad man") }
+            .edition { _ => AsnOctetString("July 2009") }
+          )
+
+      val items = Items(
+        books.items.map { Item_book(_) } :::
+        journals.items.map { Item_journal(_) }
+      )
+
       System.out.withIndentWriter { out =>
-        out.print("book1 = ")
+        out.print("val book1 = ")
         SimplePrinter.print(out, book1)
         out.println()
         out.println()
-        out.print("book2 = ")
+        out.print("val book2 = ")
         SimplePrinter.print(out, book2)
         out.println()
         out.println()
-        out.print("bookPrices = ")
-        SimplePrinter.print(out, bookPrices)
+        out.print("val bookPrice1 = ")
+        SimplePrinter.print(out, bookPrice1)
+        out.println()
+        out.println()
+        out.print("val bookPrice2 = ")
+        SimplePrinter.print(out, bookPrice2)
+        out.println()
+        out.println()
+        out.print("val books = ")
+        SimplePrinter.print(out, books)
+        out.println()
+        out.println()
+        out.print("val journals = ")
+        SimplePrinter.print(out, journals)
+        out.println()
+        out.println()
+        out.print("val items = ")
+        SimplePrinter.print(out, items)
       }
     }
   }
