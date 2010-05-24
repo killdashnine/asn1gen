@@ -1,6 +1,7 @@
 package org.asn1gen.gen.scala
 
 import java.io.PrintWriter
+import org.asn1gen.gen.AsnCodeGenerationException
 import org.asn1gen.extra.Extras._
 import org.asn1gen.io._
 import org.asn1gen.parsing.asn1.{ast => ast}
@@ -1026,6 +1027,9 @@ class GenScala(packageName: String, out: IndentWriter) {
           out.println("override def _choiceName: String = " + name.inspect)
         }
         out.println("}")
+      }
+      case x => {
+        throw new org.asn1gen.gen.AsnCodeGenerationException("CHOICE members need to be tagged: " + x)
       }
     }
   }
