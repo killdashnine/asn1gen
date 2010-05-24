@@ -44,7 +44,7 @@ object SimplePrinter extends Extras {
           } else {
             out.print(" ")
           }
-          out.println("}")
+          out.print("}")
         }
       }
       case asnCharacterString: _rt_.AsnCharacterString => {
