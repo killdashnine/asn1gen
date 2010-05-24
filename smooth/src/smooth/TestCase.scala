@@ -42,9 +42,16 @@ object TestCase extends Asn1Parser {
     }
     
     // Output model
-    val outDirectory = new File("out")
-    outDirectory.mkdir
-    model.writeTo(outDirectory)
+    try {
+      val outDirectory = new File("out")
+      outDirectory.mkdir
+      model.writeTo(outDirectory)
+    } catch {
+      case e: AsnCodeGenerationException => {
+        System.out.print("Error: ")
+        System.out.println(e.getMessage)
+      }
+    }
     
     println("Done.")
   }
