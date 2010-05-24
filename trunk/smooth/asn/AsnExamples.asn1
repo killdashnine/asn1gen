@@ -1,0 +1,24 @@
+ASNEXAMPLES DEFINITIONS ::=
+BEGIN
+  BookPrice ::= SEQUENCE {
+    isbn OCTET STRING,
+    price INTEGER
+  }
+  Book ::= SEQUENCE {
+    isbn OCTET STRING,
+    title OCTET STRING,
+    author OCTET STRING
+  }
+  Books ::= SET OF Book
+  BookPrices ::= SET OF Book
+  Journal ::= SEQUENCE {
+  	title OCTET STRING,
+  	edition OCTET STRING
+  }
+  Journals ::= SET OF Journal
+  Item ::= CHOICE {
+  	book    [1] Book,
+  	journal [2] Journal
+  }
+  Items ::= SET OF Item 
+END
