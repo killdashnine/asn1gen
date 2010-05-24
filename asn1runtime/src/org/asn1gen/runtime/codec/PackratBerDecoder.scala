@@ -150,7 +150,7 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
           //println("base: " + base)
           //println("exponent: " + exponent)
           //println("number: " + number)
-          sign * Math.pow(2, scale) * Math.pow(base, exponent) * number 
+          sign * math.pow(2, scale) * math.pow(base, exponent) * number 
         }
       } else {
         //println("BBB: " + spec)
@@ -164,7 +164,7 @@ trait PackratBerDecoder extends BinaryParsers with PackratParsers with ParsersUt
               //println("base: " + base)
               //println("exponent: " + exponent)
               //println("number: " + number)
-              sign * Math.pow(2, scale) * Math.pow(base, exponent) * number
+              sign * math.pow(2, scale) * math.pow(base, exponent) * number
             }
           }
         )
