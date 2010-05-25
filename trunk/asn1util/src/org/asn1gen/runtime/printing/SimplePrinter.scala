@@ -135,6 +135,13 @@ object SimplePrinter extends Extras {
                 out.print(subValue.inspect)
                 out.print(" }")
               }
+              case subValue: Boolean => {
+                out.print(".")
+                out.print(name)
+                out.print(" { _ => ")
+                out.print(subValue.inspect)
+                out.print(" }")
+              }
             }
           }
         }
