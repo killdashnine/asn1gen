@@ -2,18 +2,24 @@ package rough
 
 import org.asn1gen.runtime._
 import moo.ASNEXAMPLES._
+import org.asn1gen.runtime.printing.SimplePrinter
+import org.asn1gen.extra.Extras._
 
 object TestRough2 {
   def main(args: Array[String]): Unit = {
     val book1 = Book
-      .isbn { _ => AsnOctetString("123456789") }
-      .title { _ => AsnOctetString("Scala Programming") }
       .author { _ => AsnOctetString("Bjarne Stroustrup") }
+      .cover { _ => BookCover.hardCover }
+      .isbn { _ => AsnOctetString("123456789") }
+      .isInPrint { _ => true }
+      .title { _ => AsnOctetString("Scala Programming") }
     
     val book2 = Book
-      .isbn { _ => AsnOctetString("987654321") }
-      .title { _ => AsnOctetString("Real World Scala") }
       .author { _ => AsnOctetString("Bjarne Stroustrup") }
+      .cover { _ => BookCover.paperBack }
+      .isbn { _ => AsnOctetString("987654321") }
+      .isInPrint { _ => true }
+      .title { _ => AsnOctetString("Real World Scala") }
     
     val bookPrice1 = BookPrice
       .isbn { _ => AsnOctetString("123456789") }
@@ -25,17 +31,23 @@ object TestRough2 {
     
     val books = Books(
       Book
+        .author { _ => AsnOctetString("Bjarne Stroustrup") }
+        .cover { _ => BookCover.hardCover }
         .isbn { _ => AsnOctetString("123456789") }
-        .title { _ => AsnOctetString("Scala Programming") }
-        .author { _ => AsnOctetString("Bjarne Stroustrup") },
+        .isInPrint { _ => true }
+        .title { _ => AsnOctetString("Scala Programming") },
       Book
+        .author { _ => AsnOctetString("Bjarne Stroustrup") }
+        .cover { _ => BookCover.paperBack }
         .isbn { _ => AsnOctetString("987654321") }
-        .title { _ => AsnOctetString("Real World Scala") }
-        .author { _ => AsnOctetString("Bjarne Stroustrup") },
+        .isInPrint { _ => true }
+        .title { _ => AsnOctetString("Real World Scala") },
       Book
-        .isbn { _ => AsnOctetString("1010101010") }
-        .title { _ => AsnOctetString("The Art of Functional Programming") }
         .author { _ => AsnOctetString("Someone else") }
+        .cover { _ => BookCover.hardCover }
+        .isbn { _ => AsnOctetString("1010101010") }
+        .isInPrint { _ => false }
+        .title { _ => AsnOctetString("The Art of Functional Programming") }
     )
     
     val journals = Journals(
@@ -47,21 +59,27 @@ object TestRough2 {
     val items = Items(
       Item
         .book { _ => Book
+          .author { _ => AsnOctetString("Bjarne Stroustrup") }
+          .cover { _ => BookCover.hardCover }
           .isbn { _ => AsnOctetString("123456789") }
+          .isInPrint { _ => true }
           .title { _ => AsnOctetString("Scala Programming") }
-          .author { _ => AsnOctetString("Bjarne Stroustrup") }
         },
       Item
         .book { _ => Book
+          .author { _ => AsnOctetString("Bjarne Stroustrup") }
+          .cover { _ => BookCover.paperBack }
           .isbn { _ => AsnOctetString("987654321") }
+          .isInPrint { _ => true }
           .title { _ => AsnOctetString("Real World Scala") }
-          .author { _ => AsnOctetString("Bjarne Stroustrup") }
         },
       Item
         .book { _ => Book
-          .isbn { _ => AsnOctetString("1010101010") }
-          .title { _ => AsnOctetString("The Art of Functional Programming") }
           .author { _ => AsnOctetString("Someone else") }
+          .cover { _ => BookCover.hardCover }
+          .isbn { _ => AsnOctetString("1010101010") }
+          .isInPrint { _ => false }
+          .title { _ => AsnOctetString("The Art of Functional Programming") }
         },
       Item
         .journal { _ => Journal
@@ -69,5 +87,34 @@ object TestRough2 {
           .edition { _ => AsnOctetString("July 2009") }
         }
     )
+    
+    System.out.withIndentWriter { out =>
+      out.print("val book1 = ")
+      SimplePrinter.print(out, book1)
+      out.println()
+      out.println()
+      out.print("val book2 = ")
+      SimplePrinter.print(out, book2)
+      out.println()
+      out.println()
+      out.print("val bookPrice1 = ")
+      SimplePrinter.print(out, bookPrice1)
+      out.println()
+      out.println()
+      out.print("val bookPrice2 = ")
+      SimplePrinter.print(out, bookPrice2)
+      out.println()
+      out.println()
+      out.print("val books = ")
+      SimplePrinter.print(out, books)
+      out.println()
+      out.println()
+      out.print("val journals = ")
+      SimplePrinter.print(out, journals)
+      out.println()
+      out.println()
+      out.print("val items = ")
+      SimplePrinter.print(out, items)
+    }
   }
 }
