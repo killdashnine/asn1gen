@@ -98,6 +98,10 @@ class GenScala(packageName: String, out: IndentWriter) {
         out.print("(")
         out.print(defaultNameOf(firstNamedType._type))
         out.println(") {")
+        out.indent(2) {
+          generateChoiceValAliases(assignmentName, rootAlternativeTypeList)
+          generateChoiceTypeAliases(assignmentName, rootAlternativeTypeList)
+        }
         out.println("}")
       }
       case ast.SequenceType(ast.Empty) => {
@@ -1041,6 +1045,42 @@ class GenScala(packageName: String, out: IndentWriter) {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
           generateChoiceFieldTransformer(choiceTypeName, namedType)
+        }
+      }
+    }
+  }
+  
+  def generateChoiceValAliases(
+      choiceTypeName: String,
+      rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
+    rootAlternativeTypeList match {
+      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+        namedTypes foreach { namedType =>
+          out.print("val ")
+          out.print(namedType.name.capitalise)
+          out.print(" = ")
+          out.print(choiceTypeName)
+          out.print("_")
+          out.print(namedType.name)
+          out.println
+        }
+      }
+    }
+  }
+
+  def generateChoiceTypeAliases(
+      choiceTypeName: String,
+      rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
+    rootAlternativeTypeList match {
+      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+        namedTypes foreach { namedType =>
+          out.print("type ")
+          out.print(namedType.name.capitalise)
+          out.print(" = ")
+          out.print(choiceTypeName)
+          out.print("_")
+          out.print(namedType.name)
+          out.println
         }
       }
     }
