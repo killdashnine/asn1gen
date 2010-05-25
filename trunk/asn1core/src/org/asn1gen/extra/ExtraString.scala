@@ -11,4 +11,6 @@ class ExtraString(value: String) {
       )
     return "\"" + newValue + "\""
   }
+  
+  def capitalise: String = value(0).toUpperCase + value.substring(1)
 }
