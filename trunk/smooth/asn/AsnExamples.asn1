@@ -1,5 +1,9 @@
 ASNEXAMPLES DEFINITIONS ::=
 BEGIN
+  BookCover ::= ENUMERATED {
+    hardCover,
+    paperBack
+  }
   BookPrice ::= SEQUENCE {
     isbn OCTET STRING,
     price INTEGER
@@ -7,7 +11,9 @@ BEGIN
   Book ::= SEQUENCE {
     isbn OCTET STRING,
     title OCTET STRING,
-    author OCTET STRING
+    author OCTET STRING,
+    cover BookCover,
+    isInPrint BOOLEAN
   }
   Books ::= SET OF Book
   BookPrices ::= SET OF Book
