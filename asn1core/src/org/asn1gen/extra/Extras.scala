@@ -5,6 +5,8 @@ import java.io.OutputStream
 import java.io.Writer
 
 trait Extras {
+  implicit def toExtra(value: Boolean) = new ExtraBoolean(value)
+  
   implicit def toExtra(value: Char) = new ExtraChar(value)
 
   implicit def toExtra(value: String) = new ExtraString(value)
