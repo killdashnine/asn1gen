@@ -20,6 +20,11 @@ package rough {
         .title { _ => AsnOctetString("Real World Scala") }
         .cover { _ => BookCover.paperBack }
 
+      val book3 = book2
+        .isbn { _ => AsnOctetString("987654321") }
+        .title { _ => AsnOctetString("Real World Scala") }
+        .cover { _ => hardCover }
+
       val bookPrice1 =
         BookPrice
           .isbn { _ => AsnOctetString("123456789") }
@@ -46,8 +51,8 @@ package rough {
           )
 
       val items = Items(
-        books.items.map { Item_book(_): Item.Book } :::
-        journals.items.map { Item_journal(_): Item.Journal }
+        (books.items.map { Item_book(_): Item.Book }) :::
+        (journals.items.map { Item_journal(_): Item.Journal })
       )
 
       System.out.withIndentWriter { out =>
