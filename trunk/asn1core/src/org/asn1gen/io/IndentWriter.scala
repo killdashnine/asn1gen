@@ -75,6 +75,53 @@ class IndentWriter(out: Writer) extends PrintWriter(out, true) {
     prePrint()
     super.print(value)
   }
+
+  def <<(s: String): IndentWriter = {
+    if (s.length != 0) {
+      prePrint()
+    }
+    super.print(s)
+    return this
+  }
+  
+  def <<(value: Char): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Int): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Long): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Float): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Double): IndentWriter = {
+    this.print(value)
+    return this
+  }
+  
+  def <<(value: Object): IndentWriter = {
+    this.print(value.toString)
+    return this
+  }
+  
+  def <<(endLn: EndLn): IndentWriter = {
+    this.println()
+    return this
+  }
 }
 
 object IndentWriter {
