@@ -142,6 +142,11 @@ object SimplePrinter extends Extras {
                 out.print(subValue.inspect)
                 out.print(" }")
               }
+              case null => {
+                out.print(".")
+                out.print(name)
+                out.print(" { _ => null }")
+              }
             }
           }
         }
