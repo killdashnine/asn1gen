@@ -8,14 +8,14 @@ import org.asn1gen.extra.Extras._
 object TestRough2 {
   def main(args: Array[String]): Unit = {
     val book1 = Book
-      .author { _ => AsnOctetString("Bjarne Stroustrup") }
-      .cover { _ => BookCover.hardCover }
-      .isbn { _ => AsnOctetString("123456789") }
+      .author { _ => null }
+      .cover { _ => BookCover.paperBack }
+      .isbn { _ => null }
       .isInPrint { _ => true }
-      .title { _ => AsnOctetString("Scala Programming") }
+      .title { _ => null }
     
     val book2 = Book
-      .author { _ => AsnOctetString("Bjarne Stroustrup") }
+      .author { _ => null }
       .cover { _ => BookCover.paperBack }
       .isbn { _ => AsnOctetString("987654321") }
       .isInPrint { _ => true }
@@ -31,20 +31,20 @@ object TestRough2 {
     
     val books = Books(
       Book
-        .author { _ => AsnOctetString("Bjarne Stroustrup") }
-        .cover { _ => BookCover.hardCover }
-        .isbn { _ => AsnOctetString("123456789") }
+        .author { _ => null }
+        .cover { _ => BookCover.paperBack }
+        .isbn { _ => null }
         .isInPrint { _ => true }
-        .title { _ => AsnOctetString("Scala Programming") },
+        .title { _ => null },
       Book
-        .author { _ => AsnOctetString("Bjarne Stroustrup") }
+        .author { _ => null }
         .cover { _ => BookCover.paperBack }
         .isbn { _ => AsnOctetString("987654321") }
         .isInPrint { _ => true }
         .title { _ => AsnOctetString("Real World Scala") },
       Book
         .author { _ => AsnOctetString("Someone else") }
-        .cover { _ => BookCover.hardCover }
+        .cover { _ => BookCover.paperBack }
         .isbn { _ => AsnOctetString("1010101010") }
         .isInPrint { _ => false }
         .title { _ => AsnOctetString("The Art of Functional Programming") }
@@ -59,15 +59,15 @@ object TestRough2 {
     val items = Items(
       Item
         .book { _ => Book
-          .author { _ => AsnOctetString("Bjarne Stroustrup") }
-          .cover { _ => BookCover.hardCover }
-          .isbn { _ => AsnOctetString("123456789") }
+          .author { _ => null }
+          .cover { _ => BookCover.paperBack }
+          .isbn { _ => null }
           .isInPrint { _ => true }
-          .title { _ => AsnOctetString("Scala Programming") }
+          .title { _ => null }
         },
       Item
         .book { _ => Book
-          .author { _ => AsnOctetString("Bjarne Stroustrup") }
+          .author { _ => null }
           .cover { _ => BookCover.paperBack }
           .isbn { _ => AsnOctetString("987654321") }
           .isInPrint { _ => true }
@@ -76,7 +76,7 @@ object TestRough2 {
       Item
         .book { _ => Book
           .author { _ => AsnOctetString("Someone else") }
-          .cover { _ => BookCover.hardCover }
+          .cover { _ => BookCover.paperBack }
           .isbn { _ => AsnOctetString("1010101010") }
           .isInPrint { _ => false }
           .title { _ => AsnOctetString("The Art of Functional Programming") }
@@ -87,7 +87,7 @@ object TestRough2 {
           .edition { _ => AsnOctetString("July 2009") }
         }
     )
-    
+
     System.out.withIndentWriter { out =>
       out.print("val book1 = ")
       SimplePrinter.print(out, book1)
