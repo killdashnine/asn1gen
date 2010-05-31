@@ -34,5 +34,19 @@ BEGIN
   	journal [2] Journal
   }
   
-  Items ::= SET OF Item 
+  Items ::= SET OF Item
+  
+  defaultBook Book ::= {
+    isbn "default isbn",
+    title "default title",
+    author "default author",
+    cover paperBack,
+    isInPrint TRUE
+  }
+  
+  defaultInteger INTEGER ::= 123
+  defaultBooleanTrue BOOLEAN ::= TRUE
+  defaultBooleanFalse BOOLEAN ::= FALSE
+  defaultOctetString OCTET STRING ::= "Hello world"
+  
 END
