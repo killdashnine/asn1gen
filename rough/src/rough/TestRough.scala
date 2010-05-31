@@ -20,7 +20,7 @@ package rough {
         .title { _ => AsnOctetString("Real World Scala") }
         .cover { _ => BookCover.paperBack }
 
-      val book3 = book2
+      val book3 = defaultBook
         .isbn { _ => AsnOctetString("987654321") }
         .title { _ => AsnOctetString("Real World Scala") }
         .cover { _ => hardCover }
@@ -64,6 +64,10 @@ package rough {
         SimplePrinter.print(out, book2)
         out.println()
         out.println()
+        out.print("val book3 = ")
+        SimplePrinter.print(out, book3)
+        out.println()
+        out.println()
         out.print("val bookPrice1 = ")
         SimplePrinter.print(out, bookPrice1)
         out.println()
@@ -82,6 +86,22 @@ package rough {
         out.println()
         out.print("val items = ")
         SimplePrinter.print(out, items)
+        out.println()
+        out.println()
+        out.print("val defaultInteger = ")
+        SimplePrinter.print(out, defaultInteger)
+        out.println()
+        out.println()
+        out.print("val defaultBooleanTrue = ")
+        SimplePrinter.print(out, defaultBooleanTrue)
+        out.println()
+        out.println()
+        out.print("val defaultBooleanFalse = ")
+        SimplePrinter.print(out, defaultBooleanFalse)
+        out.println()
+        out.println()
+        out.print("val defaultOctetString = ")
+        SimplePrinter.print(out, defaultOctetString)
       }
     }
   }
