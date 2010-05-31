@@ -167,6 +167,8 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
   def builtinValue: Parser[BuiltinValue] =
     ( bitStringValue
     | booleanValue
+    | sequenceValue
+    | sequenceOfValue
     | characterStringValue
     | choiceValue
     | embeddedPdvValue
@@ -180,8 +182,6 @@ class Asn1Parser extends Asn1ParserBase with ImplicitConversions {
     | octetStringValue
     | realValue
     | relativeOidValue
-    | sequenceValue
-    | sequenceOfValue
     | setValue
     | setOfValue
     | taggedValue
