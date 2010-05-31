@@ -35,18 +35,68 @@ class GenScala(packageName: String, out: IndentWriter) {
         out << "import " << symbolsFromModule.module << "._" << EndLn
       }
       out << EndLn
-      module.values foreach { value =>
-        ( out
-          << "/*" << EndLn
-          << value << EndLn
-          << "*/" << EndLn
-        )
-      }
       module.types.foreach { case (_, namedType: NamedType) =>
         generate(namedType)
       }
+      module.values foreach { case (name, namedValue) =>
+        generate(namedValue)
+      }
     }
     out << "}" << EndLn
+  }
+  
+  def generate(namedValue: NamedValue): Unit = {
+    namedValue match {
+      case NamedValue(name, ast.Type(ast.INTEGER(None), _), ast.SignedNumber(negative, ast.Number(magnitude))) => {
+        out << "lazy val " << name << " = "
+        if (negative) {
+          out << "-"
+        }
+        out << magnitude << EndLn
+      }
+      case NamedValue(name, ast.Type(ast.BOOLEAN, _), ast.BooleanValue(booleanValue)) => {
+        out << "lazy val " << name << " = " << booleanValue << EndLn
+      }
+      case NamedValue(name, ast.Type(ast.OctetStringType, _), ast.CString(stringValue)) => {
+        out << "lazy val " << name << " = " << stringValue.inspect << EndLn
+      }
+      case NamedValue(name, typePart, valuePart) => {
+        typePart match {
+          case ast.Type(ast.TypeReference(typeName), _) => {
+            out << "lazy val " << name << " = " << typeName << EndLn
+          }
+        }
+        out.indent(2) {
+          valuePart match {
+            case ast.SequenceValue(memberValues) => {
+              memberValues.foreach { memberValue =>
+                memberValue match {
+                  case ast.NamedValue(ast.Identifier(id), value) => {
+                    out << "." << safeId(id) << " { " << "_ => "
+                    value match {
+                      case ast.CString(stringValue) => {
+                        out << "_rt_.AsnOctetString(" << stringValue.inspect << ")"
+                      }
+                      case ast.ValueReference(valueReferenceName) => {
+                        out << safeId(valueReferenceName)
+                      }
+                      case ast.BooleanValue(booleanValue) => {
+                        out << booleanValue
+                      }
+                      
+                    }
+                    out << " }" << EndLn
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      case x => {
+        out << "/* unknown value " << x << " */" << EndLn
+      }
+    }
   }
   
   def generate(namedType: NamedType): Unit = {
