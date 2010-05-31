@@ -113,6 +113,11 @@ class IndentWriter(out: Writer) extends PrintWriter(out, true) {
     return this
   }
   
+  def <<(value: Boolean): IndentWriter = {
+    this.print(value)
+    return this
+  }
+  
   def <<(value: Object): IndentWriter = {
     this.print(value.toString)
     return this
