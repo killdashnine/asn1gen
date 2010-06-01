@@ -1,6 +1,7 @@
 import moo.ASNEXAMPLES._
 
 import org.asn1gen.runtime._
+import org.asn1gen.runtime.Extras._
 import org.asn1gen.runtime.printing.SimplePrinter
 import org.asn1gen.extra.Extras._
 import org.asn1gen.io.IndentWriter

@@ -48,17 +48,18 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generate(namedValue: NamedValue): Unit = {
     namedValue match {
       case NamedValue(name, ast.Type(ast.INTEGER(None), _), ast.SignedNumber(negative, ast.Number(magnitude))) => {
-        out << "lazy val " << name << " = "
+        out << "lazy val " << name << " = _rt_.AsnInteger("
         if (negative) {
           out << "-"
         }
-        out << magnitude << EndLn
+        out << magnitude << ")" << EndLn
       }
       case NamedValue(name, ast.Type(ast.BOOLEAN, _), ast.BooleanValue(booleanValue)) => {
-        out << "lazy val " << name << " = " << booleanValue << EndLn
+        val booleanString = if (booleanValue) "_rt_.AsnTrue" else "_rt_.AsnFalse"
+        out << "lazy val " << name << " = " << booleanString << EndLn
       }
       case NamedValue(name, ast.Type(ast.OctetStringType, _), ast.CString(stringValue)) => {
-        out << "lazy val " << name << " = " << stringValue.inspect << EndLn
+        out << "lazy val " << name << " = _rt_.AsnOctetString(" << stringValue.inspect << ")" << EndLn
       }
       case NamedValue(name, typePart, valuePart) => {
         typePart match {
@@ -81,7 +82,8 @@ class GenScala(packageName: String, out: IndentWriter) {
                         out << safeId(valueReferenceName)
                       }
                       case ast.BooleanValue(booleanValue) => {
-                        out << booleanValue
+                        val booleanString = if (booleanValue) "_rt_.AsnTrue" else "_rt_.AsnFalse"
+                        out << booleanString
                       }
                       
                     }
@@ -450,9 +452,9 @@ class GenScala(packageName: String, out: IndentWriter) {
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << safeAssignmentName << " = Boolean" << EndLn
+          << "type " << safeAssignmentName << " = _rt_.AsnBoolean" << EndLn
           << EndLn
-          << "lazy val " << safeAssignmentName << " = false" << EndLn
+          << "lazy val " << safeAssignmentName << " = _rt_.AsnFalse" << EndLn
         )
       }
       case ast.OctetStringType => {
@@ -748,7 +750,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnBitString"
       }
       case ast.BOOLEAN => {
-        return "false"
+        return "_rt_.AsnFalse"
       }
       case characterString: ast.CharacterStringType => {
         defaultNameOf(characterString)
@@ -906,7 +908,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnBitString"
       }
       case ast.BOOLEAN => {
-        return "Boolean"
+        return "_rt_.AsnBoolean"
       }
       case characterString: ast.CharacterStringType => {
         typeNameOf(characterString)
