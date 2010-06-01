@@ -48,18 +48,17 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generate(namedValue: NamedValue): Unit = {
     namedValue match {
       case NamedValue(name, ast.Type(ast.INTEGER(None), _), ast.SignedNumber(negative, ast.Number(magnitude))) => {
-        out << "lazy val " << name << " = _rt_.AsnInteger("
+        out << "lazy val " << name << " = "
         if (negative) {
           out << "-"
         }
-        out << magnitude << ")" << EndLn
+        out << magnitude << EndLn
       }
       case NamedValue(name, ast.Type(ast.BOOLEAN, _), ast.BooleanValue(booleanValue)) => {
-        val booleanString = if (booleanValue) "_rt_.AsnTrue" else "_rt_.AsnFalse"
-        out << "lazy val " << name << " = " << booleanString << EndLn
+        out << "lazy val " << name << " = " << booleanValue << EndLn
       }
       case NamedValue(name, ast.Type(ast.OctetStringType, _), ast.CString(stringValue)) => {
-        out << "lazy val " << name << " = _rt_.AsnOctetString(" << stringValue.inspect << ")" << EndLn
+        out << "lazy val " << name << " = " << stringValue.inspect << "" << EndLn
       }
       case NamedValue(name, typePart, valuePart) => {
         typePart match {
@@ -76,14 +75,13 @@ class GenScala(packageName: String, out: IndentWriter) {
                     out << "." << safeId(id) << " { " << "_ => "
                     value match {
                       case ast.CString(stringValue) => {
-                        out << "_rt_.AsnOctetString(" << stringValue.inspect << ")"
+                        out << stringValue.inspect
                       }
                       case ast.ValueReference(valueReferenceName) => {
                         out << safeId(valueReferenceName)
                       }
                       case ast.BooleanValue(booleanValue) => {
-                        val booleanString = if (booleanValue) "_rt_.AsnTrue" else "_rt_.AsnFalse"
-                        out << booleanString
+                        out << booleanValue
                       }
                       
                     }
@@ -151,7 +149,7 @@ class GenScala(packageName: String, out: IndentWriter) {
           << EndLn
           << "object " << safeAssignmentName << " extends "
           << safeId(assignmentName + "_" + firstNamedType.name)
-          << "(" << defaultNameOf(firstNamedType._type) << ") {" << EndLn
+          << "(" << rawDefaultOf(firstNamedType._type) << ") {" << EndLn
         )
         out.indent(2) {
           generateChoiceValAliases(assignmentName, rootAlternativeTypeList)
@@ -279,7 +277,7 @@ class GenScala(packageName: String, out: IndentWriter) {
               }
               optionalDefault match {
                 case ast.Empty => {
-                  out << safeId(defaultNameOf(_type))
+                  out << safeId(rawDefaultOf(_type))
                 }
                 case ast.Optional => {
                   out << "None"
@@ -579,9 +577,9 @@ class GenScala(packageName: String, out: IndentWriter) {
             out.ensureEmptyLines(1)
             ( out
               << "type " << safeAssignmentName
-              << " = List[" << typeNameOf(builtinType) << "]"
+              << " = List[" << asnTypeOf(builtinType) << "]"
               << "lazy val " << safeAssignmentName
-              << " = Nil: List[" << typeNameOf(builtinType) << "]"
+              << " = Nil: List[" << asnTypeOf(builtinType) << "]"
             )
           }
         }
@@ -589,27 +587,214 @@ class GenScala(packageName: String, out: IndentWriter) {
     }
   }
   
-  def typeNameOf(namedComponentType: ast.NamedComponentType): String = {
+  ///
+  
+  def asnTypeOf(namedComponentType: ast.NamedComponentType): String = {
     namedComponentType match {
       case ast.NamedComponentType(
         ast.NamedType(ast.Identifier(identifier), _type),
         value)
       => {
-        typeNameOf(_type, value)
+        asnTypeOf(_type, value)
       }
     }
   }
   
-  def typeNameOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
+  def asnTypeOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
     value match {
       case ast.Empty =>
-        return typeNameOf(_type)
+        return asnTypeOf(_type)
       case ast.Default(value) =>
-        return typeNameOf(_type)
+        return asnTypeOf(_type)
       case ast.Optional =>
-        return "Option[" + typeNameOf(_type) + "]"
+        return "Option[" + asnTypeOf(_type) + "]"
     }
   }
+  
+  //////
+
+  def rawTypeOf(namedComponentType: ast.NamedComponentType): String = {
+    namedComponentType match {
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
+        value)
+      => {
+        rawTypeOf(_type, value)
+      }
+    }
+  }
+  
+  def rawTypeOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return rawTypeOf(_type)
+      case ast.Default(value) =>
+        return rawTypeOf(_type)
+      case ast.Optional =>
+        return "Option[" + rawTypeOf(_type) + "]"
+    }
+  }
+
+  def rawTypeOf(_type: ast.Type): String = {
+    _type match {
+      case ast.Type(typeKind, _) => rawTypeOf(typeKind)
+    }
+  }
+  
+  def rawTypeOf(typeKind: ast.TypeKind): String = {
+    typeKind match {
+      case builtinType: ast.BuiltinType => rawTypeOf(builtinType)
+      case usefulType: ast.UsefulType => rawTypeOf(usefulType)
+      case ast.TypeReference(reference) => reference
+      case unmatched => "Unmatched(" + unmatched + ")"
+    }
+  }
+  
+  def rawTypeOf(typeKind: ast.TypeKind, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return rawTypeOf(typeKind)
+      case ast.Default(value) =>
+        return rawTypeOf(typeKind)
+      case ast.Optional =>
+        return "Option[" + rawTypeOf(typeKind) + "]"
+    }
+  }
+  
+  def rawTypeOf(builtinType: ast.UsefulType): String = {
+    builtinType match {
+      case ast.GeneralizedTime => {
+        return "_rt_.AsnGeneralizedTime"
+      }
+      case ast.ObjectDescriptor => {
+        return "_rt_.AsnObjectDescriptor"
+      }
+      case ast.UTCTime => {
+        return "_rt_.AsnUtcTime"
+      }
+      case unmatched => {
+        return "UnknownUsefulType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def rawTypeOf(builtinType: ast.BuiltinType): String = {
+    builtinType match {
+      case ast.BitStringType(_) => {
+        return "String"
+      }
+      case ast.BOOLEAN => {
+        return "Boolean"
+      }
+      case characterString: ast.CharacterStringType => {
+        rawTypeOf(characterString)
+      }
+      case _: ast.ChoiceType => {
+        return "_rt_.AsnChoice"
+      }
+      case ast.EmbeddedPdvType => {
+        return "_rt_.AsnEmbeddedPdv"
+      }
+      case ast.EnumeratedType(_) => {
+        return "_rt_.AsnEnumeration"
+      }
+      case ast.EXTERNAL => {
+        return "ExternalType"
+      }
+      case ast.InstanceOfType(_) => {
+        return "InstanceOfType"
+      }
+      case ast.INTEGER(_) => {
+        return "Long"
+      }
+      case ast.NULL => {
+        return "_rt_.AsnNull"
+      }
+      case _: ast.ObjectClassFieldType => {
+        return "_rt_.AsnObjectClassField"
+      }
+      case ast.ObjectIdentifierType => {
+        return "_rt_.AsnObjectIdentifier"
+      }
+      case ast.OctetStringType => {
+        return "String"
+      }
+      case ast.REAL => {
+        return "Double"
+      }
+      case ast.RelativeOidType => {
+        return "_rt_.AsnRelativeOidType"
+      }
+      case ast.SequenceOfType(_) => {
+        return "_rt_.AsnSequenceOf"
+      }
+      case ast.SequenceType(_) => {
+        return "_rt_.AsnSequence"
+      }
+      case ast.SetOfType(_) => {
+        return "_rt_.AsnSetOf"
+      }
+      case ast.SetType(_) => {
+        return "_rt_.AsnSet"
+      }
+      case ast.TaggedType(_, _, underlyingType) => {
+        return rawTypeOf(underlyingType)
+      }
+      case unmatched => {
+        return "UnknownBuiltinType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def rawTypeOf(characterString: ast.CharacterStringType): String = {
+    characterString match {
+      case ast.BMPString => {
+        return "_rt_.AsnBmpString"
+      }
+      case ast.GeneralString => {
+        return "_rt_.AsnGeneralString"
+      }
+      case ast.GraphicString => {
+        return "_rt_.AsnGraphicString"
+      }
+      case ast.IA5String => {
+        return "_rt_.AsnIa5String"
+      }
+      case ast.ISO646String => {
+        return "_rt_.AsnIso646String"
+      }
+      case ast.NumericString => {
+        return "_rt_.AsnNumericString"
+      }
+      case ast.PrintableString => {
+        return "String"
+      }
+      case ast.T61String => {
+        return "_rt_.AsnT61String"
+      }
+      case ast.TeletexString => {
+        return "_rt_.AsnTeletexString"
+      }
+      case ast.UniversalString => {
+        return "_rt_.AsnUniversalString"
+      }
+      case ast.UTF8String => {
+        return "String"
+      }
+      case ast.VideotexString => {
+        return "_rt_.AsnVideotexString"
+      }
+      case ast.VisibleString => {
+        return "_rt_.AsnVisibleString"
+      }
+      case unknown => {
+        return "UnknownCharacterString(" + unknown + ")"
+      }
+    }
+  }
+  
+  
+  ///
   
   def defaultNameOf(namedComponentType: ast.NamedComponentType): String = {
     namedComponentType match {
@@ -625,13 +810,39 @@ class GenScala(packageName: String, out: IndentWriter) {
   def defaultNameOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
     value match {
       case ast.Empty =>
-        return typeNameOf(_type)
+        return asnTypeOf(_type)
       case ast.Default(value) =>
         return defaultNameOf(_type)
       case ast.Optional =>
         return "None"
     }
   }
+
+  ///////
+  
+  def rawDefaultOf(namedComponentType: ast.NamedComponentType): String = {
+    namedComponentType match {
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
+        value)
+      => {
+        rawDefaultOf(_type, value)
+      }
+    }
+  }
+  
+  def rawDefaultOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return asnTypeOf(_type)
+      case ast.Default(value) =>
+        return rawDefaultOf(_type)
+      case ast.Optional =>
+        return "None"
+    }
+  }
+  
+  //////
   
   def generateSequenceFieldDefines(
       sequenceName: String, list: List[ast.ComponentType]): Unit = {
@@ -644,7 +855,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         if (!firstTime) {
           out << "," << EndLn
         }
-        out << "val " << safeId(identifier) << ": " << safeId(typeNameOf(_type, value))
+        out << "val " << safeId(identifier) << ": " << safeId(rawTypeOf(_type, value))
         firstTime = false
       }
     }
@@ -661,7 +872,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         if (!firstTime) {
           out << "," << EndLn
         }
-        out << safeId(identifier) << ": " << safeId(typeNameOf(_type, value))
+        out << safeId(identifier) << ": " << safeId(rawTypeOf(_type, value))
         firstTime = false
       }
     }
@@ -695,7 +906,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         if (!firstTime) {
           out << "," << EndLn
         }
-        out << safeId(identifier) << ": " << safeId(typeNameOf(_type, value)) << " = this." << safeId(identifier)
+        out << safeId(identifier) << ": " << safeId(rawTypeOf(_type, value)) << " = this." << safeId(identifier)
         firstTime = false
       }
     }
@@ -858,34 +1069,196 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
     }
   }
+
+  /////////
   
-  def typeNameOf(_type: ast.Type): String = {
+  def rawDefaultOf(_type: ast.Type): String = {
     _type match {
-      case ast.Type(typeKind, _) => typeNameOf(typeKind)
+      case ast.Type(typeKind, _) => rawDefaultOf(typeKind)
     }
   }
   
-  def typeNameOf(typeKind: ast.TypeKind): String = {
+  def rawDefaultOf(typeKind: ast.TypeKind): String = {
     typeKind match {
-      case builtinType: ast.BuiltinType => typeNameOf(builtinType)
-      case usefulType: ast.UsefulType => typeNameOf(usefulType)
+      case builtinType: ast.BuiltinType => rawDefaultOf(builtinType)
+      case usefulType: ast.UsefulType => rawDefaultOf(usefulType)
+      case ast.TypeReference(reference) => reference
+      case unmatched => "UnmatchedDefaultName(" + unmatched + ")"
+    }
+  }
+  
+  def rawDefaultOf(typeKind: ast.TypeKind, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return rawDefaultOf(typeKind)
+      case ast.Default(value) =>
+        return rawDefaultOf(typeKind)
+      case ast.Optional =>
+        return "None"
+    }
+  }
+  
+  def rawDefaultOf(usefulType: ast.UsefulType): String = {
+    usefulType match {
+      case ast.GeneralizedTime => {
+        return "_rt_.AsnGeneralizedTime"
+      }
+      case ast.ObjectDescriptor => {
+        return "_rt_.AsnObjectDescriptor"
+      }
+      case ast.UTCTime => {
+        return "_rt_.AsnUtcTime"
+      }
+      case unmatched => {
+        return "UnknownUsefulType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def rawDefaultOf(builtinType: ast.BuiltinType): String = {
+    builtinType match {
+      case ast.BitStringType(_) => {
+        return "_rt_.AsnBitString"
+      }
+      case ast.BOOLEAN => {
+        return "false"
+      }
+      case characterString: ast.CharacterStringType => {
+        rawDefaultOf(characterString)
+      }
+      case _: ast.ChoiceType => {
+        return "_rt_.AsnChoice"
+      }
+      case ast.EmbeddedPdvType => {
+        return "_rt_.AsnEmbeddedPdv"
+      }
+      case ast.EnumeratedType(_) => {
+        return "_rt_.AsnEnumeration"
+      }
+      case ast.EXTERNAL => {
+        return "ExternalType"
+      }
+      case ast.InstanceOfType(_) => {
+        return "InstanceOfType"
+      }
+      case ast.INTEGER(_) => {
+        return "0L"
+      }
+      case ast.NULL => {
+        return "_rt_.AsnNull"
+      }
+      case _: ast.ObjectClassFieldType => {
+        return "_rt_.AsnObjectClassField"
+      }
+      case ast.ObjectIdentifierType => {
+        return "_rt_.AsnObjectIdentifier"
+      }
+      case ast.OctetStringType => {
+        return "\"\""
+      }
+      case ast.REAL => {
+        return "0.0"
+      }
+      case ast.RelativeOidType => {
+        return "_rt_.AsnRelativeOidType"
+      }
+      case ast.SequenceOfType(_) => {
+        return "_rt_.AsnSequenceOf"
+      }
+      case ast.SequenceType(_) => {
+        return "_rt_.AsnSequence"
+      }
+      case ast.SetOfType(_) => {
+        return "_rt_.AsnSetOf"
+      }
+      case ast.SetType(_) => {
+        return "_rt_.AsnSet"
+      }
+      case ast.TaggedType(_, _, underlyingType) => {
+        return rawDefaultOf(underlyingType)
+      }
+      case unmatched => {
+        return "UnknownBuiltinType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def rawDefaultOf(characterString: ast.CharacterStringType): String = {
+    characterString match {
+      case ast.BMPString => {
+        return "\"\""
+      }
+      case ast.GeneralString => {
+        return "\"\""
+      }
+      case ast.GraphicString => {
+        return "\"\""
+      }
+      case ast.IA5String => {
+        return "\"\""
+      }
+      case ast.ISO646String => {
+        return "\"\""
+      }
+      case ast.NumericString => {
+        return "\"\""
+      }
+      case ast.PrintableString => {
+        return "\"\""
+      }
+      case ast.T61String => {
+        return "\"\""
+      }
+      case ast.TeletexString => {
+        return "\"\""
+      }
+      case ast.UniversalString => {
+        return "\"\""
+      }
+      case ast.UTF8String => {
+        return "\"\""
+      }
+      case ast.VideotexString => {
+        return "\"\""
+      }
+      case ast.VisibleString => {
+        return "\"\""
+      }
+      case unknown => {
+        return "UnknownCharacterString(" + unknown + ")"
+      }
+    }
+  }
+  
+  /////////
+  
+  def asnTypeOf(_type: ast.Type): String = {
+    _type match {
+      case ast.Type(typeKind, _) => asnTypeOf(typeKind)
+    }
+  }
+  
+  def asnTypeOf(typeKind: ast.TypeKind): String = {
+    typeKind match {
+      case builtinType: ast.BuiltinType => asnTypeOf(builtinType)
+      case usefulType: ast.UsefulType => asnTypeOf(usefulType)
       case ast.TypeReference(reference) => reference
       case unmatched => "Unmatched(" + unmatched + ")"
     }
   }
   
-  def typeNameOf(typeKind: ast.TypeKind, value: ast.OptionalDefault[ast.Value]): String = {
+  def asnTypeOf(typeKind: ast.TypeKind, value: ast.OptionalDefault[ast.Value]): String = {
     value match {
       case ast.Empty =>
-        return typeNameOf(typeKind)
+        return asnTypeOf(typeKind)
       case ast.Default(value) =>
-        return typeNameOf(typeKind)
+        return asnTypeOf(typeKind)
       case ast.Optional =>
-        return "Option[" + typeNameOf(typeKind) + "]"
+        return "Option[" + asnTypeOf(typeKind) + "]"
     }
   }
   
-  def typeNameOf(builtinType: ast.UsefulType): String = {
+  def asnTypeOf(builtinType: ast.UsefulType): String = {
     builtinType match {
       case ast.GeneralizedTime => {
         return "_rt_.AsnGeneralizedTime"
@@ -902,7 +1275,7 @@ class GenScala(packageName: String, out: IndentWriter) {
     }
   }
   
-  def typeNameOf(builtinType: ast.BuiltinType): String = {
+  def asnTypeOf(builtinType: ast.BuiltinType): String = {
     builtinType match {
       case ast.BitStringType(_) => {
         return "_rt_.AsnBitString"
@@ -911,7 +1284,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnBoolean"
       }
       case characterString: ast.CharacterStringType => {
-        typeNameOf(characterString)
+        asnTypeOf(characterString)
       }
       case _: ast.ChoiceType => {
         return "_rt_.AsnChoice"
@@ -962,7 +1335,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         return "_rt_.AsnSet"
       }
       case ast.TaggedType(_, _, underlyingType) => {
-        return typeNameOf(underlyingType)
+        return asnTypeOf(underlyingType)
       }
       case unmatched => {
         return "UnknownBuiltinType(" + unmatched + ")"
@@ -970,7 +1343,7 @@ class GenScala(packageName: String, out: IndentWriter) {
     }
   }
   
-  def typeNameOf(characterString: ast.CharacterStringType): String = {
+  def asnTypeOf(characterString: ast.CharacterStringType): String = {
     characterString match {
       case ast.BMPString => {
         return "_rt_.AsnBmpString"
@@ -1047,7 +1420,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         //out.println("// tag " + number)
       }
       case ast.Type(builtinType: ast.TypeKind, List()) => {
-        val setterType = typeNameOf(builtinType, value)
+        val setterType = rawTypeOf(builtinType, value)
         ( out
           << "def " << safeId(fieldName) << "(f: (" << setterType << " => "
           << setterType << ")): " << sequenceName << " =" << EndLn
@@ -1086,13 +1459,13 @@ class GenScala(packageName: String, out: IndentWriter) {
           _))
       => {
         val safeName = safeId(name)
-        val safeElementType = safeId(typeNameOf(_type))
+        val safeElementType = safeId(rawTypeOf(_type))
         val safeChoiceType = safeId(assignmentName)
         val safeChoiceChoice = safeId(assignmentName + "_" + name)
         out.ensureEmptyLines(1)
         ( out
           << "case class " << safeChoiceChoice
-          << "(_element: " << typeNameOf(_type) << ") extends "
+          << "(_element: " << asnTypeOf(_type) << ") extends "
           << safeId(assignmentName) << "(_element) {" << EndLn
         )
         out.indent(2) {
@@ -1192,7 +1565,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         val safeElementName = safeId(name)
         val safeChoiceType = safeId(choiceTypeName)
         val safeChoiceChoice = safeId(choiceTypeName + "_" + name)
-        val safeElementType = safeId(typeNameOf(_type))
+        val safeElementType = safeId(asnTypeOf(_type))
         ( out
           << EndLn
           << "def "
@@ -1238,7 +1611,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         _type)
       => {
     	val safeName = safeId(name)
-    	val safeType = safeId(typeNameOf(_type))
+    	val safeType = safeId(asnTypeOf(_type))
         ( out
           << EndLn
           << "def "
