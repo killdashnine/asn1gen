@@ -1,6 +1,6 @@
 package org.asn1gen.runtime
 
-class AsnBoolean(val value: Boolean) extends AsnType {
+sealed class AsnBoolean(val value: Boolean) extends AsnType {
   override def _desc: meta.AsnBoolean = meta.AsnBoolean
 
   def copy(value: Boolean = this.value): AsnBoolean = AsnBoolean(value)
@@ -12,11 +12,17 @@ class AsnBoolean(val value: Boolean) extends AsnType {
 
   override def hashCode(): Int = this.value.hashCode
 
-  def value(f: (Boolean => Boolean)): AsnBoolean = this.copy(value = f(this.value))
+  def value(f: (Boolean => Boolean)): AsnBoolean = if (f(this.value)) AsnTrue else AsnFalse
 }
 
 object AsnBoolean extends AsnBoolean(false) {
-  def apply(value: Boolean) = new AsnBoolean(value)
+  def apply(value: Boolean) = if (value) AsnTrue else AsnFalse
 
   def unapply(value: AsnBoolean) = Some(value.value)
+}
+
+object AsnFalse extends AsnBoolean(false) {
+}
+
+object AsnTrue extends AsnBoolean(true) {
 }

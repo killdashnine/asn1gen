@@ -152,10 +152,11 @@ object SimplePrinter extends Extras {
         }
       }
       case _rt_.AsnBoolean(value) => {
-        out.print("AsnBoolean")
-        out.print("(")
-        out.print(value)
-        out.print(")")
+        if (value) {
+          out.print("AsnTrue")
+        } else {
+          out.print("AsnFalse")
+        }
       }
       case list: _rt_.AsnList => {
         out.print(list._desc.name)
