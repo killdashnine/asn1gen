@@ -18,16 +18,16 @@ object TestRough2 {
     val book2 = Book
       .author { _ => null }
       .cover { _ => BookCover.paperBack }
-      .isbn { _ => AsnOctetString("987654321") }
+      .isbn { _ => "987654321" }
       .isInPrint { _ => true }
-      .title { _ => AsnOctetString("Real World Scala") }
+      .title { _ => "Real World Scala" }
     
     val bookPrice1 = BookPrice
-      .isbn { _ => AsnOctetString("123456789") }
+      .isbn { _ => "123456789" }
       .price { _ => 1234 }
     
     val bookPrice2 = BookPrice
-      .isbn { _ => AsnOctetString("987654321") }
+      .isbn { _ => "987654321" }
       .price { _ => 4321 }
     
     val books = Books(
@@ -40,21 +40,21 @@ object TestRough2 {
       Book
         .author { _ => null }
         .cover { _ => BookCover.paperBack }
-        .isbn { _ => AsnOctetString("987654321") }
+        .isbn { _ => "987654321" }
         .isInPrint { _ => true }
-        .title { _ => AsnOctetString("Real World Scala") },
+        .title { _ => "Real World Scala" },
       Book
-        .author { _ => AsnOctetString("Someone else") }
+        .author { _ => "Someone else" }
         .cover { _ => BookCover.paperBack }
-        .isbn { _ => AsnOctetString("1010101010") }
+        .isbn { _ => "1010101010" }
         .isInPrint { _ => false }
-        .title { _ => AsnOctetString("The Art of Functional Programming") }
+        .title { _ => "The Art of Functional Programming" }
     )
     
     val journals = Journals(
       Journal
-        .title { _ => AsnOctetString("Monologues of a mad man") }
-        .edition { _ => AsnOctetString("July 2009") }
+        .title { _ => "Monologues of a mad man" }
+        .edition { _ => "July 2009" }
     )
     
     val items = Items(
@@ -70,22 +70,22 @@ object TestRough2 {
         .book { _ => Book
           .author { _ => null }
           .cover { _ => BookCover.paperBack }
-          .isbn { _ => AsnOctetString("987654321") }
+          .isbn { _ => "987654321" }
           .isInPrint { _ => true }
-          .title { _ => AsnOctetString("Real World Scala") }
+          .title { _ => "Real World Scala" }
         },
       Item
         .book { _ => Book
-          .author { _ => AsnOctetString("Someone else") }
+          .author { _ => "Someone else" }
           .cover { _ => BookCover.paperBack }
-          .isbn { _ => AsnOctetString("1010101010") }
+          .isbn { _ => "1010101010" }
           .isInPrint { _ => false }
-          .title { _ => AsnOctetString("The Art of Functional Programming") }
+          .title { _ => "The Art of Functional Programming" }
         },
       Item
         .journal { _ => Journal
-          .title { _ => AsnOctetString("Monologues of a mad man") }
-          .edition { _ => AsnOctetString("July 2009") }
+          .title { _ => "Monologues of a mad man" }
+          .edition { _ => "July 2009" }
         }
     )
 
