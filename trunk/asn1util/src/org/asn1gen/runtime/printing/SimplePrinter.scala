@@ -196,6 +196,12 @@ object SimplePrinter extends Extras {
       case value: Boolean => {
         out.print(value)
       }
+      case value: Integer => {
+        out.print(value)
+      }
+      case value: String => {
+        out.print(value.inspect)
+      }
       case _ => {
         out.print("/**")
         out.print(value)

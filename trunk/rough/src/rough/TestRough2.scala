@@ -9,15 +9,22 @@ import org.asn1gen.extra.Extras._
 object TestRough2 {
   def main(args: Array[String]): Unit = {
     val book1 = Book
-      .author { _ => null }
+      .author { _ => "Bjarne Stroustrup" }
       .cover { _ => BookCover.paperBack }
-      .isbn { _ => null }
+      .isbn { _ => "123456789" }
       .isInPrint { _ => true }
-      .title { _ => null }
+      .title { _ => "Scala Programming" }
     
     val book2 = Book
-      .author { _ => null }
+      .author { _ => "Bjarne Stroustrup" }
       .cover { _ => BookCover.paperBack }
+      .isbn { _ => "987654321" }
+      .isInPrint { _ => true }
+      .title { _ => "Real World Scala" }
+    
+    val book3 = Book
+      .author { _ => "default author" }
+      .cover { _ => BookCover.hardCover }
       .isbn { _ => "987654321" }
       .isInPrint { _ => true }
       .title { _ => "Real World Scala" }
@@ -32,13 +39,13 @@ object TestRough2 {
     
     val books = Books(
       Book
-        .author { _ => null }
+        .author { _ => "Bjarne Stroustrup" }
         .cover { _ => BookCover.paperBack }
-        .isbn { _ => null }
+        .isbn { _ => "123456789" }
         .isInPrint { _ => true }
-        .title { _ => null },
+        .title { _ => "Scala Programming" },
       Book
-        .author { _ => null }
+        .author { _ => "Bjarne Stroustrup" }
         .cover { _ => BookCover.paperBack }
         .isbn { _ => "987654321" }
         .isInPrint { _ => true }
@@ -60,15 +67,15 @@ object TestRough2 {
     val items = Items(
       Item
         .book { _ => Book
-          .author { _ => null }
+          .author { _ => "Bjarne Stroustrup" }
           .cover { _ => BookCover.paperBack }
-          .isbn { _ => null }
+          .isbn { _ => "123456789" }
           .isInPrint { _ => true }
-          .title { _ => null }
+          .title { _ => "Scala Programming" }
         },
       Item
         .book { _ => Book
-          .author { _ => null }
+          .author { _ => "Bjarne Stroustrup" }
           .cover { _ => BookCover.paperBack }
           .isbn { _ => "987654321" }
           .isInPrint { _ => true }
@@ -88,7 +95,15 @@ object TestRough2 {
           .edition { _ => "July 2009" }
         }
     )
-
+    
+    val defaultInteger = 123
+    
+    val defaultBooleanTrue = true
+    
+    val defaultBooleanFalse = false
+    
+    val defaultOctetString = "Hello world"
+  
     System.out.withIndentWriter { out =>
       out.print("val book1 = ")
       SimplePrinter.print(out, book1)
@@ -96,6 +111,10 @@ object TestRough2 {
       out.println()
       out.print("val book2 = ")
       SimplePrinter.print(out, book2)
+      out.println()
+      out.println()
+      out.print("val book3 = ")
+      SimplePrinter.print(out, book3)
       out.println()
       out.println()
       out.print("val bookPrice1 = ")
@@ -116,6 +135,22 @@ object TestRough2 {
       out.println()
       out.print("val items = ")
       SimplePrinter.print(out, items)
+      out.println()
+      out.println()
+      out.print("val defaultInteger = ")
+      SimplePrinter.print(out, defaultInteger)
+      out.println()
+      out.println()
+      out.print("val defaultBooleanTrue = ")
+      SimplePrinter.print(out, defaultBooleanTrue)
+      out.println()
+      out.println()
+      out.print("val defaultBooleanFalse = ")
+      SimplePrinter.print(out, defaultBooleanFalse)
+      out.println()
+      out.println()
+      out.print("val defaultOctetString = ")
+      SimplePrinter.print(out, defaultOctetString)
     }
   }
 }

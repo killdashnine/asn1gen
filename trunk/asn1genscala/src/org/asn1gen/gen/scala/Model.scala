@@ -48,6 +48,10 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     outDirectory.mkdir
     val metaDirectory = outDirectory.child("meta")
     metaDirectory.mkdir
+    val codecDirectory = outDirectory.child("codec")
+    codecDirectory.mkdir
+    val berDirectory = codecDirectory.child("ber")
+    berDirectory.mkdir
     modules foreach { case (moduleName, module) =>
       val moduleFile = outDirectory.child(moduleName + ".scala")
       moduleFile.openPrintStream { ps =>
@@ -60,6 +64,14 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
       val moduleFile = metaDirectory.child(moduleName + ".scala")
       moduleFile.openPrintStream { ps =>
         val genScala = new GenScalaMeta("moo", new IndentWriter(ps))
+        genScala.generate(module)
+        println("Writing to " + moduleFile)
+      }
+    }
+    modules foreach { case (moduleName, module) =>
+      val moduleFile = berDirectory.child(moduleName + ".scala")
+      moduleFile.openPrintStream { ps =>
+        val genScala = new GenScalaBerEncoder("moo", new IndentWriter(ps))
         genScala.generate(module)
         println("Writing to " + moduleFile)
       }
