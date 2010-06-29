@@ -78,7 +78,7 @@ class TestBerEncoder {
 
   @Test
   def fixedBoolean_0(): Unit = {
-    val result = encode(false)
+    val result = encodeData(false)
     val expected = List[Byte](0)
     assertEquals(expected, result(Nil))
     assertEquals(expected.length, result.length)
@@ -86,7 +86,7 @@ class TestBerEncoder {
 
   @Test
   def fixedBoolean_1(): Unit = {
-    val result = encode(true)
+    val result = encodeData(true)
     val expected = List[Byte](-1)
     assertEquals(expected, result(Nil))
     assertEquals(expected.length, result.length)
