@@ -27,7 +27,7 @@ class GenScalaBerEncoder(packageName: String, out: IndentWriter) {
       << "import org.asn1gen.{io => _io_}" << EndLn
       << "import moo.{ASNEXAMPLES => _m_}" << EndLn
       << EndLn
-      << "trait " << safeId(module.name) << " extends _rt_.codec.BerEncoder {" << EndLn
+      << "trait " << safeId(module.name) << " extends org.asn1gen.runtime.codec.BerEncoder {" << EndLn
       << EndLn
     )
     out.indent(2) {
@@ -63,25 +63,106 @@ class GenScalaBerEncoder(packageName: String, out: IndentWriter) {
       case ast.ChoiceType(
         ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
-        out << "def encode(value: " << safeAssignmentName << "): _io_.ByteStreamer = _io_.ByteStreamer.nil" << EndLn
+        out << "// Choice type" << EndLn
+        out << "def encode("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}" << EndLn
+        out << EndLn
+        out << "def encodeData("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          rootAlternativeTypeList match {
+            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+              namedTypes foreach { namedType =>
+                out << "// 1 -> " << namedType << EndLn
+              }
+            }
+          }
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}"
+        out << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
-        out << "def encode(value: " << safeAssignmentName << "): _io_.ByteStreamer = _io_.ByteStreamer.nil" << EndLn
+        out << "// Empty sequence type" << EndLn
+        out << "def encode("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}" << EndLn
+        out << EndLn
+        out << "def encodeData("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          out << "// 2 -> Empty"
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}" << EndLn
+        out << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
         val list = (list1.toList:::list2.toList).map { componentTypeList =>
           componentTypeList.componentTypes
         }.flatten
         out.ensureEmptyLines(1)
-        out << "def encode(value: " << safeAssignmentName << "): _io_.ByteStreamer = _io_.ByteStreamer.nil" << EndLn
+        out << "// Sequence type" << EndLn
+        out << "def encode("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}" << EndLn
+        out << EndLn
+        out << "def encodeData("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          list foreach {
+            case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
+              out << "// 3 -> " << identifier << EndLn
+              out << "encode(value." << identifier << ")" << EndLn
+            }
+          }
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}" << EndLn
         out << EndLn
       }
       case ast.EnumeratedType(enumerations)
       => {
         var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
-        out << "def encode(value: " << safeAssignmentName << "): _io_.ByteStreamer = _io_.ByteStreamer.nil" << EndLn
+        out << "// Enumerated type" << EndLn
+        out << "def encode("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}" << EndLn
+        out << EndLn
+        out << "def encodeData("
+        out << "value: " << safeAssignmentName
+        out << "): _io_.ByteStreamer = {" << EndLn
+        out.indent(2) {
+          enumerations match {
+            case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension) => {
+              out << "// 4 -> " << items << EndLn
+            }
+          }
+          out << "_io_.ByteStreamer.nil" << EndLn
+        }
+        out << "}" << EndLn
         out << EndLn
       }
       case unmatched => {
