@@ -17,11 +17,15 @@ object ByteStreamer {
   object nil extends ByteStreamer(0) {
     def apply(tail: List[Byte]): List[Byte] = tail
   }
-  
-  def byte(value: Byte) = new ByteStreamer(1) {
-    def apply(tail: List[Byte]): List[Byte] = value :: tail
+
+  val byte = {
+    0.to(0xff).map { value =>
+      new ByteStreamer(1) {
+        def apply(tail: List[Byte]): List[Byte] = value.toByte :: tail
+      }
+    }
   }
-  
+
   def bytes(values: List[Byte]) = new ByteStreamer(values.length) {
     def apply(tail: List[Byte]): List[Byte] = values ::: tail
   }
