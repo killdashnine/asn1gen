@@ -3,6 +3,7 @@ package org.asn1gen.runtime.codec
 import java.io._
 import org.asn1gen.io._
 import org.asn1gen.runtime._
+import scala.collection.immutable._
 
 trait BerEncoder {
   def encodeTagType(tagType: Int): ByteStreamer = {
@@ -75,13 +76,19 @@ trait BerEncoder {
     }
   }
   
-  def encode(value: String): ByteStreamer = {
-    // TODO: Implement me
-    ByteStreamer.nil
+  ///////
+  ///////
+
+  private def encodeDataUnsigned(value: Long) = {
+    val leader = value >>> 8
+    if (leader == 0) {
+      ByteStreamer.byte(value.toInt)
+    } else {
+      val lastByte = ByteStreamer.byte((value & 0xff).toInt)
+      val remainder = encodeData(leader)
+      remainder ::: lastByte
+    }
   }
-  
-  ///////
-  ///////
 
   /**
    * Encode the data part of a boolean value.
@@ -166,6 +173,110 @@ trait BerEncoder {
    */
   def encode(value: Long): ByteStreamer = {
     val tag = ByteStreamer.byte(2)
+    val data = encodeData(value)
+    val length = ByteStreamer.byte(data.length)
+    tag ::: length ::: data
+  }
+  
+  /**
+   * Encode the data part of an integer value.
+   * This implementation uses the shortest representation allowed.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded data.
+   */
+  def encodeData(value: Double): ByteStreamer = {
+    if (value == 0.0) {
+      ByteStreamer.nil
+    } else if (value.isNegInfinity) {
+      ByteStreamer.byte(0x41)
+    } else if (value.isPosInfinity) {
+      ByteStreamer.byte(0x40)
+    } else {
+      val rawValue = java.lang.Double.doubleToRawLongBits(value)
+      val sign = (rawValue >> 63) & 0x1
+      val scale = 0
+      val base = 0 // binary
+      val encodedMantissa = encodeDataUnsigned(rawValue & 0x000fffffffffffffL)
+      val encodedExponent = encodeDataUnsigned((rawValue >> 52) & 0x7ff)
+      val encodedDescriptor = ByteStreamer.byte(
+          (0x80 | (sign << 6) | (base << 4) | (scale << 2) | (encodedExponent.length & 0x3)).toInt)
+      encodedDescriptor ::: encodedExponent ::: encodedMantissa
+    }
+  }
+  
+  /**
+   * Encode the header and data part of a null value.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded header and data.
+   */
+  def encode(value: Double): ByteStreamer = {
+    val tag = ByteStreamer.byte(9)
+    val data = encodeData(value)
+    val length = ByteStreamer.byte(data.length)
+    tag ::: length ::: data
+  }
+  
+  /**
+   * Encode the data part of an bit string value.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded data.
+   */
+  def encodeData(value: BitSet): ByteStreamer = {
+    val hello = BigDecimal(0)
+    val buffer = new Array[Byte](((value.size - 1) / 8) + 1)
+    val padding = 8 - (value.size % 8)
+    value.foreach { index =>
+      val paddedIndex = index + padding
+      val bufferIndex = paddedIndex / 8
+      val byteIndex = paddedIndex % 8
+      val mask = 0x1 << paddedIndex % 8
+      buffer(bufferIndex) = (buffer(bufferIndex) | mask).toByte
+    }
+    ByteStreamer.byte(padding) ::: ByteStreamer.bytes(buffer)
+  }
+  
+  /**
+   * Encode the header and data part of a bit string value.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded header and data.
+   */
+  def encode(value: BitSet): ByteStreamer = {
+    val tag = ByteStreamer.byte(3)
+    val data = encodeData(value)
+    val length = ByteStreamer.byte(data.length)
+    tag ::: length ::: data
+  }
+  
+  /**
+   * Encode the data part of an bit string value.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded data.
+   */
+  def encodeData(value: AsnUtf8String): ByteStreamer = {
+    val utf8CharSet = java.nio.charset.Charset.forName("UTF-8")
+    val bytes = value.value.getBytes(utf8CharSet)
+    ByteStreamer.bytes(bytes)
+  }
+
+  /**
+   * Encode the header and data part of a bit string value.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded header and data.
+   */
+  def encode(value: AsnUtf8String): ByteStreamer = {
+    val tag = ByteStreamer.byte(12)
     val data = encodeData(value)
     val length = ByteStreamer.byte(data.length)
     tag ::: length ::: data
