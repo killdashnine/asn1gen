@@ -127,6 +127,17 @@ class IndentWriter(out: Writer) extends PrintWriter(out, true) {
     this.println()
     return this
   }
+
+  def trace(left: String, right: String): this.type = {
+    try {
+      throw new Exception()
+    } catch {
+      case e => {
+        this << left << e.getStackTrace()(1) << right
+      }
+    }
+    this
+  }
 }
 
 object IndentWriter {
