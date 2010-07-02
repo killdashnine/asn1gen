@@ -2,6 +2,8 @@ package org.asn1gen.runtime
 
 abstract class AsnCharacterString(val value: String) extends AsnType {
   override def _desc: meta.AsnCharacterString = meta.AsnCharacterString
+  
+  def _raw = value
 
   def copy(value: String = this.value): AsnCharacterString
 

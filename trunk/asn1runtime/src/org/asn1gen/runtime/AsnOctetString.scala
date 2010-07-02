@@ -5,6 +5,8 @@ import org.asn1gen.extra.Extras._
 
 class AsnOctetString(val value: List[Byte]) extends AsnType {
   override def _desc: meta.AsnOctetString = meta.AsnOctetString
+  
+  def _raw = value
 
   def copy(value: List[Byte] = this.value) = new AsnOctetString(value)
 
