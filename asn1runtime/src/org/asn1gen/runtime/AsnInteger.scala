@@ -2,6 +2,8 @@ package org.asn1gen.runtime
 
 class AsnInteger(val value: Long) extends AsnType {
   override def _desc: meta.AsnInteger = meta.AsnInteger
+  
+  def _raw = value
 
   def copy(value: Long = this.value) = AsnInteger(value)
 

@@ -281,6 +281,45 @@ trait BerEncoder {
     val length = ByteStreamer.byte(data.length)
     tag ::: length ::: data
   }
+  
+  /**
+   * Encode the data part of an bit string value.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded data.
+   */
+  def encodeData(value: AsnOctetString): ByteStreamer = {
+    val utf8CharSet = java.nio.charset.Charset.forName("UTF-8")
+    val bytes = value.value
+    ByteStreamer.bytes(bytes)
+  }
+
+  /**
+   * Encode the header and data part of a bit string value.
+   * @param value
+   *  The value to encode.
+   * @return
+   *  The encoded header and data.
+   */
+  def encode(value: AsnOctetString): ByteStreamer = {
+    val tag = ByteStreamer.byte(4)
+    val data = encodeData(value)
+    val length = ByteStreamer.byte(data.length)
+    tag ::: length ::: data
+  }
+  
+  def encodeData(value: AsnBoolean): ByteStreamer = encode(value.value)
+
+  def encode(value: AsnBoolean): ByteStreamer = encode(value.value)
+  
+  def encodeData(value: AsnInteger): ByteStreamer = encode(value.value)
+
+  def encode(value: AsnInteger): ByteStreamer = encode(value.value)
+  
+  def encodeData(value: AsnReal): ByteStreamer = encode(value.value)
+
+  def encode(value: AsnReal): ByteStreamer = encode(value.value)
 }
 
 object BerEncoder extends BerEncoder

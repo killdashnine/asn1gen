@@ -2,6 +2,8 @@ package org.asn1gen.runtime
 
 class AsnReal(val value: Double) extends AsnType {
   override def _desc: meta.AsnReal = meta.AsnReal
+  
+  def _raw: this.type = this
 
   def copy(value: Double = this.value): AsnReal = AsnReal(value)
 
