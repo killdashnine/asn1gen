@@ -31,7 +31,10 @@ class GenScala(packageName: String, out: IndentWriter) {
       << "object " << safeId(module.name) << " {" << EndLn
     )
     out.indent(2) {
-      out << "import " << packageName << ".meta.{" << safeId(module.name) << " => _meta_}" << EndLn
+      ( out
+        << "import " << packageName << ".meta.{"
+        << safeId(module.name) << " => _meta_}" << EndLn
+      )
       module.imports foreach { symbolsFromModule =>
         out << "import " << symbolsFromModule.module << "._" << EndLn
       }
@@ -47,6 +50,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   }
   
   def generate(namedValue: NamedValue): Unit = {
+    out.trace("/*", "*/")
     namedValue match {
       case NamedValue(name, ast.Type(ast.INTEGER(None), _), ast.SignedNumber(negative, ast.Number(magnitude))) => {
         out << "lazy val " << name << " = "
@@ -73,13 +77,13 @@ class GenScala(packageName: String, out: IndentWriter) {
               memberValues.foreach { memberValue =>
                 memberValue match {
                   case ast.NamedValue(ast.Identifier(id), value) => {
-                    out << "." << "/*1*/" << safeId(id) << " { " << "_ => "
+                    out << "." << safeId(id) << " { " << "_ => "
                     value match {
                       case ast.CString(stringValue) => {
                         out << stringValue.inspect
                       }
                       case ast.ValueReference(valueReferenceName) => {
-                        out << "/*2*/" << safeId(valueReferenceName)
+                        out << safeId(valueReferenceName)
                       }
                       case ast.BooleanValue(booleanValue) => {
                         out << booleanValue
@@ -101,6 +105,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   }
   
   def generate(namedType: NamedType): Unit = {
+    out.trace("/*", "*/")
     namedType._type match {
       case ast.Type(builtinType: ast.BuiltinType, _) => {
         generate(builtinType, namedType.name)
@@ -109,8 +114,8 @@ class GenScala(packageName: String, out: IndentWriter) {
         referencedType match {
           case ast.TypeReference(name) => {
             out.ensureEmptyLines(1)
-            out << "type " << "/*2*/" << safeId(namedType.name) << " = " << safeId(name) << EndLn
-            out << "lazy val " << "/*3*/" << safeId(namedType.name) << " = " + safeId(name) << EndLn
+            out << "type " << safeId(namedType.name) << " = " << safeId(name) << EndLn
+            out << "lazy val " << safeId(namedType.name) << " = " + safeId(name) << EndLn
           }
           case _ => {
             out << "/* referencedType" << EndLn
@@ -128,13 +133,14 @@ class GenScala(packageName: String, out: IndentWriter) {
   }
   
   def generate(builtinType: ast.BuiltinType, assignmentName: String): Unit = {
+    out.trace("/*", "*/")
     val safeAssignmentName = safeId(assignmentName)
     builtinType match {
       case ast.ChoiceType(
         ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
         ( out
-          << "abstract class " << "/*4*/ " << safeAssignmentName
+          << "abstract class " << safeAssignmentName
           << "(_element: Any) extends _rt_.AsnChoice {" << EndLn
         )
         out.indent(2) {
@@ -148,8 +154,8 @@ class GenScala(packageName: String, out: IndentWriter) {
           rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
         ( out
           << EndLn
-          << "object " << "/*5*/ " << safeAssignmentName << " extends "
-          << "/*6*/" << "/*7*/ " << safeId(assignmentName + "_" + firstNamedType.name)
+          << "object " << safeAssignmentName << " extends "
+          << safeId(assignmentName + "_" + firstNamedType.name)
           << "(" << rawDefaultOf(firstNamedType._type) << ") {" << EndLn
         )
         out.indent(2) {
@@ -160,17 +166,17 @@ class GenScala(packageName: String, out: IndentWriter) {
       }
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
-        out << "class " << "/*8*/ " << safeAssignmentName << " extends _rt_.AsnSequence {" << EndLn
+        out << "class " << safeAssignmentName << " extends _rt_.AsnSequence {" << EndLn
         out.indent(2) {
           ( out
-            << "override def _desc: _meta_." << "/*9*/ " << safeAssignmentName
-            << " = _meta_." << "/*10*/ " << safeAssignmentName << EndLn << EndLn
+            << "override def _desc: _meta_." << safeAssignmentName
+            << " = _meta_." << safeAssignmentName << EndLn << EndLn
           )
         }
         ( out
           << "}" << EndLn
           << EndLn
-          << "object " << "/*11*/ " << safeAssignmentName << " extends " << safeAssignmentName << " {" << EndLn
+          << "object " << safeAssignmentName << " extends " << safeAssignmentName << " {" << EndLn
           << "}" << EndLn
         )
       }
@@ -179,7 +185,7 @@ class GenScala(packageName: String, out: IndentWriter) {
           componentTypeList.componentTypes
         }.flatten
         out.ensureEmptyLines(1)
-        out << "class " << "/*12*/ " << safeAssignmentName << "(" << EndLn
+        out << "class " << safeAssignmentName << "(" << EndLn
         out.indent(2) {
           generateSequenceFieldDefines(assignmentName, list)
           out << EndLn
@@ -187,8 +193,8 @@ class GenScala(packageName: String, out: IndentWriter) {
         out << ") extends _rt_.AsnSequence {" << EndLn
         out.indent(2) {
           ( out
-            << "override def _desc: _meta_." << "/*13*/ " << safeAssignmentName
-            << " = _meta_." << "/*14*/ " << safeAssignmentName << EndLn
+            << "override def _desc: _meta_." << safeAssignmentName
+            << " = _meta_." << safeAssignmentName << EndLn
             << EndLn
             << "def copy(" << EndLn
           )
@@ -197,7 +203,7 @@ class GenScala(packageName: String, out: IndentWriter) {
               generateSequenceCopyParameters(list)
               out << ") = {" << EndLn
             }
-            out << "/*15*/ " << safeAssignmentName << "(" << EndLn
+            out << safeAssignmentName << "(" << EndLn
             out.indent(2) {
               list1 match {
                 case Some(ast.ComponentTypeList(list)) => {
@@ -215,21 +221,21 @@ class GenScala(packageName: String, out: IndentWriter) {
           out.indent(2) {
             out << "val other = try {" << EndLn
             out.indent(2) {
-              out << "that.asInstanceOf[" << "/*16*/ " << safeAssignmentName << "]" << EndLn
+              out << "that.asInstanceOf[" << safeAssignmentName << "]" << EndLn
             }
             out << "} catch {" << EndLn
             out.indent(2) {
               out << "case e: ClassCastException => return false" << EndLn
             }
             out << "}" << EndLn
-            out << "this.equals(other: " << "/*17*/ " << safeAssignmentName + ")" << EndLn
+            out << "this.equals(other: " << safeAssignmentName + ")" << EndLn
           }
           out << "}" << EndLn << EndLn
-          out << "def equals(that: " << "/*18*/ " << safeAssignmentName << "): Boolean = {" << EndLn
+          out << "def equals(that: " << safeAssignmentName << "): Boolean = {" << EndLn
           out.indent(2) {
             list foreach {
               case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                out << "if (this." << "/*19*/" << safeId(identifier) << " != that." << "/*20*/ " << safeId(identifier) << ")"
+                out << "if (this." << safeId(identifier) << " != that." << safeId(identifier) << ")"
                 out.indent(2) {
                   out << "return false" << EndLn
                 }
@@ -244,7 +250,7 @@ class GenScala(packageName: String, out: IndentWriter) {
             out << "0" << EndLn
             list foreach {
               case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                out << "^ this." << "/*21*/" << safeId(identifier) << ".hashCode" << EndLn
+                out << "^ this." << safeId(identifier) << ".hashCode" << EndLn
               }
             }
           }
@@ -264,7 +270,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         }
         out << "}" << EndLn
         out << EndLn
-        out << "object " << "/*23*/ " << safeAssignmentName << " extends " << safeAssignmentName << "("
+        out << "object " << safeAssignmentName << " extends " << safeAssignmentName << "("
         out.indent(2) {
           out << EndLn
           var firstItem = true
@@ -278,7 +284,7 @@ class GenScala(packageName: String, out: IndentWriter) {
               }
               optionalDefault match {
                 case ast.Empty => {
-                  out << "/*24*/" << safeId(rawDefaultOf(_type))
+                  out << safeId(rawDefaultOf(_type))
                 }
                 case ast.Optional => {
                   out << "None"
@@ -298,9 +304,9 @@ class GenScala(packageName: String, out: IndentWriter) {
           out.indent(2) {
             out.indent(2) {
               generateSequenceFieldParameters(assignmentName, list)
-              out << "): " << "/*25*/ " << safeAssignmentName << " = {" << EndLn
+              out << "): " << safeAssignmentName << " = {" << EndLn
             }
-            out << "new " << "/*26*/ " << safeAssignmentName << "("
+            out << "new " << safeAssignmentName << "("
             out.indent(2) {
               generateSequenceFieldValues(assignmentName, list)
               out << ")" << EndLn
@@ -314,11 +320,11 @@ class GenScala(packageName: String, out: IndentWriter) {
       => {
         var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
-        out << "case class " << "/*27*/ " << safeAssignmentName
+        out << "case class " << safeAssignmentName
         out << "(_value: Long) extends _rt_.AsnEnumeration {" << EndLn
         out.indent(2) {
-          out << "override def _desc: _meta_." << "/*28*/ " << safeAssignmentName
-          out << " = _meta_." << "/*28*/ " << safeAssignmentName << EndLn
+          out << "override def _desc: _meta_." << safeAssignmentName
+          out << " = _meta_." << safeAssignmentName << EndLn
           out << EndLn
           out << "override def _shortName: Option[String] = {" << EndLn
           out.indent(2) {
@@ -330,7 +336,7 @@ class GenScala(packageName: String, out: IndentWriter) {
                   var index: Long = 0
                   items foreach {
                     case ast.Identifier(item) => {
-                      out << "case " << index << " => Some(" << "/*30*/" << safeId(item).inspect() << ")" << EndLn
+                      out << "case " << index << " => Some(" << safeId(item).inspect() << ")" << EndLn
                       if (firstIndex == None) {
                         firstIndex = Some(index)
                       }
@@ -339,7 +345,7 @@ class GenScala(packageName: String, out: IndentWriter) {
                     case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
                       val number = java.lang.Long.parseLong(n)
                       val value = if (sign) number * -1 else number
-                      out << "case " << value << " => Some(" << "/*31*/" << safeId(item).inspect() << ")" << EndLn
+                      out << "case " << value << " => Some(" << safeId(item).inspect() << ")" << EndLn
                       if (firstIndex == None) {
                         firstIndex = Some(value)
                       }
@@ -357,11 +363,11 @@ class GenScala(packageName: String, out: IndentWriter) {
         out << "}" << EndLn
         out << EndLn
         out << "object " << safeAssignmentName << " extends "
-        out << "/*32*/ " << safeAssignmentName << "(" << firstIndex.getOrElse(0L) << ") {" << EndLn
+        out << safeAssignmentName << "(" << firstIndex.getOrElse(0L) << ") {" << EndLn
         out.indent(2) {
           generateEnumeratedValues(enumerations, assignmentName)
           out << EndLn
-          out << "def of(name: String): " << "/*33*/" << safeId(assignmentName) << " = {" << EndLn
+          out << "def of(name: String): " << safeId(assignmentName) << " = {" << EndLn
           out.indent(2) {
             out << "name match {" << EndLn
             out.indent(2) {
@@ -371,11 +377,11 @@ class GenScala(packageName: String, out: IndentWriter) {
                   var index = 0
                   items foreach {
                     case ast.Identifier(item) => {
-                      out << "case " << "/*34*/" << safeId(item).inspect << " => " << safeId(item) << EndLn
+                      out << "case " << safeId(item).inspect << " => " << safeId(item) << EndLn
                       index = index + 1
                     }
                     case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
-                      out << "case " << "/*35*/" << safeId(item).inspect << " => " + safeId(item) << EndLn
+                      out << "case " << safeId(item).inspect << " => " + safeId(item) << EndLn
                       index = index + 1
                     }
                   }
@@ -393,7 +399,7 @@ class GenScala(packageName: String, out: IndentWriter) {
             out << "}" << EndLn
           }
           out << "}" << EndLn << EndLn
-          out << "def of(value: Int): " << "/*36*/" << safeId(assignmentName) << " = {" << EndLn
+          out << "def of(value: Int): " << safeId(assignmentName) << " = {" << EndLn
           out.indent(2) {
             out << "value match {" << EndLn
             out.indent(2) {
@@ -403,12 +409,12 @@ class GenScala(packageName: String, out: IndentWriter) {
                   var index = 0
                   items foreach {
                     case ast.Identifier(item) => {
-                      out << "case " << index << " => " << "/*37*/" << safeId(item) << EndLn
+                      out << "case " << index << " => " << safeId(item) << EndLn
                       index = index + 1
                     }
                     case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
                       val value = if (sign) n * -1 else n
-                      out << "case " << value << " => " + "/*38*/" << safeId(item) << EndLn
+                      out << "case " << value << " => " << safeId(item) << EndLn
                       index = index + 1
                     }
                   }
@@ -418,7 +424,7 @@ class GenScala(packageName: String, out: IndentWriter) {
                   }
                 }
               }
-              out << "case _ => " << "/*39*/" << safeId(assignmentName) << "(value)" << EndLn
+              out << "case _ => " << safeId(assignmentName) << "(value)" << EndLn
             }
             out << "}" << EndLn
           }
@@ -434,63 +440,63 @@ class GenScala(packageName: String, out: IndentWriter) {
       case bitStringType: ast.BitStringType => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << "/*40*/ " << safeAssignmentName << " = _rt_.AsnBitString" << EndLn
+          << "type " << safeAssignmentName << " = _rt_.AsnBitString" << EndLn
           << EndLn
           << EndLn
-          << "lazy val " << "/*41*/ " << safeAssignmentName << " = _rt_.AsnBitString" << EndLn
+          << "lazy val " << safeAssignmentName << " = _rt_.AsnBitString" << EndLn
         )
       }
       case ast.INTEGER(None) => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << "/*42*/ " << safeAssignmentName << " = Long" << EndLn
+          << "type " << safeAssignmentName << " = Long" << EndLn
           << EndLn
-          << "lazy val " << "/*43*/ " << safeAssignmentName << " = 0L" << EndLn
+          << "lazy val " << safeAssignmentName << " = 0L" << EndLn
         )
       }
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << "/*44*/ " << safeAssignmentName << " = _rt_.AsnBoolean" << EndLn
+          << "type " << safeAssignmentName << " = _rt_.AsnBoolean" << EndLn
           << EndLn
-          << "lazy val " << "/*45*/ " << safeAssignmentName << " = _rt_.AsnFalse" << EndLn
+          << "lazy val " << safeAssignmentName << " = _rt_.AsnFalse" << EndLn
         )
       }
       case ast.OctetStringType => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << "/*46*/ " << safeAssignmentName << " = _rt_.AsnOctetString" << EndLn
+          << "type " << safeAssignmentName << " = _rt_.AsnOctetString" << EndLn
           << EndLn
-          << "lazy val " << "/*47*/ " << safeAssignmentName << " = _rt_.AsnOctetString" << EndLn
+          << "lazy val " << safeAssignmentName << " = _rt_.AsnOctetString" << EndLn
         )
       }
       case ast.PrintableString => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << "/*48*/ " << safeAssignmentName << " = String" << EndLn
+          << "type " << safeAssignmentName << " = String" << EndLn
           << EndLn
-          << "lazy val " << "/*49*/ " << safeAssignmentName << " = \"\"" << EndLn
+          << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
         )
       }
       case ast.REAL => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << "/*50*/ " << safeAssignmentName << " = Double" << EndLn
+          << "type " << safeAssignmentName << " = Double" << EndLn
           << EndLn
-          << "lazy val " << "/*51*/ " << safeAssignmentName << " = 0.0" << EndLn
+          << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
         )
       }
       case ast.UTF8String => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << "/*52*/ " << safeAssignmentName << " = String" << EndLn
+          << "type " << safeAssignmentName << " = String" << EndLn
           << EndLn
-          << "lazy val " << "/*53*/ " << safeAssignmentName << " = \"\"" << EndLn
+          << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
         )
       }
       case unmatched => {
         out.ensureEmptyLines(1)
-        out << "// Unmatched " << "/*54*/ " << safeAssignmentName << ": " << unmatched << EndLn
+        out << "// Unmatched " << safeAssignmentName << ": " << unmatched << EndLn
       }
     }
   }
@@ -498,18 +504,19 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generateEnumeratedValues(
       enumerations: ast.Enumerations,
       assignmentName:String): Unit = {
+    out.trace("/*", "*/")
     enumerations match {
       case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
       => {
         var index = 0
         items foreach {
           case ast.Identifier(item) => {
-            out << "val " << "/*55*/" << safeId(item) << " = " << safeId(assignmentName) << "(" << index << ")" << EndLn
+            out << "val " << safeId(item) << " = " << safeId(assignmentName) << "(" << index << ")" << EndLn
             index = index + 1
           }
           case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
             val value = if (sign) n * -1 else n
-            out << "val " << "/*56*/ " << safeId(item) << " = " << safeId(assignmentName) << "(" << value << ")" << EndLn
+            out << "val " << safeId(item) << " = " << safeId(assignmentName) << "(" << value << ")" << EndLn
             index = index + 1
           }
         }
@@ -523,6 +530,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   
   def generate(assignmentName: String, setOfType: ast.SetOfType): Unit = {
     val safeAssignmentName = safeId(assignmentName)
+    out.trace("/*", "*/")
     setOfType match {
       case ast.SetOfType(ast.Type(elementType, _)) => {
         elementType match {
@@ -530,17 +538,17 @@ class GenScala(packageName: String, out: IndentWriter) {
             val safeReferenceType = safeId(referencedType)
             out.ensureEmptyLines(1)
             ( out
-              << "case class " << "/*57*/ " << safeAssignmentName
-              << "(items: List[" << "/*58*/ " << safeReferenceType << "]) "
+              << "case class " << safeAssignmentName
+              << "(items: List[" << safeReferenceType << "]) "
               << "extends _rt_.AsnList {" << EndLn
             )
             out.indent(2) {
               ( out
-                << "override def _desc: _meta_." << "/*59*/ " << safeAssignmentName
-                << " = _meta_." << "/*60*/ " << safeAssignmentName << EndLn
+                << "override def _desc: _meta_." << safeAssignmentName
+                << " = _meta_." << safeAssignmentName << EndLn
                 << EndLn
-                << "def items(f: (List[" << "/*61*/ " << safeReferenceType << ("] => List[")
-                << "/*62*/ " << safeReferenceType << "])): " << "/*63*/ " << safeAssignmentName
+                << "def items(f: (List[" << safeReferenceType << ("] => List[")
+                << safeReferenceType << "])): " << safeAssignmentName
                 << " =" << EndLn
               )
               out.indent(2) {
@@ -549,14 +557,14 @@ class GenScala(packageName: String, out: IndentWriter) {
             }
             ( out
               << "}" << EndLn << EndLn
-              << "object " << "/*64*/ " << safeAssignmentName
-              << " extends " << "/*65*/ " << safeAssignmentName << "(Nil) {" << EndLn
+              << "object " << safeAssignmentName
+              << " extends " << safeAssignmentName << "(Nil) {" << EndLn
             )
             out.indent(2) {
               ( out
-                << "def apply(items: " << "/*66*/ " << safeReferenceType
-                << "*): " << "/*67*/ " << safeAssignmentName << " = "
-                << "/*68*/ " << safeAssignmentName << "(items.toList)" << EndLn
+                << "def apply(items: " << safeReferenceType
+                << "*): " << safeAssignmentName << " = "
+                << safeAssignmentName << "(items.toList)" << EndLn
               )
             }
             out << "}" << EndLn
@@ -567,19 +575,19 @@ class GenScala(packageName: String, out: IndentWriter) {
             val safeAssignmentElementName = safeId(assignmentElementName)
             out.ensureEmptyLines(1)
             ( out
-              << "type " << "/*69*/ " << safeAssignmentName << " = List["
-              << "/*70*/ " << safeAssignmentElementName << "]" << EndLn
-              << "lazy val " << "/*71*/ " << safeAssignmentName << " = Nil: List["
-              << "/*72*/ " << safeAssignmentElementName << "]" << EndLn
+              << "type " << safeAssignmentName << " = List["
+              << safeAssignmentElementName << "]" << EndLn
+              << "lazy val " << safeAssignmentName << " = Nil: List["
+              << safeAssignmentElementName << "]" << EndLn
             )
             generate(sequenceType, assignmentElementName)
           }
           case builtinType: ast.BuiltinType => {
             out.ensureEmptyLines(1)
             ( out
-              << "type " << "/*73*/ " << safeAssignmentName
+              << "type " << safeAssignmentName
               << " = List[" << asnTypeOf(builtinType) << "]"
-              << "lazy val " << "/*74*/ " << safeAssignmentName
+              << "lazy val " << safeAssignmentName
               << " = Nil: List[" << asnTypeOf(builtinType) << "]"
             )
           }
@@ -847,6 +855,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   
   def generateSequenceFieldDefines(
       sequenceName: String, list: List[ast.ComponentType]): Unit = {
+    out.trace("/*", "*/")
     var firstTime = true
     list foreach {
       case ast.NamedComponentType(
@@ -857,8 +866,8 @@ class GenScala(packageName: String, out: IndentWriter) {
           out << "," << EndLn
         }
         ( out
-          << "val " << "/*75*/" << safeId(identifier)
-          << ": " << "/*76*/ " << safeId(asnTypeOf(_type, value))
+          << "val " << safeId(identifier)
+          << ": " << safeId(asnTypeOf(_type, value))
         )
         firstTime = false
       }
@@ -867,6 +876,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   
   def generateSequenceFieldParameters(
       sequenceName: String, list: List[ast.ComponentType]): Unit = {
+    out.trace("/*", "*/")
     var firstTime = true
     list foreach {
       case ast.NamedComponentType(
@@ -876,7 +886,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         if (!firstTime) {
           out << "," << EndLn
         }
-        out << "/*77*/" << safeId(identifier) << ": " << "/*79*/ " << safeId(asnTypeOf(_type, value))
+        out << safeId(identifier) << ": " << safeId(asnTypeOf(_type, value))
         firstTime = false
       }
     }
@@ -884,6 +894,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   
   def generateSequenceFieldValues(
       sequenceName: String, list: List[ast.ComponentType]): Unit = {
+    out.trace("/*", "*/")
     var firstTime = true
     list foreach {
       case ast.NamedComponentType(
@@ -893,7 +904,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         if (!firstTime) {
           out << "," << EndLn
         }
-        out << "/*80*/" << safeId(identifier)
+        out << safeId(identifier)
         firstTime = false
       }
     }
@@ -901,6 +912,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   
   def generateSequenceCopyParameters(
       list: List[ast.ComponentType]): Unit = {
+    out.trace("/*", "*/")
     var firstTime = true
     list foreach {
       case ast.NamedComponentType(
@@ -911,9 +923,9 @@ class GenScala(packageName: String, out: IndentWriter) {
           out << "," << EndLn
         }
         ( out
-          << "/*81*/" << safeId(identifier)
-          << ": " << "/*82*/ " << safeId(asnTypeOf(_type, value))
-          << " = this." << "/*83*/ " << safeId(identifier)
+          << safeId(identifier)
+          << ": " << safeId(asnTypeOf(_type, value))
+          << " = this." << safeId(identifier)
         )
         firstTime = false
       }
@@ -1399,6 +1411,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   }
   
   def generateSequenceImmutableSetters(sequenceName: String, list: List[ast.ComponentType]): Unit = {
+    out.trace("/*", "*/")
     val fieldNames = list.map {
       case ast.NamedComponentType(
         ast.NamedType(ast.Identifier(identifier), _),
@@ -1422,6 +1435,7 @@ class GenScala(packageName: String, out: IndentWriter) {
       _type: ast.Type,
       value: ast.OptionalDefault[ast.Value],
       fieldNames: List[String]): Unit = {
+    out.trace("/*", "*/")
     _type match {
       case ast.Type(ast.TaggedType(_, _, fieldType), _) => {
         generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, value, fieldNames)
@@ -1430,12 +1444,12 @@ class GenScala(packageName: String, out: IndentWriter) {
       case ast.Type(builtinType: ast.TypeKind, List()) => {
         val setterType = asnTypeOf(builtinType, value)
         ( out
-          << "def " << "/*84*/" << safeId(fieldName)
+          << "def " << safeId(fieldName)
           << "(f: (" << setterType << " => "
           << setterType << ")): " << sequenceName << " =" << EndLn
         )
         out.indent(2) {
-          out << "this.copy(" << "/*85*/" << safeId(fieldName) << " = f(this." << "/*86*/ " << safeId(fieldName) << "))" << EndLn
+          out << "this.copy(" << safeId(fieldName) << " = f(this." << safeId(fieldName) << "))" << EndLn
         }
       }
       case unmatched => {
@@ -1447,6 +1461,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generateChoices(
       assignmentName: String,
       rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
+    out.trace("/*", "*/")
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
@@ -1459,6 +1474,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generateChoices(
       assignmentName: String,
       namedType: ast.NamedType): Unit = {
+    out.trace("/*", "*/")
     namedType match {
       case ast.NamedType(
         ast.Identifier(name),
@@ -1473,33 +1489,33 @@ class GenScala(packageName: String, out: IndentWriter) {
         val safeChoiceChoice = safeId(assignmentName + "_" + name)
         out.ensureEmptyLines(1)
         ( out
-          << "case class " << "/*87*/ " << safeChoiceChoice
+          << "case class " << safeChoiceChoice
           << "(_element: " << asnTypeOf(_type) << ") extends "
-          << "/*88*/" << safeId(assignmentName) << "(_element) {" << EndLn
+          << safeId(assignmentName) << "(_element) {" << EndLn
         )
         out.indent(2) {
           ( out
-            << "override def _desc: _meta_." << "/*89*/ " << safeChoiceType
-            << " = _meta_." << "/*89a*/ " << safeChoiceType
+            << "override def _desc: _meta_." << safeChoiceType
+            << " = _meta_." << safeChoiceType
             << EndLn
             << "def _choice: Int = " + tagNumber
             << EndLn
             << EndLn
             << "override def "
-            << "/*9x*/ " << safeName
-            << ": Option[" << "/*9x*/ " << safeElementType << "] = Some(_element)"
+            << safeName
+            << ": Option[" << safeElementType << "] = Some(_element)"
             << EndLn
             << EndLn
             << "override def "
-            << "/*9x*/ " << safeName
+            << safeName
             << "(f: ("
-            << "/*9x*/ " << safeElementType
+            << safeElementType
             << " => "
-            << "/*9x*/ " << safeElementType
+            << safeElementType
             << ")): "
-            << "/*9x*/ " << safeChoiceType
+            << safeChoiceType
             << " = "
-            << "/*9x*/ " << safeChoiceChoice
+            << safeChoiceChoice
             << "(f(_element))"
             << EndLn
             << EndLn
@@ -1518,6 +1534,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generateChoiceFieldTransformers(
       choiceTypeName: String,
       rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
+    out.trace("/*", "*/")
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
@@ -1530,6 +1547,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generateChoiceValAliases(
       choiceTypeName: String,
       rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
+    out.trace("/*", "*/")
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
@@ -1550,6 +1568,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   def generateChoiceTypeAliases(
       choiceTypeName: String,
       rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
+    out.trace("/*", "*/")
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
@@ -1566,6 +1585,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   }
 
   def generateChoiceFieldTransformer(choiceTypeName: String, namedType: ast.NamedType): Unit = {
+    out.trace("/*", "*/")
     namedType match {
       case ast.NamedType(
         ast.Identifier(name),
@@ -1578,24 +1598,24 @@ class GenScala(packageName: String, out: IndentWriter) {
         ( out
           << EndLn
           << "def "
-          << "/*9x*/ " << safeElementName
+          << safeElementName
           << "(f: ("
-          << "/*9x*/ " << safeElementType
+          << safeElementType
           << " => "
-          << "/*9x*/ " << safeElementType
+          << safeElementType
           << ")): "
-          << "/*9x*/ " << safeChoiceType
+          << safeChoiceType
           << " = this"
           << EndLn
           << EndLn
           << "def "
-          << "/*10x*/ " << safeElementName
+          << safeElementName
           << "(f: => "
-          << "/*10x*/ " << safeElementType
+          << safeElementType
           << "): "
-          << "/*10x*/ " << safeChoiceType
+          << safeChoiceType
           << " = "
-          << "/*10x*/ " << safeChoiceChoice
+          << safeChoiceChoice
           << "(f)"
           << EndLn
         )
@@ -1604,6 +1624,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   }
 
   def generateSimpleGetters(rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
+    out.trace("/*", "*/")
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
@@ -1614,6 +1635,7 @@ class GenScala(packageName: String, out: IndentWriter) {
   }
   
   def generateSimpleGetters(namedType: ast.NamedType): Unit = {
+    out.trace("/*", "*/")
     namedType match {
       case ast.NamedType(
         ast.Identifier(name),
@@ -1624,7 +1646,7 @@ class GenScala(packageName: String, out: IndentWriter) {
         ( out
           << EndLn
           << "def "
-          << "/*10x*/ " << safeName
+          << safeName
           << ": Option[" << safeType << "] = None"
           << EndLn
         )
