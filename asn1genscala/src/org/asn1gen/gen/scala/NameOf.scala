@@ -741,4 +741,184 @@ object NameOf {
       return id.replaceAll("-", "_")
     }
   }
+  
+  def typeNameOf(namedComponentType: ast.NamedComponentType): String = {
+    namedComponentType match {
+      case ast.NamedComponentType(
+        ast.NamedType(ast.Identifier(identifier), _type),
+        value)
+      => {
+        typeNameOf(_type, value)
+      }
+    }
+  }
+  
+  def typeNameOf(_type: ast.Type, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return typeNameOf(_type)
+      case ast.Default(value) =>
+        return typeNameOf(_type)
+      case ast.Optional =>
+        return "Option[" + typeNameOf(_type) + "]"
+    }
+  }
+  
+  def typeNameOf(_type: ast.Type): String = {
+    _type match {
+      case ast.Type(typeKind, _) => typeNameOf(typeKind)
+    }
+  }
+  
+  def typeNameOf(typeKind: ast.TypeKind): String = {
+    typeKind match {
+      case builtinType: ast.BuiltinType => typeNameOf(builtinType)
+      case usefulType: ast.UsefulType => typeNameOf(usefulType)
+      case ast.TypeReference(reference) => reference
+      case unmatched => "Unmatched(" + unmatched + ")"
+    }
+  }
+  
+  def typeNameOf(typeKind: ast.TypeKind, value: ast.OptionalDefault[ast.Value]): String = {
+    value match {
+      case ast.Empty =>
+        return typeNameOf(typeKind)
+      case ast.Default(value) =>
+        return typeNameOf(typeKind)
+      case ast.Optional =>
+        return "Option[" + typeNameOf(typeKind) + "]"
+    }
+  }
+  
+  def typeNameOf(usefulType: ast.UsefulType): String = {
+    usefulType match {
+      case ast.GeneralizedTime => {
+        return "_meta_.AsnGeneralizedTime"
+      }
+      case ast.ObjectDescriptor => {
+        return "_meta_.AsnObjectDescriptor"
+      }
+      case ast.UTCTime => {
+        return "_meta_.AsnUtcTime"
+      }
+      case unmatched => {
+        return "UnknownUsefulType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def typeNameOf(builtinType: ast.BuiltinType): String = {
+    builtinType match {
+      case ast.BitStringType(_) => {
+        return "_meta_.AsnBitString"
+      }
+      case ast.BOOLEAN => {
+        return "_meta_.AsnBoolean"
+      }
+      case characterString: ast.CharacterStringType => {
+        typeNameOf(characterString)
+      }
+      case _: ast.ChoiceType => {
+        return "_meta_.AsnChoice"
+      }
+      case ast.EmbeddedPdvType => {
+        return "_meta_.AsnEmbeddedPdv"
+      }
+      case ast.EnumeratedType(_) => {
+        return "_meta_.AsnEnumeration"
+      }
+      case ast.EXTERNAL => {
+        return "ExternalType"
+      }
+      case ast.InstanceOfType(_) => {
+        return "InstanceOfType"
+      }
+      case ast.INTEGER(_) => {
+        return "_meta_.AsnInteger"
+      }
+      case ast.NULL => {
+        return "_meta_.AsnNull"
+      }
+      case _: ast.ObjectClassFieldType => {
+        return "_meta_.AsnObjectClassField"
+      }
+      case ast.ObjectIdentifierType => {
+        return "_meta_.AsnObjectIdentifier"
+      }
+      case ast.OctetStringType => {
+        return "_meta_.AsnOctetString"
+      }
+      case ast.REAL => {
+        return "_meta_.AsnReal"
+      }
+      case ast.RelativeOidType => {
+        return "_meta_.AsnRelativeOidType"
+      }
+      case ast.SequenceOfType(_) => {
+        return "_meta_.AsnSequenceOf"
+      }
+      case ast.SequenceType(_) => {
+        return "_meta_.AsnSequence"
+      }
+      case ast.SetOfType(_) => {
+        return "_meta_.AsnSetOf"
+      }
+      case ast.SetType(_) => {
+        return "_meta_.AsnSet"
+      }
+      case ast.TaggedType(_, _, underlyingType) => {
+        return typeNameOf(underlyingType)
+      }
+      case unmatched => {
+        return "UnknownBuiltinType(" + unmatched + ")"
+      }
+    }
+  }
+  
+  def typeNameOf(characterString: ast.CharacterStringType): String = {
+    characterString match {
+      case ast.BMPString => {
+        return "_meta_.AsnBmpString"
+      }
+      case ast.GeneralString => {
+        return "_meta_.AsnGeneralString"
+      }
+      case ast.GraphicString => {
+        return "_meta_.AsnGraphicString"
+      }
+      case ast.IA5String => {
+        return "_meta_.AsnIa5String"
+      }
+      case ast.ISO646String => {
+        return "_meta_.AsnIso646String"
+      }
+      case ast.NumericString => {
+        return "_meta_.AsnNumericString"
+      }
+      case ast.PrintableString => {
+        return "_meta_.AsnPrintableString"
+      }
+      case ast.T61String => {
+        return "_meta_.AsnT61String"
+      }
+      case ast.TeletexString => {
+        return "_meta_.AsnTeletexString"
+      }
+      case ast.UniversalString => {
+        return "_meta_.AsnUniversalString"
+      }
+      case ast.UTF8String => {
+        return "_meta_.AsnUtf8String"
+      }
+      case ast.VideotexString => {
+        return "_meta_.AsnVideotexString"
+      }
+      case ast.VisibleString => {
+        return "_meta_.AsnVisibleString"
+      }
+      case unknown => {
+        return "UnknownCharacterString(" + unknown + ")"
+      }
+    }
+  }
 }
