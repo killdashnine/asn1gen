@@ -138,24 +138,17 @@ class GenScalaBerEncoder(packageName: String, out: IndentWriter) {
         out << "// Enumerated type" << EndLn
         out << "def encode("
         out << "value: " << safeAssignmentName
-        out << "): _io_.ByteStreamer = {" << EndLn
+        out << "): _io_.ByteStreamer =" << EndLn
         out.indent(2) {
-          out << "_io_.ByteStreamer.nil" << EndLn
+          out << "encode(value.asInstanceOf[_rt_.AsnEnumeration])" << EndLn
         }
-        out << "}" << EndLn
         out << EndLn
         out << "def encodeData("
         out << "value: " << safeAssignmentName
-        out << "): _io_.ByteStreamer = {" << EndLn
+        out << "): _io_.ByteStreamer =" << EndLn
         out.indent(2) {
-          enumerations match {
-            case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension) => {
-              out << "// 4 -> " << items << EndLn
-            }
-          }
-          out << "_io_.ByteStreamer.nil" << EndLn
+          out << "encodeData(value.asInstanceOf[_rt_.AsnEnumeration])" << EndLn
         }
-        out << "}" << EndLn
         out << EndLn
       }
       case unmatched => {
