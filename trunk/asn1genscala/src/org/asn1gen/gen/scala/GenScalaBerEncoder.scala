@@ -5,17 +5,10 @@ import org.asn1gen.extra.Extras._
 import org.asn1gen.io._
 import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable.Set
+import org.asn1gen.gen.scala.NameOf._
 
 class GenScalaBerEncoder(packageName: String, out: IndentWriter) {
   val keywords = Set("yield", "type", "null", "final")
-  
-  def safeId(id: String): String = {
-    if (keywords contains id) {
-      return "`" + id + "`"
-    } else {
-      return id.replaceAll("-", "_")
-    }
-  }
   
   def generate(module: Module): Unit = {
     ( out
@@ -119,7 +112,7 @@ class GenScalaBerEncoder(packageName: String, out: IndentWriter) {
         out << "value: " << safeAssignmentName
         out << "): _io_.ByteStreamer = {" << EndLn
         out.indent(2) {
-          out << "_io_.ByteStreamer.nil" << EndLn
+          out << "encodeSequence(encodeData(value))" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
