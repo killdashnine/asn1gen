@@ -139,4 +139,28 @@ class TestBerEncoder {
     assertEquals(expected, result(Nil))
     assertEquals(expected.length, result.length)
   }
+  
+  @Test
+  def encodeAsnBoolean_0(): Unit = {
+    val result = encode(AsnTrue)
+    val expected = List[Byte](1, 1, 0xff.toByte)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
+  
+  @Test
+  def encodeAsnBoolean_1(): Unit = {
+    val result = encode(AsnFalse)
+    val expected = List[Byte](1, 1, 0)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
+  
+  @Test
+  def encodeAsnNull_0(): Unit = {
+    val result = encode(AsnNull)
+    val expected = List[Byte](5, 0)
+    assertEquals(expected, result(Nil))
+    assertEquals(expected.length, result.length)
+  }
 }
