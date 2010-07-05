@@ -133,7 +133,10 @@ class IndentWriter(out: Writer) extends PrintWriter(out, true) {
       throw new Exception()
     } catch {
       case e => {
-        this << left << e.getStackTrace()(1) << right
+        val frame = e.getStackTrace()(1)
+        ( this
+          << left << frame.getFileName
+          << ":" << frame.getLineNumber << right )
       }
     }
     this
