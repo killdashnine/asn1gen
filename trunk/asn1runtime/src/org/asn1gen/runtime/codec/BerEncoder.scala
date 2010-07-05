@@ -320,6 +320,12 @@ trait BerEncoder {
   def encodeData(value: AsnReal): ByteStreamer = encode(value.value)
 
   def encode(value: AsnReal): ByteStreamer = encode(value.value)
+  
+  def encodeSequence(data: ByteStreamer) = {
+    val tag = ByteStreamer.byte(0x20 | 0x10)
+    val length = ByteStreamer.byte(data.length)
+    tag ::: length ::: data
+  }
 }
 
 object BerEncoder extends BerEncoder
