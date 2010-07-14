@@ -6,6 +6,35 @@ import org.asn1gen.runtime._
 import scala.collection.immutable._
 
 trait BerEncoder {
+  class Tagger(val data: ByteStreamer) {
+    private def encodeTagLength(number: Long): ByteStreamer = {
+      import ByteStreamer._
+      if (number < 0x80) {
+        byte(number)
+      } else {
+        encodeTagLength(number >> 7) :::byte((number & 0x7f) | 0x80)
+      }
+    }
+    
+    def tag(
+        tagClass: TagClass,
+        tagConstruction: TagConstruction,
+        tagNumber: Long): ByteStreamer = {
+      import ByteStreamer._
+      assert(tagNumber >= 0)
+      val length = data.length
+      if (tagNumber < 31) {
+        val tagByte = tagClass.bits | tagConstruction.bits | tagNumber
+        byte(tagByte) ::: byte(length) ::: data
+      } else {
+        val tagByte = tagClass.bits | tagConstruction.bits | 31
+        byte(tagByte) ::: encodeTagLength(tagNumber) ::: byte(length) ::: data
+      }
+    }
+  }
+
+
+
   def encodeTagType(tagType: Int): ByteStreamer = {
     if (tagType < 0x80) {
       ByteStreamer.byte(tagType)
