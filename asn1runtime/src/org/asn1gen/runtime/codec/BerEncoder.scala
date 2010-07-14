@@ -33,7 +33,7 @@ trait BerEncoder {
     }
   }
 
-
+  implicit def byteStreamer2Tagger(data: ByteStreamer): Tagger = new Tagger(data)
 
   def encodeTagType(tagType: Int): ByteStreamer = {
     if (tagType < 0x80) {
