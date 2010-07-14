@@ -1,6 +1,7 @@
 package org.asn1gen.runtime.codec
 
 sealed abstract class TagClass(val value: Int) {
+  val bits: Int = (value & 0x3) << 6 
 }
 
 object TagClass {
