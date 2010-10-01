@@ -5,7 +5,8 @@ import org.junit.runners.Suite;
 
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array
-    ( classOf[TestExtraString]
+    ( classOf[TestExtraByte]
+    , classOf[TestExtraString]
     )
 )
 class Test_

@@ -5,8 +5,7 @@ import org.junit.runners.Suite;
  
 @RunWith(classOf[Suite])
 @Suite.SuiteClasses(Array
-    ( classOf[extra.Test_]
-    , classOf[runtime.Test_]
+    ( classOf[runtime.Test_]
     , classOf[scratch.Test_]
     )
 )
