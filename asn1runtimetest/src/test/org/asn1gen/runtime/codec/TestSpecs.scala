@@ -5,7 +5,7 @@ import org.specs.runner._
 
 class TestSpecs extends JUnit4(TestSpecs)
 
-object TestSpecs extends Specification with JUnit {
+object TestSpecs extends SpecificationWithJUnit {
   "'hello world' has 11 characters" in {
      "hello world".size must_== 11
   }
