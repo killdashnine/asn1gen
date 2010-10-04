@@ -11,6 +11,12 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 class TestExtraString extends Extras {
   @Test(expected = classOf[IllegalArgumentException])
   def test_none(): Unit = "".bin
+
+  @Test(expected = classOf[IllegalArgumentException])
+  def test_oversize(): Unit = ("0" * 33).bin
+
+  @Test def test_maxed_0(): Unit = assertEquals(0, ("0" * 32).bin)
+  @Test def test_maxed_1(): Unit = assertEquals(-1, ("1" * 32).bin)
   
   @Test def test_0(): Unit = assertEquals(0, "0".bin)
   @Test def test_1(): Unit = assertEquals(1, "1".bin)
