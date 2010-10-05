@@ -10,157 +10,161 @@ import org.asn1gen.junit.Assert._
 import test.asn1.genruntime.BerDecoder
 import _root_.org.asn1gen.io._
 import _root_.org.asn1gen.runtime.codec.BerEncoder._
+import org.specs._
+import org.specs.runner._
 
-class TestBerEncoder {
-  @Test
-  def fixedInteger_1(): Unit = {
-    val result = encodeFixed(0)
-    val expected = List[Byte](0)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
+class TestBerEncoder extends JUnit4(TestBerEncoder)
 
-  @Test
-  def fixedInteger_2(): Unit = {
-    val result = encodeFixed(-1)
-    val expected = List[Byte](-1)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedInteger_3(): Unit = {
-    val result = encodeFixed(42)
-    val expected = List[Byte](42)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedInteger_4(): Unit = {
-    val result = encodeFixed(-42)
-    val expected = List[Byte](-42)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedInteger_5(): Unit = {
-    val result = encodeFixed(255)
-    val expected = List[Byte](0, -1)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedInteger_6(): Unit = {
-    val result = encodeFixed(128)
-    val expected = List[Byte](0, -128)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedInteger_7(): Unit = {
-    val result = encodeFixed(-256)
-    val expected = List[Byte](-1, 0)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedInteger_8(): Unit = {
-    val result = encodeFixed(256)
-    val expected = List[Byte](1, 0)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedBoolean_0(): Unit = {
-    val result = encodeData(false)
-    val expected = List[Byte](0)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedBoolean_1(): Unit = {
-    val result = encodeData(true)
-    val expected = List[Byte](-1)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedRaw_0(): Unit = {
-    val result = encodeRaw("")
-    val expected = List[Byte]()
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def fixedRaw_1(): Unit = {
-    val result = encodeRaw("abc")
-    val expected = List[Byte](97, 98, 99)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def encodeLength_1(): Unit = {
-    val result = encodeLength(0)
-    val expected = List[Byte](0)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def encodeLength_2(): Unit = {
-    val result = encodeLength(1)
-    val expected = List[Byte](1)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def encodeLength_3(): Unit = {
-    val result = encodeLength(127)
-    val expected = List[Byte](127)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
-  }
-
-  @Test
-  def encodeLength_4(): Unit = {
-    val result = encodeLength(128)
-    val expected = List[Byte](0x81.toByte, 128.toByte)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
+object TestBerEncoder extends SpecificationWithJUnit {
+  "Encoder for 0" >> {
+    val encoder = encodeFixed(0)
+    
+    "should encode to List[Byte](0)" >> {
+      encoder(Nil) must_== List[Byte](0)
+    }
   }
   
-  @Test
-  def encodeAsnBoolean_0(): Unit = {
-    val result = encode(AsnTrue)
-    val expected = List[Byte](1, 1, 0xff.toByte)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
+  "Encoder for -1" >> {
+    val encoder = encodeFixed(-1)
+
+    "should encode to List[Byte](-1)" >> {
+      encoder(Nil) must_== List[Byte](-1)
+    }
   }
   
-  @Test
-  def encodeAsnBoolean_1(): Unit = {
-    val result = encode(AsnFalse)
-    val expected = List[Byte](1, 1, 0)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
+  "Encoder for 42" >> {
+    val encoder = encodeFixed(42)
+
+    "should encode to List[Byte](42)" >> {
+      encoder(Nil) must_== List[Byte](42)
+    }
   }
-  
-  @Test
-  def encodeAsnNull_0(): Unit = {
-    val result = encode(AsnNull)
-    val expected = List[Byte](5, 0)
-    assertEquals(expected, result(Nil))
-    assertEquals(expected.length, result.length)
+
+  "Encoder for -42" >> {
+    val encoder = encodeFixed(-42)
+
+    "should encode to List[Byte](-42)" >> {
+      encoder(Nil) must_== List[Byte](-42)
+    }
+  }
+
+  "Encoder for 255" >> {
+    val encoder = encodeFixed(255)
+
+    "should encode to List[Byte](0, -1)" >> {
+      encoder(Nil) must_== List[Byte](0, -1)
+    }
+  }
+
+  "Encoder for 128" >> {
+    val encoder = encodeFixed(128)
+
+    "should encode to List[Byte](0, -128)" >> {
+      encoder(Nil) must_== List[Byte](0, -128)
+    }
+  }
+
+  "Encoder for -256" >> {
+    val encoder = encodeFixed(-256)
+
+    "should encode to List[Byte](-1, 0)" >> {
+      encoder(Nil) must_== List[Byte](-1, 0)
+    }
+  }
+
+  "Encoder for 256" >> {
+    val encoder = encodeFixed(256)
+
+    "should encode to List[Byte](1, 0)" >> {
+      encoder(Nil) must_== List[Byte](1, 0)
+    }
+  }
+
+  "Encoder for false" >> {
+    val encoder = encodeData(false)
+
+    "should encode to List[Byte](0)" >> {
+      encoder(Nil) must_== List[Byte](0)
+    }
+  }
+
+  "Encoder for true" >> {
+    val encoder = encodeData(true)
+
+    "should encode to List[Byte](-1)" >> {
+      encoder(Nil) must_== List[Byte](-1)
+    }
+  }
+
+  "Encoder for \"\"" >> {
+    val encoder = encodeRaw("")
+
+    "should encode to List[Byte]()" >> {
+      encoder(Nil) must_== List[Byte]()
+    }
+  }
+
+  "Encoder for \"abc\"" >> {
+    val encoder = encodeRaw("abc")
+
+    "should encode to List[Byte](97, 98, 99)" >> {
+      encoder(Nil) must_== List[Byte](97, 98, 99)
+    }
+  }
+
+  "Length encoder for 0" >> {
+    val encoder = encodeLength(0)
+
+    "should encode to List[Byte](0)" >> {
+      encoder(Nil) must_== List[Byte](0)
+    }
+  }
+
+  "Length encoder for 1" >> {
+    val encoder = encodeLength(1)
+
+    "should encode to List[Byte](1)" >> {
+      encoder(Nil) must_== List[Byte](1)
+    }
+  }
+
+  "Length encoder for 127" >> {
+    val encoder = encodeLength(127)
+
+    "should encode to List[Byte](127)" >> {
+      encoder(Nil) must_== List[Byte](127)
+    }
+  }
+
+  "Length encoder for 128" >> {
+    val encoder = encodeLength(128)
+
+    "should encode to List[Byte](0x81, 128)" >> {
+      encoder(Nil) must_== List[Byte](0x81.toByte, 128.toByte)
+    }
+  }
+
+  "Encoder for AsnTrue" >> {
+    val encoder = encode(AsnTrue)
+
+    "should encode to List[Byte](1, 1, 0xff)" >> {
+      encoder(Nil) must_== List[Byte](1, 1, 0xff.toByte)
+    }
+  }
+
+  "Encoder for AsnFalse" >> {
+    val encoder = encode(AsnFalse)
+
+    "should encode to List[Byte](1, 1, 0)" >> {
+      encoder(Nil) must_== List[Byte](1, 1, 0)
+    }
+  }
+
+  "Encoder for AsnNull" >> {
+    val encoder = encode(AsnNull)
+
+    "should encode to List[Byte](5, 0)" >> {
+      encoder(Nil) must_== List[Byte](5, 0)
+    }
   }
 }
