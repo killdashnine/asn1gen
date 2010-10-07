@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object REAL extends Node with BuiltinType {
 }
 
@@ -14,10 +12,8 @@ trait Reference extends Symbol {
 trait ReferencedObjects {
 }
 
-
 trait ReferencedType extends TypeKind {
 }
-
 
 trait ReferencedValue
   extends ObjectClassFieldValueKind
@@ -25,10 +21,12 @@ trait ReferencedValue
   with Value {
 }
 
-
 case class RelativeOidComponents(
   kind: RelativeOidComponentsKind
 ) extends Node {
+}
+
+trait RelativeOidComponentsKind {
 }
 
 object RelativeOidType extends Node with BuiltinType {
@@ -51,7 +49,6 @@ trait RestrictedCharacterStringValue extends Node with CharacterStringValue {
 case class Root() extends Node {
 }
 
-
 case class RootAlternativeTypeList(alternativeTypeList: AlternativeTypeList) extends Node {
   def namedTypes = alternativeTypeList.namedTypes
 }
@@ -62,12 +59,10 @@ trait RootComponentTypeList {
 case class RootElementSetSpec(elementSetSpec: ElementSetSpec) extends Node {
 }
 
-
 case class RootEnumeration(
   enumeration: Enumeration
 ) extends Node {
 }
-
 
 case class Row(
   number: Number

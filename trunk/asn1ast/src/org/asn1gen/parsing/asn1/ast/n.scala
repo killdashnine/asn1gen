@@ -1,6 +1,7 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
+import scala.util.parsing.input.Position
+import scala.util.parsing.input.Positional
 
 case class NameAndNumberForm(
   identifier: Identifier,
@@ -15,11 +16,13 @@ case class NameForm(
   with ObjIdComponents {
 }
 
-
 case class NamedBit(
   identifier: Identifier,
   kind: NamedBitKind
 ) extends Node {
+}
+
+trait NamedBitKind {
 }
 
 case class NamedComponentType(
@@ -34,7 +37,6 @@ case class NamedConstraint(
   componentConstraint: ComponentConstraint
 ) extends Node {
 }
-
 
 case class NamedNumber(
   identifier: Identifier,
@@ -62,10 +64,6 @@ case class NamedValue(
 ) extends Node {
 }
 
-
-import scala.util.parsing.input.Position
-import scala.util.parsing.input.Positional
-
 class Node extends Positional {
   def withPosition(pos: Position): Node = {
     this.pos = pos
@@ -73,21 +71,11 @@ class Node extends Positional {
   }
 }
 
-
-
-
-
-
-
-
-
 case class NonZeroNumber() extends Node {
 }
 
-
 object NULL extends Node with BuiltinType with BuiltinValue {
 }
-
 
 case class Number(
   chars: String
@@ -98,7 +86,6 @@ case class Number(
     with NamedBitKind {
   def negative = Number("-" + chars)
 }
-
 
 trait NumberForm
   extends ObjIdComponents

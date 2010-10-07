@@ -5,10 +5,12 @@ import org.asn1gen.parsing.asn1.ast.kind._
 object PLUS_INFINITY extends SpecialRealValue {
 }
 
-
 case class ParamGovernor(
   kind: ParamGovernorKind
 ) extends Node {
+}
+
+trait ParamGovernorKind {
 }
 
 case class Parameter(
@@ -17,16 +19,13 @@ case class Parameter(
 ) extends Node {
 }
 
-
 case class ParameterList(
   parameters: List[Parameter]
 ) extends Node {
 }
 
-
 trait ParameterizedAssignment extends Assignment {
 }
-
 
 case class ParameterizedObject(
   definedObject: DefinedObject,
@@ -55,7 +54,6 @@ case class ParameterizedObjectClassAssignment(
 ) extends Node with ParameterizedAssignment {
 }
 
-
 case class ParameterizedObjectSet(
   definedObjectSet: DefinedObjectSet,
   actualParameterList: ActualParameterList
@@ -81,7 +79,6 @@ case class ParameterizedType(
   actualParameterList: ActualParameterList
 ) extends Node with DefinedType {
 }
-
 
 case class ParameterizedTypeAssignment(
   typeReference: TypeReference,
@@ -123,13 +120,10 @@ case class PartialSpecification(
 ) extends Node with MultipleTypeConstraints {
 }
 
-
 case class PatternConstraint(
   value: Value
 ) extends Node with SubtypeElementsKind {
 }
-
-
 
 case class PermittedAlphabet(
   constraint: Constraint
@@ -141,17 +135,21 @@ case class Plane(
 ) extends Node {
 }
 
-
 trait PresenceConstraint {
+}
+
+trait PresenceConstraintKind {
 }
 
 object Present extends PresenceConstraint {
 }
 
-
 case class PrimitiveFieldName(
   kind: PrimitiveFieldNameKind
 ) extends Node with RequiredToken {
+}
+
+trait PrimitiveFieldNameKind {
 }
 
 object PrintableString extends RestrictedCharacterStringType {

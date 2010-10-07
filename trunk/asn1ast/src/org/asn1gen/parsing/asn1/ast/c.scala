@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 case class CString(
   chars: String
 ) extends Node
@@ -13,8 +11,6 @@ case class Cell(
   number: Number
 ) extends Node {
 }
-
-
 
 case class CharacterStringList(
   charsDefns: List[CharsDefn]
@@ -50,17 +46,14 @@ trait Class_ {
 case class Comment() extends Node {
 }
 
-
 case class ComponentConstraint(
   valueConstraint: ValueConstraint,
   presenceConstraint: PresenceConstraint
 ) extends Node {
 }
 
-
 case class ComponentIdList(identifiers: List[Identifier]) extends Node {
 }
-
 
 case class ComponentRelationConstraint(
   definedObjectSet: DefinedObjectSet,
@@ -69,6 +62,9 @@ case class ComponentRelationConstraint(
 }
 
 trait ComponentType extends ExtensionAddition {
+}
+
+trait ComponentTypeKind {
 }
 
 case class ComponentTypeList(
@@ -106,7 +102,6 @@ trait ConstraintOrSizeConstraint {
 
 trait ConstraintSpec {
 }
-
 
 case class ContainedSubtype(
   includes: Boolean,

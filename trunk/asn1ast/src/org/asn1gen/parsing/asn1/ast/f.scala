@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object FALSE extends BooleanValue(false) {
 }
 
@@ -16,14 +14,15 @@ case class FieldSetting(
 ) extends Node {
 }
 
-
 trait FieldSpec {
 }
-
 
 case class FixedTypeFieldVal(
   kind: FixedTypeFieldValKind
 ) extends Node with ObjectClassFieldValueKind {
+}
+
+trait FixedTypeFieldValKind {
 }
 
 case class FixedTypeValueFieldSpec(

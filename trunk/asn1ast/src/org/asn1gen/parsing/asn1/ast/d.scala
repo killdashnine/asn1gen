@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 case class Default[+T](value: T) extends Node with OptionalDefault[T] {
 }
 
@@ -10,12 +8,10 @@ case class DefaultSyntax(
 ) extends Node with ObjectDefn {
 }
 
-
 trait DefinedObject
   extends ObjectKind
   with ReferencedObjects {
 }
-
 
 trait DefinedObjectClass
   extends GovernorKind
@@ -23,7 +19,6 @@ trait DefinedObjectClass
   with ActualParameter
   with UserDefinedConstraintParameter {
 }
-
 
 trait DefinedObjectSet
   extends ObjectSetElementsKind
@@ -40,7 +35,6 @@ trait DefinedSyntaxToken {
 
 trait DefinedType extends ReferencedType {
 }
-
 
 trait DefinedValue
   extends AssignedIdentifier
@@ -74,12 +68,10 @@ case class DefinitiveNumberForm(
 trait DefinitiveObjectIdComponent {
 }
 
-
 case class DummyGovernor(
   dummyReference: DummyReference
 ) extends Node with ParamGovernorKind {
 }
-
 
 case class DummyReference(
   reference: Reference

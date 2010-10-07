@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object ENUMERATED {
 }
 
@@ -17,13 +15,11 @@ case class ElementSetSpecs(
 ) extends Node with ConstraintSpec {
 }
 
-
 trait Elements {
 }
 
 case class Elems() extends Node {
 }
-
 
 object EmbeddedPdvType extends Node with BuiltinType {
 }
@@ -32,7 +28,6 @@ case class EmbeddedPdvValue(
   sequenceValue: SequenceValue
 ) extends Node with BuiltinValue {
 }
-
 
 case class Empty() extends Node
   with AssignedIdentifier
@@ -65,7 +60,6 @@ case class Enumeration(
   enumerationItems: List[EnumerationItem]
 ) extends Node {
 }
-
 
 trait EnumerationItem {
 }
@@ -104,7 +98,6 @@ case class Exclusions(
 ) extends Node with ElementSetSpec {
 }
 
-
 object Explicit extends TaggedKind with TagDefault {
 }
 
@@ -126,7 +119,6 @@ case class ExtensionAdditionAlternativesList(
   extensionAdditionAlternatives: List[ExtensionAdditionAlternative]
 ) extends Node with ExtensionAdditionAlternatives {
 }
-
 
 case class ExtensionAdditionGroup(
   componentTypeList: ComponentTypeList

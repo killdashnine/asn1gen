@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 trait ObjIdComponents {
 }
 
@@ -33,10 +31,12 @@ case class ObjectClassFieldType(
 ) extends Node with BuiltinType {
 }
 
-
 case class ObjectClassFieldValue(
   kind: ObjectClassFieldValueKind
 ) extends Node with BuiltinValue {
+}
+
+trait ObjectClassFieldValueKind {
 }
 
 case class ObjectClassReference(
@@ -45,19 +45,16 @@ case class ObjectClassReference(
   def name = chars
 }
 
-
 trait ObjectDefn extends ObjectKind {
 }
 
 object ObjectDescriptor extends UsefulType {
 }
 
-
 case class ObjectFieldReference(
   valueFieldReference: ValueFieldReference
 ) extends Node with PrimitiveFieldNameKind {
 }
-
 
 case class ObjectFieldSpec(
   objectFieldReference: ObjectFieldReference,
@@ -66,13 +63,11 @@ case class ObjectFieldSpec(
 ) extends Node with FieldSpec {
 }
 
-
 case class ObjectFromObject(
   referencedObjects: ReferencedObjects,
   fieldName: FieldName
 ) extends Node with ObjectKind {
 }
-
 
 object ObjectIdentifierType extends Node with BuiltinType {
 }
@@ -83,11 +78,13 @@ case class ObjectIdentifierValue(
 ) extends Node with AssignedIdentifier with BuiltinValue {
 }
 
+trait ObjectKind {
+}
+
 case class ObjectOptionalitySpec(
   value: OptionalDefault[Object_]
 ) extends Node {
 }
-
 
 case class ObjectReference(
   chars: String
@@ -110,19 +107,19 @@ case class ObjectSetAssignment(
 ) extends Node with Assignment {
 }
 
-
 case class ObjectSetElements(
   kind: ObjectSetElementsKind
 ) extends Node with Elements {
 }
 
+trait ObjectSetElementsKind {
+}
 
 case class ObjectSetFieldReference(
   chars: String
 ) extends Node with PrimitiveFieldNameKind {
   def name = chars
 }
-
 
 case class ObjectSetFieldSpec(
   objectSetFieldReference: ObjectSetFieldReference,
@@ -131,14 +128,11 @@ case class ObjectSetFieldSpec(
 ) extends Node with FieldSpec {
 }
 
-
 case class ObjectSetFromObjects(
   referencedObjects: ReferencedObjects,
   fieldName: FieldName
 ) extends Node with ObjectSetElementsKind {
 }
-
-
 
 case class ObjectSetOptionalitySpec(
   value: OptionalDefault[ObjectSet]
@@ -156,8 +150,6 @@ case class ObjectSetSpec(
     additionalElementSetSpec: Option[AdditionalElementSetSpec]
 ) extends Node {
 }
-
-
 
 case class Object_(
   kind: ObjectKind
@@ -177,8 +169,6 @@ trait OctetStringValue extends BuiltinValue {
 case class OpAssignment() extends Node {
 }
 
-
-
 case class OpenTypeFieldVal(
   _type: Type,
   value: Value
@@ -190,7 +180,6 @@ case class Operator(
 ) extends Node {
   def name = chars
 }
-
 
 object Optional extends Node
   with OptionalDefault[Nothing]
@@ -204,7 +193,6 @@ case class OptionalExtensionMarker(
     exists: Boolean
 ) extends Node {
 }
-
 
 case class OptionalGroup(
   tokenOrGroupSpecs: List[TokenOrGroupSpec]

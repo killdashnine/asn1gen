@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object ABSTRACT_SYNTAX extends UsefulObjectClassReference {
 }
 
@@ -17,12 +15,10 @@ case class ActualParameterList(parameters: List[ActualParameter]) extends Node {
 case class AdditionalElementSetSpec(elementSetSpec: ElementSetSpec) extends Node {
 }
 
-
 case class AdditionalEnumeration(
   enumeration: Enumeration
 ) extends Node {
 }
-
 
 case class AlternativeTypeList(namedTypes: List[NamedType]) extends Node {
 }
@@ -33,7 +29,6 @@ case class AlternativeTypeLists(
   extensionAdditionAlternatives: Option[ExtensionAdditionAlternatives],
   optionalExtensionMarker: Option[OptionalExtensionMarker]) extends Node {
 }
-
 
 object Application extends Class_ {
 }
@@ -46,7 +41,6 @@ trait Assignment {
 
 case class AssignmentList(assignments: List[Assignment]) extends Node {
 }
-
 
 case class AtNotation(
   componentIdList: ComponentIdList,

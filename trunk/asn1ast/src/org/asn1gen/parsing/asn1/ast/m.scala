@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object MINUS_INFINITY extends SpecialRealValue {
 }
 
@@ -14,7 +12,6 @@ object Min extends LowerEndValue {
 case class ModuleBody(exports: Exports, imports: Imports, assignmentList: AssignmentList) extends Node {
   def this() = {this(Exports(None), Imports(None), AssignmentList(Nil))}
 }
-
 
 case class ModuleDefinition(
   identifier: ModuleIdentifier,
@@ -35,7 +32,6 @@ case class ModuleIdentifier(
   def name = reference.name
 }
 
-
 case class ModuleReference(
   name: String
 ) extends Node {
@@ -43,3 +39,7 @@ case class ModuleReference(
 
 trait MultipleTypeConstraints extends InnerTypeConstraints {
 }
+
+trait MultipleTypeConstraintsKind {
+}
+

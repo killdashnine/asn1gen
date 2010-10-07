@@ -8,3 +8,4 @@ case class HString(
   with OctetStringValue
   with BitStringValue {
 }
+
