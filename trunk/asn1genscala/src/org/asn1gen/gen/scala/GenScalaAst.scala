@@ -2,7 +2,6 @@ package org.asn1gen.gen.scala
 
 import org.asn1gen.parsing.asn1.ast._
 import org.asn1gen.parsing.asn1.{ast => ast}
-import org.asn1gen.parsing.asn1.ast.kind._
 import org.asn1gen.io._
 
 object GenScalaAst {
