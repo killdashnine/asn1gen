@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 case class SelectionType(
   identifier: Identifier,
   _type: Type
@@ -32,7 +30,6 @@ case class SequenceType(
 trait SequenceTypeSpec {
 }
 
-
 case class SequenceValue(
   namedValues: List[NamedValue]
 ) extends Node with BuiltinValue with NumericRealValue {
@@ -55,7 +52,6 @@ case class SetType(
   spec: SetTypeSpec
 ) extends BuiltinType {
 }
-
 
 case class SetTypeExtension(
   extensionAndException: ExtensionAndException,
@@ -99,14 +95,10 @@ case class SingleTypeConstraint(
 ) extends Node with InnerTypeConstraints {
 }
 
-
-
 case class SingleValue(
   value: Value
 ) extends Node with SubtypeElementsKind {
 }
-
-
 
 case class SizeConstraint(
   constraint: Constraint
@@ -118,10 +110,12 @@ case class SizeConstraint(
 class SpecialRealValue extends Node with RealValue {
 }
 
-
 case class SubtypeElements(
   kind: SubtypeElementsKind
 ) extends Node with Elements {
+}
+
+trait SubtypeElementsKind {
 }
 
 trait Symbol {
@@ -131,7 +125,6 @@ case class SymbolsExported(
   symbols: List[Symbol]
 ) extends Node {
 }
-
 
 case class SymbolsFromModule(
   symbols: List[Symbol],

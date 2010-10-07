@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object BMPString extends RestrictedCharacterStringType {
 }
 
@@ -20,7 +18,6 @@ case class BasicComponentType(
 ) extends ComponentType {
 }
 
-
 case class BitStringType(
   namedBits: Option[List[NamedBit]]
 ) extends Node with BuiltinType {
@@ -37,9 +34,11 @@ case class BooleanValue(
 trait BuiltinType extends TypeKind {
 }
 
-
 trait BuiltinValue extends Node
   with ObjectClassFieldValueKind
   with FixedTypeFieldValKind
   with Value {
+}
+
+trait BuiltinValueKind {
 }

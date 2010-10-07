@@ -1,13 +1,10 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object IA5String extends RestrictedCharacterStringType {
 }
 
 case class IElems() extends Node {
 }
-
 
 case class INTEGER(
   namedNumbers: Option[List[NamedNumber]]
@@ -27,7 +24,6 @@ case class IdentifierList(
 ) extends Node with BitStringValue {
 }
 
-
 object Implicit extends TaggedKind with TagDefault {
 }
 
@@ -38,8 +34,6 @@ case class Imports(
 
 case class Includes() extends Node {
 }
-
-
 
 trait InnerTypeConstraints extends SubtypeElementsKind {
 }
@@ -65,7 +59,6 @@ case class IntersectionElements(
 
 object IntersectionMark extends Node {
 }
-
 
 case class Intersections(
     intersectionElementsList: List[IntersectionElements]

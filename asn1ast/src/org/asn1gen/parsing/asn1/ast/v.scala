@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 trait Value
   extends ActualParameter
   with GovernorConstraintParameterValue
@@ -21,13 +19,11 @@ case class ValueAssignment(
 trait ValueConstraint {
 }
 
-
 case class ValueFieldReference(
   chars: String
 ) extends Node with PrimitiveFieldNameKind {
   def name = chars
 }
-
 
 case class ValueFromObject(
   referencedObjects: ReferencedObjects,
@@ -40,14 +36,11 @@ case class ValueOptionalitySpec(
 ) extends Node {
 }
 
-
-
 case class ValueRange(
   lowerEndPoint: LowerEndPoint,
   upperEndPoint: UpperEndPoint
 ) extends Node with SubtypeElementsKind {
 }
-
 
 case class ValueReference (
   name: String
@@ -65,13 +58,11 @@ case class ValueSet(
   with Setting {
 }
 
-
 case class ValueSetFieldReference(
   chars: String
 ) extends Node with PrimitiveFieldNameKind {
   def name = chars
 }
-
 
 case class ValueSetFromObjects(
   referencedObjects: ReferencedObjects,
@@ -83,7 +74,6 @@ case class ValueSetOptionalitySpec(
     value: OptionalDefault[ValueSet]
 ) extends Node {
 }
-
 
 case class ValueSetTypeAssignment(
   typeReference: TypeReference,

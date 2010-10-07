@@ -1,7 +1,5 @@
 package org.asn1gen.parsing.asn1.ast
 
-import org.asn1gen.parsing.asn1.ast.kind._
-
 object T61String extends RestrictedCharacterStringType {
 }
 
@@ -16,7 +14,6 @@ case class TableColumn(
 ) extends Node {
 }
 
-
 trait TableConstraint extends GeneralConstraint {
 }
 
@@ -25,14 +22,14 @@ case class TableRow(
 ) extends Node {
 }
 
-
 case class Tag(_class: Class_, classNumber: ClassNumber) extends Node {
 }
-
 
 trait TagDefault {
 }
 
+trait TaggedKind {
+}
 
 case class TaggedType(
   tag: Tag,
@@ -60,7 +57,6 @@ case class Tuple(
 ) extends Node with RestrictedCharacterStringValue with CharsDefn {
 }
 
-
 case class Type(
   kind: TypeKind,
   constraints: List[Constraint]
@@ -78,7 +74,6 @@ case class TypeAssignment(
   def name = typeReference.name
 }
 
-
 case class TypeConstraint(
   _type: Type
 ) extends Node with SubtypeElementsKind {
@@ -87,14 +82,11 @@ case class TypeConstraint(
 case class TypeConstraints(namedConstraints: List[NamedConstraint]) extends Node {
 }
 
-
-
 case class TypeFieldReference(
   chars: String
 ) extends Node with PrimitiveFieldNameKind {
   def name = chars
 }
-
 
 case class TypeFieldSpec(
   typeFieldReference: TypeFieldReference,
