@@ -1,7 +1,203 @@
 package org.asn1gen.io
 
+import java.io.Closeable
+import java.io.Flushable
+import java.io.PrintStream
+import java.io.PrintWriter
+import java.io.Writer
 import java.io._
 import scala.util.control.Breaks
+
+abstract class ByteStreamer(val length: Int) extends (List[Byte] => List[Byte]) {
+  def ::(byte: Byte) = new ByteStreamer(this.length + 1) {
+    def apply(tail: List[Byte]): List[Byte] = byte :: tail
+  }
+  
+  def :::(head: ByteStreamer): ByteStreamer = {
+    val tail = this
+    new ByteStreamer(tail.length + head.length) {
+      def apply(rest: List[Byte]): List[Byte] = head(tail(rest))
+    }
+  }
+}
+
+object ByteStreamer {
+  object nil extends ByteStreamer(0) {
+    def apply(tail: List[Byte]): List[Byte] = tail
+  }
+
+  private val byteValues = {
+    0.to(0xff).map { value =>
+      new ByteStreamer(1) {
+        def apply(tail: List[Byte]): List[Byte] = value.toByte :: tail
+      }
+    }
+  }
+  
+  def byte(value: Long) = byteValues(value.toInt)
+
+  def bytes(values: List[Byte]) = new ByteStreamer(values.length) {
+    def apply(tail: List[Byte]): List[Byte] = values ::: tail
+  }
+  
+  def bytes(values: Byte*): ByteStreamer = bytes(values.toList)
+  
+  def bytes(values: Array[Byte]): ByteStreamer = bytes(values.toList)
+}
+
+sealed class EndLn
+
+object EndLn extends EndLn
+
+class IndentWriter(out: Writer) extends PrintWriter(out, true) {
+  val defaultIndent: Int = 2
+  var indent: Int = 0
+  var emptyLines: Int = -1
+  var line: Int = 0
+  
+  def atLineStart: Boolean = emptyLines != -1
+  
+  def this(out: PrintStream) = this(new PrintWriter(out, true))
+  
+  def break() = ensureEmptyLines(0)
+  
+  def ensureEmptyLine() = ensureEmptyLines(1)
+  
+  def ensureEmptyLines(lines: Int) = while (emptyLines < lines) this.println()
+  
+  def indent[T](offset: Int)(f: => T): T = {
+    indent += offset
+    try {
+      return f
+    } finally {
+      indent -= offset
+    }
+  }
+  
+  def indent[T](f: => T): T = indent(defaultIndent)(f)
+  
+  override def println(): Unit = {
+    super.println()
+    emptyLines += 1
+    line += 1
+  }
+
+  private def prePrint(): Unit = {
+    if (atLineStart) {
+      super.print(" " * indent)
+      emptyLines = -1
+    }
+  }
+  
+  override def print(s: String): Unit = {
+    if (s.length != 0) {
+      prePrint()
+    }
+    super.print(s)
+  }
+  
+  override def print(value: Char): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Int): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Long): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Float): Unit = {
+    prePrint()
+    super.print(value)
+  }
+  
+  override def print(value: Double): Unit = {
+    prePrint()
+    super.print(value)
+  }
+
+  def <<(s: String): IndentWriter = {
+    if (s.length != 0) {
+      prePrint()
+    }
+    super.print(s)
+    return this
+  }
+  
+  def <<(value: Char): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Int): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Long): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Float): IndentWriter = {
+    prePrint()
+    super.print(value)
+    return this
+  }
+  
+  def <<(value: Double): IndentWriter = {
+    this.print(value)
+    return this
+  }
+  
+  def <<(value: Boolean): IndentWriter = {
+    this.print(value)
+    return this
+  }
+  
+  def <<(value: Object): IndentWriter = {
+    this.print(value.toString)
+    return this
+  }
+  
+  def <<(endLn: EndLn): IndentWriter = {
+    this.println()
+    return this
+  }
+
+  def trace(left: String, right: String): this.type = {
+    try {
+      throw new Exception()
+    } catch {
+      case e => {
+        val frame = e.getStackTrace()(1)
+        ( this
+          << left << frame.getFileName
+          << ":" << frame.getLineNumber << right )
+      }
+    }
+    this
+  }
+}
+
+object IndentWriter {
+  def wrap[T](printWriter: PrintWriter)(f: IndentWriter => T): T = {
+    val writer = new IndentWriter(printWriter)
+    try {
+      f(writer)
+    } finally {
+      writer.flush()
+    }
+  }
+}
 
 class ReverseDataOutputStream(out: OutputStream)
     extends FilterOutputStream(out) with DataOutput {
@@ -187,4 +383,29 @@ class ReverseDataOutputStream(out: OutputStream)
   final def size(): Int = {
     return written
   }
+}
+
+trait ReverseOutputStream extends Closeable with Flushable {
+  def write(bytes: Array[Byte], offset: Int, length: Int): Unit = {
+    val end = offset + length
+    val invalidOffset = (offset < 0) || (offset > bytes.length)
+    val invalidLength = length < 0
+    val invalidEnd = (end > bytes.length) || (end < 0)
+    if (invalidOffset || invalidLength || invalidEnd) {
+      throw new IndexOutOfBoundsException()
+    } else if (length == 0) {
+      return
+    }
+    for (i <- (length - 1) to 0) {
+      write(bytes(offset + i))
+    }
+  }
+
+  def write(bytes: Array[Byte], offset: Int): Unit =
+    write(bytes, offset, bytes.length - offset)
+
+  def write(bytes: Array[Byte]): Unit =
+    write(bytes, 0, bytes.length)
+
+  def write(byte: Int): Unit
 }
