@@ -1,0 +1,51 @@
+ASNEXAMPLES DEFINITIONS ::=
+BEGIN
+  Enum0 ::= ENUMERATED {
+  }
+  
+  Enum1 ::= ENUMERATED {
+    enum1MemberA
+  }
+  
+  Enum2 ::= ENUMERATED {
+    enum2MemberA,
+    enum2MemberB
+  }
+  
+  Sequence0 ::= SEQUENCE {
+  }
+
+  Sequence1 ::= SEQUENCE {
+  	sequence1MemberA INTEGER
+  }
+
+  Sequence2 ::= SEQUENCE {
+  	sequence2MemberA INTEGER,
+  	sequence2MemberB INTEGER
+  }
+  
+  Sequence3 ::= SEQUENCE {
+  	sequence3MemberA INTEGER OPTIONAL,
+  	sequence3MemberB INTEGER
+  }
+  
+  Sequence4 ::= SEQUENCE {
+  	sequence4MemberA INTEGER,
+  	sequence4MemberB INTEGER OPTIONAL
+  }
+  
+  Sequence5 ::= SEQUENCE {
+  	sequence5MemberA INTEGER OPTIONAL,
+  	sequence5MemberB INTEGER OPTIONAL
+  }
+  
+  Sequence6 ::= SEQUENCE {
+  	sequence6MemberA INTEGER DEFAULT 1,
+  	sequence6MemberB INTEGER
+  }
+  
+  Sequence7 ::= SEQUENCE {
+  	sequence7MemberA INTEGER,
+  	sequence7MemberB INTEGER DEFAULT 1
+  }  
+END
