@@ -2,7 +2,9 @@ package org.asn1gen.extra
 
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.OutputStream
+import java.io.PrintStream
 import java.io.PrintWriter
 import java.io.Writer
 import org.asn1gen.io.IndentWriter
@@ -67,6 +69,38 @@ case class ExtraFile(file: File) {
   }
   
   def apply(path: String): File = new File(file, path)
+
+  def openOutputStream[T](f: OutputStream => T): T = {
+    val os = new FileOutputStream(file)
+    try f(os) finally os.close
+  }
+  
+  def openPrintStream[T](f: PrintStream => T): T = {
+    openOutputStream { os =>
+      val ps = new PrintStream(os)
+      try f(ps) finally ps.flush
+    }
+  }
+  
+  def child(childName: String) = new File(file, childName)
+  
+  def children: Array[File] = file.listFiles
+  
+  def children(filter: File => Boolean): Array[File] = this.children.filter(filter)
+  
+  def requireExists = {
+    if (!file.exists) {
+      throw new IOException("Directory does not exist")
+    }
+  }
+  
+  def requireDirectory = {
+    if (!file.isDirectory) {
+      throw new IOException("'" + file.getName + "' is not a directory")
+    }
+  }
+  
+  def name = file.getName
 }
 
 case class ExtraListOfByte(value: List[Byte]) {
