@@ -25,11 +25,17 @@ trait Extras {
   implicit def toExtra(writer: Writer) = ExtraWriter(writer)
   
   implicit def toExtra(file: File) = ExtraFile(file)
+  
+  implicit def toExtra[T](any: T) = ExtraAnyT(any)
 }
 
 object Extras extends Extras
 
 import org.asn1gen.extra.Extras._
+
+case class ExtraAnyT[T](value: T) {
+  def as[U](f: T => U) = f(value)
+}
 
 case class ExtraBoolean(value: Boolean) {
   def inspect: String = if (value) "true" else "false"
