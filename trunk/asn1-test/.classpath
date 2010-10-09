@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1gen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1genscala"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/asn1core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/asn1parse"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -9,8 +9,6 @@ import org.asn1gen.gen._
 import org.asn1gen.gen.scala._
 import org.asn1gen.extra.Extras._
 import org.asn1gen.io.IndentWriter
-import org.asn1gen.io.JavaTypes._
-import org.asn1gen.io.RichFile._
 
 object TestCase extends Asn1Parser {
   def parse[N](root: Parser[N], input: String) =
