@@ -10,23 +10,23 @@ import java.io.Writer
 import org.asn1gen.io.IndentWriter
 
 trait Extras {
-  implicit def toExtra(value: Boolean) = new ExtraBoolean(value)
+  implicit def enrichBoolean(value: Boolean) = new ExtraBoolean(value)
   
-  implicit def toExtra(value: Char) = new ExtraChar(value)
+  implicit def enrichChar(value: Char) = new ExtraChar(value)
 
-  implicit def toExtra(value: String) = new ExtraString(value)
+  implicit def enrichString(value: String) = new ExtraString(value)
 
-  implicit def toExtra(value: Byte) = ExtraByte(value)
+  implicit def enrichByte(value: Byte) = ExtraByte(value)
   
-  implicit def toExtra(value: List[Byte]) = ExtraListOfByte(value)
+  implicit def enrichListOfByte(value: List[Byte]) = ExtraListOfByte(value)
   
-  implicit def toExtra(os: OutputStream) = ExtraOutputStream(os)
+  implicit def enrichOutputStream(os: OutputStream) = ExtraOutputStream(os)
   
-  implicit def toExtra(writer: Writer) = ExtraWriter(writer)
+  implicit def enrichWriter(writer: Writer) = ExtraWriter(writer)
   
-  implicit def toExtra(file: File) = ExtraFile(file)
+  implicit def enrichFile(file: File) = ExtraFile(file)
   
-  implicit def toExtra[T](any: T) = ExtraAnyT(any)
+  implicit def enrichAnyT[T](any: T) = ExtraAnyT(any)
 }
 
 object Extras extends Extras
