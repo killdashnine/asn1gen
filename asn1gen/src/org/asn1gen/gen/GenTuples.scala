@@ -1,8 +1,8 @@
 package org.asn1gen.gen
 
-import java.io.File
-import org.asn1gen.extra.Extras._
-import org.asn1gen.io._
+import _root_.java.io.File
+import _root_.org.asn1gen.extra.Extras._
+import _root_.org.asn1gen.io._
 
 object GenTuples {
   def genN(out: IndentWriter, prefix: String, count: Int) = {
@@ -16,8 +16,8 @@ object GenTuples {
   }
   
   def main(args : Array[String]) : Unit = {
-    val start: Int = java.lang.Integer.parseInt(args(0))
-    val end: Int = java.lang.Integer.parseInt(args(1))
+    val start: Int = _root_.java.lang.Integer.parseInt(args(0))
+    val end: Int = _root_.java.lang.Integer.parseInt(args(1))
     val outdir = new File("out/scala")
     outdir.mkdirs
     

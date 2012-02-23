@@ -12,7 +12,7 @@ package test.org.asn1gen.gen {
   class TestGenJava extends TestCase {
     import Asn1._
     
-    @Test def test1() {
+    /*@Test def test1() {
       val text = """
         ModuleName DEFINITIONS ::= BEGIN -- xasdfsfd -- MyChoice ::= CHOICE {
           choice1 [0] INTEGER, choice2 [1] INTEGER
@@ -39,6 +39,6 @@ package test.org.asn1gen.gen {
         }
         case x => fail("Parse failed: " + x)
       }
-    }
+    }*/
   }
 }
