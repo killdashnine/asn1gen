@@ -1,4 +1,4 @@
-package org.asn1gen.gen
+package org.asn1gen.gen.java
 
 import java.io.PrintWriter
 import org.asn1gen.parsing.asn1.ast._
