@@ -151,18 +151,15 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           componentTypeList.componentTypes
         }.flatten
         out.ensureEmptyLines(1)
-        out << "public class " << safeAssignmentName << "(" << EndLn
+        out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
         out.indent(2) {
           generateSequenceFieldDefines(assignmentName, list)
           out << EndLn
-        }
-        out << ") extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
-        out.indent(2) {
-          out << "def copy(" << EndLn
+          out << "public " << safeAssignmentName << "(" << EndLn
           out.indent(2) {
             out.indent(2) {
-              generateSequenceCopyParameters(list)
-              out << ") = {" << EndLn
+              generateSequenceParameters(list)
+              out << ") {" << EndLn
             }
             out << safeAssignmentName << "(" << EndLn
             out.indent(2) {
@@ -520,20 +517,12 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
   def generateSequenceFieldDefines(
       sequenceName: String, list: List[ast.ComponentType]): Unit = {
     out.trace("/*", "*/")
-    var firstTime = true
     list foreach {
       case ast.NamedComponentType(
         ast.NamedType(ast.Identifier(identifier), _type),
         value)
       => {
-        if (!firstTime) {
-          out << "," << EndLn
-        }
-        ( out
-          << "val " << safeId(identifier)
-          << ": " << safeId(asnTypeOf(_type, value))
-        )
-        firstTime = false
+        out << "final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
       }
     }
   }
@@ -574,7 +563,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     }
   }
   
-  def generateSequenceCopyParameters(
+  def generateSequenceParameters(
       list: List[ast.ComponentType]): Unit = {
     out.trace("/*", "*/")
     var firstTime = true
@@ -586,11 +575,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         if (!firstTime) {
           out << "," << EndLn
         }
-        ( out
-          << safeId(identifier)
-          << ": " << safeId(asnTypeOf(_type, value))
-          << " = this." << safeId(identifier)
-        )
+        out << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier)
         firstTime = false
       }
     }
