@@ -13,10 +13,15 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     phrase(root)(new lexical.Scanner(input))
   
   def generateTo(packageName: String, directory: File): Unit = {
-    modules foreach { case (name, module) =>
-      new File(directory, name + ".java").openPrintStream { ps =>
-        val genJava = new GenJava(packageName, new IndentWriter(ps))
-        genJava.generate(module)
+    modules foreach { case (moduleName, module) =>
+      module.types.foreach { case (_, namedType: NamedType) =>
+        val modulePath = directory.child(moduleName)
+        modulePath.mkdir
+        val typePath = modulePath.child(namedType.name + ".java")
+        typePath.openPrintStream { ps =>
+          val genJava = new GenJava(packageName, namedType, new IndentWriter(ps))
+          genJava.generate(module)
+        }
       }
     }
   }
@@ -52,11 +57,15 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     val berDirectory = codecDirectory.child("ber")
     berDirectory.mkdir
     modules foreach { case (moduleName, module) =>
-      val moduleFile = outDirectory.child(moduleName + ".java")
-      moduleFile.openPrintStream { ps =>
-        val genJava = new GenJava("moo", new IndentWriter(ps))
-        genJava.generate(module)
-        println("Writing to " + moduleFile)
+      module.types.foreach { case (_, namedType: NamedType) =>
+        val modulePath = outDirectory.child(moduleName)
+        modulePath.mkdir
+        val typeFile = modulePath.child("/" + namedType.name + ".java")
+        typeFile.openPrintStream { ps =>
+          val genJava = new GenJava("moo", namedType, new IndentWriter(ps))
+          genJava.generate(module)
+          println("Writing to " + typeFile)
+        }
       }
     }
     modules foreach { case (moduleName, module) =>
