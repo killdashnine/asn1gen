@@ -168,7 +168,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           componentTypeList.componentTypes
         }.flatten
         out.ensureEmptyLines(1)
-        out << "class " << safeAssignmentName << "(" << EndLn
+        out << "public class " << safeAssignmentName << "(" << EndLn
         out.indent(2) {
           generateSequenceFieldDefines(assignmentName, list)
           out << EndLn
@@ -522,6 +522,8 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
             out.ensureEmptyLines(1)
             out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnList {" << EndLn
             out.indent(2) {
+              out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.java.runtime.Nil.<" << safeReferenceType << ">instance());" << EndLn
+              out << EndLn
               out << "public final org.asn1gen.java.runtime.List<" << safeReferenceType << "> items;" << EndLn
               out << EndLn
               out << "public " << safeAssignmentName << " withItems(final org.asn1gen.java.runtime.List<" << safeReferenceType << "> value) {" << EndLn
@@ -530,7 +532,21 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
               }
               out << "}" << EndLn
               out << EndLn
-              out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.java.runtime.Nil.<" << safeReferenceType << ">instance());" << EndLn
+              out << "@Override" << EndLn
+              out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
+              out.indent(2) {
+                out << "assert other != null;" << EndLn
+                out << EndLn
+                out << "return this.items.equals(that.items)" << EndLn
+              }
+              out << "}" << EndLn
+              out << EndLn
+              out << "@Override" << EndLn
+              out << "public int hashcode() {" << EndLn
+              out.indent(2) {
+                out << "return this.items.hascode()" << EndLn
+              }
+              out << "}" << EndLn
             }
             out << "}" << EndLn << EndLn
           }
