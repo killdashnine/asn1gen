@@ -124,7 +124,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       => {
         ( out
           << "abstract class " << safeAssignmentName
-          << "(_element: Any) extends _rt_.AsnChoice {" << EndLn
+          << "(_element: Any) extends org.asn1gen.java.runtime.AsnChoice {" << EndLn
         )
         out.indent(2) {
           out << "def _choice: Int" << EndLn
@@ -149,7 +149,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       }
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
-        out << "class " << safeAssignmentName << " extends _rt_.AsnSequence {" << EndLn
+        out << "class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
         out.indent(2) {
           ( out
             << "override def _desc: _meta_." << safeAssignmentName
@@ -173,7 +173,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           generateSequenceFieldDefines(assignmentName, list)
           out << EndLn
         }
-        out << ") extends _rt_.AsnSequence {" << EndLn
+        out << ") extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
         out.indent(2) {
           ( out
             << "override def _desc: _meta_." << safeAssignmentName
@@ -303,7 +303,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       => {
         var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
-        out << "public class " << safeAssignmentName << " extends _rt_.AsnEnumeration {" << EndLn
+        out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnEnumeration {" << EndLn
         out.indent(2) {
           out << "public final long value;" << EndLn
           out << "override def _desc: _meta_." << safeAssignmentName
@@ -374,7 +374,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
                   }
                 }
               }
-              out << "case _ => throw _rt_.BadEnumerationException(" << EndLn
+              out << "case _ => throw org.asn1gen.java.runtime.BadEnumerationException(" << EndLn
               out.indent(2) {
                 out << "\"Unrecogonised enumeration value + '\" + name + \"'\")" << EndLn
               }
@@ -423,10 +423,10 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       case bitStringType: ast.BitStringType => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << safeAssignmentName << " = _rt_.AsnBitString" << EndLn
+          << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
           << EndLn
           << EndLn
-          << "lazy val " << safeAssignmentName << " = _rt_.AsnBitString" << EndLn
+          << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
         )
       }
       case ast.INTEGER(None) => {
@@ -440,17 +440,17 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << safeAssignmentName << " = _rt_.AsnBoolean" << EndLn
+          << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBoolean" << EndLn
           << EndLn
-          << "lazy val " << safeAssignmentName << " = _rt_.AsnFalse" << EndLn
+          << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnFalse" << EndLn
         )
       }
       case ast.OctetStringType => {
         out.ensureEmptyLines(1)
         ( out
-          << "type " << safeAssignmentName << " = _rt_.AsnOctetString" << EndLn
+          << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
           << EndLn
-          << "lazy val " << safeAssignmentName << " = _rt_.AsnOctetString" << EndLn
+          << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
         )
       }
       case ast.PrintableString => {
