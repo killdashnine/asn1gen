@@ -17,8 +17,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       << EndLn
       << "import org.asn1gen.java.runtime;" << EndLn
       << EndLn
-      << "import " << packageName << ".meta.{"
-      << safeId(module.name) << " => _meta_}" << EndLn
     )
     module.imports foreach { symbolsFromModule =>
       out << "import " << symbolsFromModule.module << "._" << EndLn
