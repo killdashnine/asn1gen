@@ -303,9 +303,9 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       => {
         var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
-        out << "public class " << safeAssignmentName
-        out << "(_value: Long) extends _rt_.AsnEnumeration {" << EndLn
+        out << "public class " << safeAssignmentName << " extends _rt_.AsnEnumeration {" << EndLn
         out.indent(2) {
+          out << "public final long value;" << EndLn
           out << "override def _desc: _meta_." << safeAssignmentName
           out << " = _meta_." << safeAssignmentName << EndLn
           out << EndLn
@@ -520,37 +520,19 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           case ast.TypeReference(referencedType) => {
             val safeReferenceType = safeId(referencedType)
             out.ensureEmptyLines(1)
-            ( out
-              << "public class " << safeAssignmentName
-              << "(items: List[" << safeReferenceType << "]) "
-              << "extends _rt_.AsnList {" << EndLn
-            )
+            out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnList {" << EndLn
             out.indent(2) {
-              ( out
-                << "override def _desc: _meta_." << safeAssignmentName
-                << " = _meta_." << safeAssignmentName << EndLn
-                << EndLn
-                << "def items(f: (List[" << safeReferenceType << ("] => List[")
-                << safeReferenceType << "])): " << safeAssignmentName
-                << " =" << EndLn
-              )
+              out << "public final org.asn1gen.java.runtime.List<" << safeReferenceType << "> items;" << EndLn
+              out << EndLn
+              out << "public " << safeAssignmentName << " withItems(final org.asn1gen.java.runtime.List<" << safeReferenceType << "> value) {" << EndLn
               out.indent(2) {
-                out << "this.copy(items = f(this.items))" << EndLn
+                out << "return new " << safeAssignmentName << "(value);" << EndLn
               }
+              out << "}" << EndLn
+              out << EndLn
+              out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.java.runtime.Nil.<" << safeReferenceType << ">instance());" << EndLn
             }
-            ( out
-              << "}" << EndLn << EndLn
-              << "object " << safeAssignmentName
-              << " extends " << safeAssignmentName << "(Nil) {" << EndLn
-            )
-            out.indent(2) {
-              ( out
-                << "def apply(items: " << safeReferenceType
-                << "*): " << safeAssignmentName << " = "
-                << safeAssignmentName << "(items.toList)" << EndLn
-              )
-            }
-            out << "}" << EndLn
+            out << "}" << EndLn << EndLn
           }
           case sequenceType: ast.SequenceType => {
             assert(false)
