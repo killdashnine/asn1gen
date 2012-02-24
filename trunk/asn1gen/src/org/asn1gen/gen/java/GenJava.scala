@@ -303,7 +303,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       => {
         var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
-        out << "case class " << safeAssignmentName
+        out << "public class " << safeAssignmentName
         out << "(_value: Long) extends _rt_.AsnEnumeration {" << EndLn
         out.indent(2) {
           out << "override def _desc: _meta_." << safeAssignmentName
@@ -521,7 +521,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
             val safeReferenceType = safeId(referencedType)
             out.ensureEmptyLines(1)
             ( out
-              << "case class " << safeAssignmentName
+              << "public class " << safeAssignmentName
               << "(items: List[" << safeReferenceType << "]) "
               << "extends _rt_.AsnList {" << EndLn
             )
@@ -737,7 +737,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         val safeChoiceChoice = safeId(assignmentName + "_" + name)
         out.ensureEmptyLines(1)
         ( out
-          << "case class " << safeChoiceChoice
+          << "public class " << safeChoiceChoice
           << "(_element: " << asnTypeOf(_type) << ") extends "
           << safeId(assignmentName) << "(_element) {" << EndLn
         )
