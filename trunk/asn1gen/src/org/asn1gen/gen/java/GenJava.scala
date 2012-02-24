@@ -150,18 +150,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
         out << "class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
-        out.indent(2) {
-          ( out
-            << "override def _desc: _meta_." << safeAssignmentName
-            << " = _meta_." << safeAssignmentName << EndLn << EndLn
-          )
-        }
-        ( out
-          << "}" << EndLn
-          << EndLn
-          << "object " << safeAssignmentName << " extends " << safeAssignmentName << " {" << EndLn
-          << "}" << EndLn
-        )
+        out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
         val list = (list1.toList:::list2.toList).map { componentTypeList =>
@@ -175,12 +164,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         }
         out << ") extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
         out.indent(2) {
-          ( out
-            << "override def _desc: _meta_." << safeAssignmentName
-            << " = _meta_." << safeAssignmentName << EndLn
-            << EndLn
-            << "def copy(" << EndLn
-          )
+          out << "def copy(" << EndLn
           out.indent(2) {
             out.indent(2) {
               generateSequenceCopyParameters(list)
@@ -228,76 +212,41 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           }
           out << "}" << EndLn
           out << EndLn
-          out << "override def hashCode(): Int = return (" << EndLn
+          out << "@Override" << EndLn
+          out << "public int hashCode() {" << EndLn
           out.indent(2) {
-            out << "0" << EndLn
-            list foreach {
-              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                out << "^ this." << safeId(identifier) << ".hashCode" << EndLn
+            out << "return (0"
+            out.indent(2) {
+              list foreach {
+                case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
+                  out << EndLn << "^ this." << safeId(identifier) << ".hashCode()"
+                }
               }
             }
+            out << ");" << EndLn
           }
-          out << ")" << EndLn << EndLn
+          out << "}" << EndLn << EndLn
           generateSequenceImmutableSetters(assignmentName, list)
-          out << EndLn << EndLn << "override def _child(name: String): Any = name match {"
+          out << EndLn << EndLn
+          out << "@Override" << EndLn
+          out << "public Object _child(name: String) {" << EndLn
           out.indent(2) {
-            list foreach {
-              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                out << "case \"" << safeId(identifier) << "\" => " << safeId(identifier) << EndLn
+            out << "= name match {" << EndLn
+            out.indent(2) {
+              list foreach {
+                case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
+                  out << "case \"" << safeId(identifier) << "\" => " << safeId(identifier) << EndLn
+                }
               }
+              out << "case _ => throw new Exception("
+              out << "\"Member '\" + name + \"' does not exist.\")" << EndLn
             }
-            out << "case _ => throw new Exception("
-            out << "\"Member '\" + name + \"' does not exist.\")" << EndLn
+            out << "}" << EndLn
           }
           out << "}" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "object " << safeAssignmentName << " extends " << safeAssignmentName << "("
-        out.indent(2) {
-          out << EndLn
-          var firstItem = true
-          list.map {
-            case ast.NamedComponentType(
-              ast.NamedType(_, _type),
-              optionalDefault)
-            => {
-              if (!firstItem) {
-                out << "," << EndLn
-              }
-              optionalDefault match {
-                case ast.Empty => {
-                  out << safeId(rawDefaultOf(_type))
-                }
-                case ast.Optional => {
-                  out << "None"
-                }
-                case ast.Default(ast.ValueReference(valueName)) => {
-                  out << "/* default */ " << valueName
-                }
-              }
-              firstItem = false
-            }
-          }
-          out << EndLn
-        }
-        out << ") {" << EndLn
-        out.indent(2) {
-          out << "def apply(" << EndLn
-          out.indent(2) {
-            out.indent(2) {
-              generateSequenceFieldParameters(assignmentName, list)
-              out << "): " << safeAssignmentName << " = {" << EndLn
-            }
-            out << "new " << safeAssignmentName << "("
-            out.indent(2) {
-              generateSequenceFieldValues(assignmentName, list)
-              out << ")" << EndLn
-            }
-          }
-          out << "}" << EndLn
-        }
-        out << "}" << EndLn << EndLn
       }
       case ast.EnumeratedType(enumerations)
       => {
@@ -306,8 +255,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnEnumeration {" << EndLn
         out.indent(2) {
           out << "public final long value;" << EndLn
-          out << "override def _desc: _meta_." << safeAssignmentName
-          out << " = _meta_." << safeAssignmentName << EndLn
           out << EndLn
           out << "override def _shortName: Option[String] = {" << EndLn
           out.indent(2) {
@@ -741,9 +688,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         )
         out.indent(2) {
           ( out
-            << "override def _desc: _meta_." << safeChoiceType
-            << " = _meta_." << safeChoiceType
-            << EndLn
             << "def _choice: Int = " + tagNumber
             << EndLn
             << EndLn
