@@ -518,7 +518,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         ast.NamedType(ast.Identifier(identifier), _type),
         value)
       => {
-        out << "final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
+        out << "public final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
       }
     }
   }
