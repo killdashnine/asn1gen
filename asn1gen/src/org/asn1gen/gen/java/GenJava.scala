@@ -161,15 +161,11 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
               generateSequenceParameters(list)
               out << ") {" << EndLn
             }
-            out << safeAssignmentName << "(" << EndLn
-            out.indent(2) {
-              list1 match {
-                case Some(ast.ComponentTypeList(list)) => {
-                  generateSequenceFieldValues(assignmentName, list)
-                }
-                case None => ()
+            list1 match {
+              case Some(ast.ComponentTypeList(list)) => {
+                generateConstructorAssignments(assignmentName, list)
               }
-              out << ")" << EndLn
+              case None => ()
             }
           }
           out << "}" << EndLn
@@ -545,7 +541,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     }
   }
   
-  def generateSequenceFieldValues(
+  def generateConstructorAssignments(
       sequenceName: String, list: List[ast.ComponentType]): Unit = {
     out.trace("/*", "*/")
     var firstTime = true
@@ -554,11 +550,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         ast.NamedType(ast.Identifier(identifier), _type),
         value)
       => {
-        if (!firstTime) {
-          out << "," << EndLn
-        }
-        out << safeId(identifier)
-        firstTime = false
+        out << "this." << safeId(identifier) << " = " << safeId(identifier) << ";" << EndLn
       }
     }
   }
