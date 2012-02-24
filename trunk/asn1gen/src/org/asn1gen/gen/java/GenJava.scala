@@ -88,7 +88,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
   }
   
   def generate(namedType: NamedType): Unit = {
-    out.trace("/*", "*/")
     namedType._type match {
       case ast.Type(builtinType: ast.BuiltinType, _) => {
         generate(builtinType, namedType.name)
@@ -116,7 +115,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
   }
   
   def generate(builtinType: ast.BuiltinType, assignmentName: String): Unit = {
-    out.trace("/*", "*/")
     val safeAssignmentName = safeId(assignmentName)
     builtinType match {
       case ast.ChoiceType(
@@ -460,7 +458,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
   
   def generate(assignmentName: String, setOfType: ast.SetOfType): Unit = {
     val safeAssignmentName = safeId(assignmentName)
-    out.trace("/*", "*/")
     setOfType match {
       case ast.SetOfType(ast.Type(elementType, _)) => {
         elementType match {
