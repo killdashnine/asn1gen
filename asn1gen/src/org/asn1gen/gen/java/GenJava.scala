@@ -197,10 +197,10 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
               out << ")" << EndLn
             }
           }
-          ( out
-            << "}" << EndLn << EndLn
-            << "override def equals(that: Any): Boolean = {" << EndLn
-          )
+          out << "}" << EndLn
+          out << EndLn
+          out << "@Override" << EndLn
+          out << "public boolean equals(final " << safeAssignmentName << " that): Boolean = {" << EndLn
           out.indent(2) {
             out << "val other = try {" << EndLn
             out.indent(2) {
