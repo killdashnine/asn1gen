@@ -542,7 +542,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
               out << "}" << EndLn
               out << EndLn
               out << "@Override" << EndLn
-              out << "public int hashcode() {" << EndLn
+              out << "public int hashCode() {" << EndLn
               out.indent(2) {
                 out << "return this.items.hascode()" << EndLn
               }
