@@ -116,10 +116,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       case ast.ChoiceType(
         ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
-        ( out
-          << "abstract class " << safeAssignmentName
-          << "(_element: Any) extends org.asn1gen.java.runtime.AsnChoice {" << EndLn
-        )
+        out << "abstract class " << safeAssignmentName << "(_element: Any) extends org.asn1gen.java.runtime.AsnChoice {" << EndLn
         out.indent(2) {
           out << "def _choice: Int" << EndLn
           generateSimpleGetters(rootAlternativeTypeList)
@@ -129,12 +126,8 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         generateChoices(assignmentName, rootAlternativeTypeList)
         val firstNamedType =
           rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
-        ( out
-          << EndLn
-          << "object " << safeAssignmentName << " extends "
-          << safeId(assignmentName + "_" + firstNamedType.name)
-          << "(" << rawDefaultOf(firstNamedType._type) << ") {" << EndLn
-        )
+        out << EndLn
+        out << "object " << safeAssignmentName << " extends " << safeId(assignmentName + "_" + firstNamedType.name) << "(" << rawDefaultOf(firstNamedType._type) << ") {" << EndLn
         out.indent(2) {
           generateChoiceValAliases(assignmentName, rootAlternativeTypeList)
           generateChoiceTypeAliases(assignmentName, rootAlternativeTypeList)
@@ -173,26 +166,28 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           out << "@Override" << EndLn
           out << "public boolean equals(final " << safeAssignmentName << " that): Boolean = {" << EndLn
           out.indent(2) {
-            out << "val other = try {" << EndLn
-            out.indent(2) {
-              out << "that.asInstanceOf[" << safeAssignmentName << "]" << EndLn
+            out << "assert that != null" << EndLn
+            out.trace("/*", "*/")
+            list foreach {
+              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
+                out << "if (this." << safeId(identifier) << " != that." + safeId(identifier) + ") {" << EndLn
+                out.indent(2) {
+                  out << "return false;" << EndLn
+                }
+                out << "}" << EndLn
+              }
             }
-            out << "} catch {" << EndLn
-            out.indent(2) {
-              out << "case e: ClassCastException => return false" << EndLn
-            }
-            out << "}" << EndLn
-            out << "this.equals(other: " << safeAssignmentName + ")" << EndLn
           }
           out << "}" << EndLn << EndLn
           out << "def equals(that: " << safeAssignmentName << "): Boolean = {" << EndLn
           out.indent(2) {
             list foreach {
               case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                out << "if (this." << safeId(identifier) << " != that." << safeId(identifier) << ")"
+                out << "if (this." << safeId(identifier) << " != that." << safeId(identifier) << ") {" << EndLn
                 out.indent(2) {
                   out << "return false" << EndLn
                 }
+                out << "}" << EndLn
               }
             }
             out << "return true" << EndLn
@@ -356,60 +351,46 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       }
       case bitStringType: ast.BitStringType => {
         out.ensureEmptyLines(1)
-        ( out
-          << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
-          << EndLn
-          << EndLn
-          << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
-        )
+        out << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
+        out << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
       }
       case ast.INTEGER(None) => {
         out.ensureEmptyLines(1)
-        ( out
-          << "type " << safeAssignmentName << " = Long" << EndLn
-          << EndLn
-          << "lazy val " << safeAssignmentName << " = 0L" << EndLn
-        )
+        out << "type " << safeAssignmentName << " = Long" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = 0L" << EndLn
       }
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
-        ( out
-          << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBoolean" << EndLn
-          << EndLn
-          << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnFalse" << EndLn
-        )
+        out << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBoolean" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnFalse" << EndLn
       }
       case ast.OctetStringType => {
         out.ensureEmptyLines(1)
-        ( out
-          << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
-          << EndLn
-          << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
-        )
+        out << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
       }
       case ast.PrintableString => {
         out.ensureEmptyLines(1)
-        ( out
-          << "type " << safeAssignmentName << " = String" << EndLn
-          << EndLn
-          << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
-        )
+        out << "type " << safeAssignmentName << " = String" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
       }
       case ast.REAL => {
         out.ensureEmptyLines(1)
-        ( out
-          << "type " << safeAssignmentName << " = Double" << EndLn
-          << EndLn
-          << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
-        )
+        out  << "type " << safeAssignmentName << " = Double" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
       }
       case ast.UTF8String => {
         out.ensureEmptyLines(1)
-        ( out
-          << "type " << safeAssignmentName << " = String" << EndLn
-          << EndLn
-          << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
-        )
+        out << "type " << safeAssignmentName << " = String" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
       }
       case unmatched => {
         out.ensureEmptyLines(1)
@@ -418,13 +399,10 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     }
   }
   
-  def generateEnumeratedValues(
-      enumerations: ast.Enumerations,
-      assignmentName:String): Unit = {
+  def generateEnumeratedValues(enumerations: ast.Enumerations, assignmentName:String): Unit = {
     out.trace("/*", "*/")
     enumerations match {
-      case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-      => {
+      case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension) => {
         var index = 0
         items foreach {
           case ast.Identifier(item) => {
@@ -488,30 +466,20 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
             val assignmentElementName = assignmentName + "_element"
             val safeAssignmentElementName = safeId(assignmentElementName)
             out.ensureEmptyLines(1)
-            ( out
-              << "type " << safeAssignmentName << " = List["
-              << safeAssignmentElementName << "]" << EndLn
-              << "lazy val " << safeAssignmentName << " = Nil: List["
-              << safeAssignmentElementName << "]" << EndLn
-            )
+            out << "type " << safeAssignmentName << " = List[" << safeAssignmentElementName << "]" << EndLn
+            out << "lazy val " << safeAssignmentName << " = Nil: List[" << safeAssignmentElementName << "]" << EndLn
             generate(sequenceType, assignmentElementName)
           }
           case builtinType: ast.BuiltinType => {
             out.ensureEmptyLines(1)
-            ( out
-              << "type " << safeAssignmentName
-              << " = List[" << asnTypeOf(builtinType) << "]"
-              << "lazy val " << safeAssignmentName
-              << " = Nil: List[" << asnTypeOf(builtinType) << "]"
-            )
+            out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = Nil: List[" << asnTypeOf(builtinType) << "]"
           }
         }
       }
     }
   }
   
-  def generateSequenceFieldDefines(
-      sequenceName: String, list: List[ast.ComponentType]): Unit = {
+  def generateSequenceFieldDefines(sequenceName: String, list: List[ast.ComponentType]): Unit = {
     out.trace("/*", "*/")
     list foreach {
       case ast.NamedComponentType(
@@ -602,15 +570,10 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     _type match {
       case ast.Type(ast.TaggedType(_, _, fieldType), _) => {
         generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, value, fieldNames)
-        //out.println("// tag " + number)
       }
       case ast.Type(builtinType: ast.TypeKind, List()) => {
         val setterType = asnTypeOf(builtinType, value)
-        ( out
-          << "def " << safeId(fieldName)
-          << "(f: (" << setterType << " => "
-          << setterType << ")): " << sequenceName << " =" << EndLn
-        )
+        out << "def " << safeId(fieldName) << "(f: (" << setterType << " => " << setterType << ")): " << sequenceName << " =" << EndLn
         out.indent(2) {
           out << "this.copy(" << safeId(fieldName) << " = f(this." << safeId(fieldName) << "))" << EndLn
         }
@@ -651,37 +614,14 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         val safeChoiceType = safeId(assignmentName)
         val safeChoiceChoice = safeId(assignmentName + "_" + name)
         out.ensureEmptyLines(1)
-        ( out
-          << "public class " << safeChoiceChoice
-          << "(_element: " << asnTypeOf(_type) << ") extends "
-          << safeId(assignmentName) << "(_element) {" << EndLn
-        )
+        out << "public class " << safeChoiceChoice << "(_element: " << asnTypeOf(_type) << ") extends " << safeId(assignmentName) << "(_element) {" << EndLn
         out.indent(2) {
-          ( out
-            << "def _choice: Int = " + tagNumber
-            << EndLn
-            << EndLn
-            << "override def "
-            << safeName
-            << ": Option[" << safeElementType << "] = Some(_element)"
-            << EndLn
-            << EndLn
-            << "override def "
-            << safeName
-            << "(f: ("
-            << safeElementType
-            << " => "
-            << safeElementType
-            << ")): "
-            << safeChoiceType
-            << " = "
-            << safeChoiceChoice
-            << "(f(_element))"
-            << EndLn
-            << EndLn
-            << "override def _choiceName: String = " << name.inspect
-            << EndLn
-          )
+          out << "def _choice: Int = " + tagNumber << EndLn
+          out << EndLn
+          out << "override def " << safeName << ": Option[" << safeElementType << "] = Some(_element)" << EndLn
+          out << EndLn
+          out << "override def " << safeName << "(f: (" << safeElementType << " => " << safeElementType << ")): " << safeChoiceType << " = " << safeChoiceChoice << "(f(_element))" << EndLn
+          out << EndLn << "override def _choiceName: String = " << name.inspect << EndLn
         }
         out << "}" << EndLn
       }
@@ -711,15 +651,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
-          ( out
-            << "val "
-            << namedType.name.capitalise
-            << " = "
-            << choiceTypeName
-            << "_"
-            << namedType.name
-            << EndLn
-          )
+          out << "val " << namedType.name.capitalise << " = " << choiceTypeName << "_" << namedType.name << EndLn
         }
       }
     }
@@ -732,13 +664,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
-          ( out
-            << "type "
-            << namedType.name.capitalise
-            << " = "
-            << choiceTypeName << "_" << namedType.name
-            << EndLn
-          )
+          out << "type " << namedType.name.capitalise << " = " << choiceTypeName << "_" << namedType.name << EndLn
         }
       }
     }
@@ -755,30 +681,10 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         val safeChoiceType = safeId(choiceTypeName)
         val safeChoiceChoice = safeId(choiceTypeName + "_" + name)
         val safeElementType = safeId(asnTypeOf(_type))
-        ( out
-          << EndLn
-          << "def "
-          << safeElementName
-          << "(f: ("
-          << safeElementType
-          << " => "
-          << safeElementType
-          << ")): "
-          << safeChoiceType
-          << " = this"
-          << EndLn
-          << EndLn
-          << "def "
-          << safeElementName
-          << "(f: => "
-          << safeElementType
-          << "): "
-          << safeChoiceType
-          << " = "
-          << safeChoiceChoice
-          << "(f)"
-          << EndLn
-        )
+        out << EndLn
+        out << "def " << safeElementName << "(f: (" << safeElementType << " => " << safeElementType << ")): " << safeChoiceType << " = this" << EndLn
+        out << EndLn
+        out << "def " << safeElementName << "(f: => " << safeElementType << "): " << safeChoiceType << " = " << safeChoiceChoice << "(f)" << EndLn
       }
     }
   }
@@ -803,13 +709,8 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       => {
     	val safeName = safeId(name)
     	val safeType = safeId(asnTypeOf(_type))
-        ( out
-          << EndLn
-          << "def "
-          << safeName
-          << ": Option[" << safeType << "] = None"
-          << EndLn
-        )
+        out << EndLn
+        out << "def " << safeName << ": Option[" << safeType << "] = None" << EndLn
       }
     }
   }
