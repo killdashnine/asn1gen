@@ -49,6 +49,10 @@ sealed class EndLn
 
 object EndLn extends EndLn
 
+sealed class Break
+
+object Break extends Break
+
 class IndentWriter(out: Writer) extends PrintWriter(out, true) {
   val defaultIndent: Int = 2
   var indent: Int = 0
@@ -170,6 +174,14 @@ class IndentWriter(out: Writer) extends PrintWriter(out, true) {
   
   def <<(endLn: EndLn): IndentWriter = {
     this.println()
+    return this
+  }
+  
+  def <<(break: Break): IndentWriter = {
+    if (!atLineStart) {
+      this.println()
+    }
+    
     return this
   }
 
