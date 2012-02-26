@@ -19,7 +19,9 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     module.imports foreach { symbolsFromModule =>
       out << "import " << symbolsFromModule.module << "._" << EndLn
     }
-    out << EndLn
+    if (module.imports.size > 0) {
+      out << EndLn
+    }
     module.types.foreach { case (_, namedType: NamedType) =>
       generate(namedType)
     }
