@@ -298,8 +298,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           out << "}" << EndLn
         }
         out << "}" << EndLn
-        out << EndLn
-        generateEnumeratedValues(enumerations, assignmentName)
       }
       case setOfType: ast.SetOfType => {
         generate(assignmentName, setOfType)
