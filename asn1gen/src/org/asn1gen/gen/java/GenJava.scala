@@ -128,12 +128,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         val firstNamedType =
           rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
         out << EndLn
-        out << "object " << safeAssignmentName << " extends " << safeId(assignmentName + "_" + firstNamedType.name) << "(" << rawDefaultOf(firstNamedType._type) << ") {" << EndLn
-        out.indent(2) {
-          generateChoiceValAliases(assignmentName, rootAlternativeTypeList)
-          generateChoiceTypeAliases(assignmentName, rootAlternativeTypeList)
-        }
-        out << "}" << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
@@ -527,6 +521,8 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         out.ensureEmptyLines(1)
         out << "public class " << safeChoiceChoice << " extends " << safeId(assignmentName) << " {" << EndLn
         out.indent(2) {
+          out << "public final static " << asnTypeOf(_type) << " EMPTY = new " << asnTypeOf(_type) << "();" << EndLn
+          out << EndLn
           out << "public final " << asnTypeOf(_type) << " element;" << EndLn
           out << EndLn
           out << "public " << safeChoiceChoice << "(final " << asnTypeOf(_type) << " element) {" << EndLn
@@ -598,32 +594,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
               out << "}" << EndLn
             }
           }
-        }
-      }
-    }
-  }
-  
-  def generateChoiceValAliases(
-      choiceTypeName: String,
-      rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
-    out.trace("/*", "*/")
-    rootAlternativeTypeList match {
-      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
-        namedTypes foreach { namedType =>
-          out << "val " << namedType.name.capitalise << " = " << choiceTypeName << "_" << namedType.name << EndLn
-        }
-      }
-    }
-  }
-
-  def generateChoiceTypeAliases(
-      choiceTypeName: String,
-      rootAlternativeTypeList: ast.RootAlternativeTypeList): Unit = {
-    out.trace("/*", "*/")
-    rootAlternativeTypeList match {
-      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
-        namedTypes foreach { namedType =>
-          out << "type " << namedType.name.capitalise << " = " << choiceTypeName << "_" << namedType.name << EndLn
         }
       }
     }
