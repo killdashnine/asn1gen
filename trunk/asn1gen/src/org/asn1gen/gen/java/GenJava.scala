@@ -117,7 +117,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       => {
         out << "abstract class " << safeAssignmentName << "(_element: Any) extends org.asn1gen.java.runtime.AsnChoice {" << EndLn
         out.indent(2) {
-          out << "def _choice: Int" << EndLn
+          out << "public abstract int choiceId();" << EndLn
           generateSimpleGetters(rootAlternativeTypeList)
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
         }
@@ -619,7 +619,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
   }
   
   def generateSimpleGetters(namedType: ast.NamedType): Unit = {
-    out.trace("/*", "*/")
     namedType match {
       case ast.NamedType(
         ast.Identifier(name),
@@ -628,7 +627,11 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     	val safeName = safeId(name)
     	val safeType = safeId(asnTypeOf(_type))
         out << EndLn
-        out << "def " << safeName << ": Option[" << safeType << "] = None" << EndLn
+        out << "public Option<" << safeType << "> get" << safeName.capitalise << "() {" << EndLn
+        out.indent(2) {
+    	    out << "return None.instance;" << EndLn
+    	  }
+        out << "}" << EndLn
       }
     }
   }
