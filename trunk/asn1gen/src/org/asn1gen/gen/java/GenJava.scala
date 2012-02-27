@@ -115,8 +115,10 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
       case ast.ChoiceType(
         ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
-        out << "abstract class " << safeAssignmentName << "(_element: Any) extends org.asn1gen.java.runtime.AsnChoice {" << EndLn
+        out << "abstract class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnChoice {" << EndLn
         out.indent(2) {
+          out << "public abstract " << safeAssignmentName << " element();" << EndLn
+          out << EndLn
           out << "public abstract int choiceId();" << EndLn
           generateSimpleGetters(rootAlternativeTypeList)
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
@@ -533,12 +535,32 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
           }
           out << "}" << EndLn
           out << EndLn
-          out << "def _choice: Int = " + tagNumber << EndLn
+          out << "public int choiceId() {" << EndLn
+          out.indent(2) {
+            out << "return " << tagNumber << ";" << EndLn
+          }
+          out << "}" << EndLn
           out << EndLn
-          out << "override def " << safeName << ": Option[" << safeElementType << "] = Some(_element)" << EndLn
+          out << "@Override" << EndLn
+          out << "public Option<" << safeElementType << "> " << safeName << "{" << EndLn
+          out.indent(2) {
+            out << "return Some.of(this.element);" << EndLn
+          }
+          out << "}" << EndLn
           out << EndLn
-          out << "override def " << safeName << "(f: (" << safeElementType << " => " << safeElementType << ")): " << safeChoiceType << " = " << safeChoiceChoice << "(f(_element))" << EndLn
-          out << EndLn << "override def _choiceName: String = " << name.inspect << EndLn
+          out << "@Override" << EndLn
+          out << "public " << safeChoiceChoice << " with" << safeName.capitalise << "(final " << asnTypeOf(_type) << " value) {" << EndLn
+          out.indent(2) {
+            out << "return new " << safeChoiceChoice << "(value);" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
+          out << "@Override" << EndLn
+          out << "public String choiceName() {" << EndLn
+          out.indent(2) {
+            out << "return " << name.inspect << ";" << EndLn
+          }
+          out << "}" << EndLn
         }
         out << "}" << EndLn
       }
@@ -565,7 +587,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
               val safeChoiceChoice = safeId(choiceTypeName + "_" + name)
               val safeElementType = safeId(asnTypeOf(_type))
               out << EndLn
-              out << "public " << safeElementType << " with" << safeElementName << "(final " << safeElementType << " value) {" << EndLn
+              out << "public " << safeElementType << " with" << safeElementName.capitalise << "(final " << safeElementType << " value) {" << EndLn
               out.indent(2) {
                 out << "return new " << safeChoiceType << "("
                 out.indent(2) {
