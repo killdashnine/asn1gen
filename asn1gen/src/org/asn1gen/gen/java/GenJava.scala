@@ -523,8 +523,16 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         val safeChoiceType = safeId(assignmentName)
         val safeChoiceChoice = safeId(assignmentName + "_" + name)
         out.ensureEmptyLines(1)
-        out << "public class " << safeChoiceChoice << "(_element: " << asnTypeOf(_type) << ") extends " << safeId(assignmentName) << "(_element) {" << EndLn
+        out << "public class " << safeChoiceChoice << " extends " << safeId(assignmentName) << " {" << EndLn
         out.indent(2) {
+          out << "public final " << asnTypeOf(_type) << " element;" << EndLn
+          out << EndLn
+          out << "public " << safeChoiceChoice << "(final " << asnTypeOf(_type) << " element) {" << EndLn
+          out.indent(2) {
+            out << "this.element = element;" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
           out << "def _choice: Int = " + tagNumber << EndLn
           out << EndLn
           out << "override def " << safeName << ": Option[" << safeElementType << "] = Some(_element)" << EndLn
