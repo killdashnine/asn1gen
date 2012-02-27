@@ -15,13 +15,10 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     out << "package " << packageName << ";" << EndLn
     out << EndLn
     out << "import org.asn1gen.java.runtime;" << EndLn
-    out << EndLn
     module.imports foreach { symbolsFromModule =>
       out << "import " << symbolsFromModule.module << "._" << EndLn
     }
-    if (module.imports.size > 0) {
-      out << EndLn
-    }
+    out << EndLn
     module.types.foreach { case (_, namedType: NamedType) =>
       generate(namedType)
     }
@@ -172,27 +169,28 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
             out.trace("/*", "*/")
             list foreach {
               case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
-                out << "if (this." << safeId(identifier) << " != that." + safeId(identifier) + ") {" << EndLn
+                out << EndLn
+                out << "if (!this." << safeId(identifier) << ".equals(that." + safeId(identifier) + ")) {" << EndLn
                 out.indent(2) {
                   out << "return false;" << EndLn
                 }
                 out << "}" << EndLn
               }
             }
-          }
-          out << "}" << EndLn << EndLn
-          out << "def equals(that: " << safeAssignmentName << "): Boolean = {" << EndLn
-          out.indent(2) {
-            list foreach {
-              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                out << "if (this." << safeId(identifier) << " != that." << safeId(identifier) << ") {" << EndLn
-                out.indent(2) {
-                  out << "return false" << EndLn
-                }
-                out << "}" << EndLn
-              }
-            }
+            out << EndLn
             out << "return true" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
+          out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
+          out.indent(2) {
+            out << "if (that instanceof " << safeAssignmentName << ") {" << EndLn
+            out.indent(2) {
+              out << "return this.equals((" + safeAssignmentName + ")that);" << EndLn
+            }
+            out << "}" << EndLn
+            out << EndLn
+            out << "return true;" << EndLn
           }
           out << "}" << EndLn
           out << EndLn
@@ -209,24 +207,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
             }
             out << ");" << EndLn
           }
-          out << "}" << EndLn << EndLn
-          generateSequenceImmutableSetters(assignmentName, list)
-          out << EndLn << EndLn
-          out << "@Override" << EndLn
-          out << "public Object _child(name: String) {" << EndLn
-          out.indent(2) {
-            out << "= name match {" << EndLn
-            out.indent(2) {
-              list foreach {
-                case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                  out << "case \"" << safeId(identifier) << "\" => " << safeId(identifier) << EndLn
-                }
-              }
-              out << "case _ => throw new Exception("
-              out << "\"Member '\" + name + \"' does not exist.\")" << EndLn
-            }
-            out << "}" << EndLn
-          }
           out << "}" << EndLn
         }
         out << "}" << EndLn
@@ -238,39 +218,13 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         out.ensureEmptyLines(1)
         out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnEnumeration {" << EndLn
         out.indent(2) {
+          out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(0);" << EndLn
+          out << EndLn
           out << "public final long value;" << EndLn
           out << EndLn
-          out << "override def _shortName: Option[String] = {" << EndLn
+          out << "public " << safeAssignmentName << "(final long value) {" << EndLn
           out.indent(2) {
-            out << "_value match {" << EndLn
-            out.indent(2) {
-              enumerations match {
-                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-                => {
-                  var index: Long = 0
-                  items foreach {
-                    case ast.Identifier(item) => {
-                      out << "case " << index << " => Some(" << safeId(item).inspect() << ")" << EndLn
-                      if (firstIndex == None) {
-                        firstIndex = Some(index)
-                      }
-                      index = index + 1
-                    }
-                    case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
-                      val number = java.lang.Long.parseLong(n)
-                      val value = if (sign) number * -1 else number
-                      out << "case " << value << " => Some(" << safeId(item).inspect() << ")" << EndLn
-                      if (firstIndex == None) {
-                        firstIndex = Some(value)
-                      }
-                      index = index + 1
-                    }
-                  }
-                }
-              }
-              out << "case _ => None" << EndLn
-            }
-            out << "}" << EndLn
+            out << "this.value = value;" << EndLn
           }
           out << "}" << EndLn
         }
@@ -539,49 +493,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         }
         out << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier)
         firstTime = false
-      }
-    }
-  }
-  
-  def generateSequenceImmutableSetters(sequenceName: String, list: List[ast.ComponentType]): Unit = {
-    out.trace("/*", "*/")
-    val fieldNames = list.map {
-      case ast.NamedComponentType(
-        ast.NamedType(ast.Identifier(identifier), _),
-        _)
-      => identifier
-    }
-    list foreach {
-      case ast.NamedComponentType(
-        ast.NamedType(ast.Identifier(identifier), _type),
-        value)
-      => {
-        generateSequenceImmutableSetter(
-            sequenceName: String, identifier, _type, value, fieldNames)
-      }
-    }
-  }
-  
-  def generateSequenceImmutableSetter(
-      sequenceName: String,
-      fieldName: String,
-      _type: ast.Type,
-      value: ast.OptionalDefault[ast.Value],
-      fieldNames: List[String]): Unit = {
-    out.trace("/*", "*/")
-    _type match {
-      case ast.Type(ast.TaggedType(_, _, fieldType), _) => {
-        generateSequenceImmutableSetter(sequenceName, fieldName, fieldType, value, fieldNames)
-      }
-      case ast.Type(builtinType: ast.TypeKind, List()) => {
-        val setterType = asnTypeOf(builtinType, value)
-        out << "def " << safeId(fieldName) << "(f: (" << setterType << " => " << setterType << ")): " << sequenceName << " =" << EndLn
-        out.indent(2) {
-          out << "this.copy(" << safeId(fieldName) << " = f(this." << safeId(fieldName) << "))" << EndLn
-        }
-      }
-      case unmatched => {
-        out << "// Unmatched type: " << unmatched << EndLn
       }
     }
   }
