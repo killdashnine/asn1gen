@@ -227,49 +227,48 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
             out << "this.value = value;" << EndLn
           }
           out << "}" << EndLn
-        }
-        out << "}" << EndLn
-        out << EndLn
-        out << "object " << safeAssignmentName << " extends "
-        out << safeAssignmentName << "(" << firstIndex.getOrElse(0L) << ") {" << EndLn
-        out.indent(2) {
+          out << EndLn
           generateEnumeratedValues(enumerations, assignmentName)
           out << EndLn
-          out << "def of(name: String): " << safeId(assignmentName) << " = {" << EndLn
+          out << "public static " << safeId(assignmentName) << " of(final String name) {" << EndLn
           out.indent(2) {
-            out << "name match {" << EndLn
-            out.indent(2) {
-              enumerations match {
-                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-                => {
-                  var index = 0
-                  items foreach {
-                    case ast.Identifier(item) => {
-                      out << "case " << safeId(item).inspect << " => " << safeId(item) << EndLn
-                      index = index + 1
+            enumerations match {
+              case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
+              => {
+                items foreach {
+                  case ast.Identifier(item) => {
+                    out << "if (name.equals(" << safeId(item).inspect << ") {" << EndLn
+                    out.indent(2) {
+                      out << "return " << safeId(item) << ";" << EndLn
                     }
-                    case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
-                      out << "case " << safeId(item).inspect << " => " + safeId(item) << EndLn
-                      index = index + 1
-                    }
+                    out << "}" << EndLn
+                    out << EndLn
                   }
-                  extension match {
-                    case None => {}
-                    case _ => out << extension << EndLn
+                  case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
+                    out << "if (name.equals(" << safeId(item).inspect << ") {" << EndLn
+                    out.indent(2) {
+                      out << "return " << safeId(item) << ";" << EndLn
+                    }
+                    out << "}" << EndLn
+                    out << EndLn
                   }
                 }
-              }
-              out << "case _ => throw org.asn1gen.java.runtime.BadEnumerationException(" << EndLn
-              out.indent(2) {
-                out << "\"Unrecogonised enumeration value + '\" + name + \"'\")" << EndLn
+                extension match {
+                  case None => {}
+                  case _ => out << extension << EndLn
+                }
               }
             }
-            out << "}" << EndLn
+            out << "throw new org.asn1gen.java.runtime.BadEnumerationException(" << EndLn
+            out.indent(2) {
+              out << "\"Unrecogonised enumeration value + '\" + name + \"'\");" << EndLn
+            }
           }
-          out << "}" << EndLn << EndLn
-          out << "def of(value: Int): " << safeId(assignmentName) << " = {" << EndLn
+          out << "}" << EndLn
+          out << EndLn
+          out << "public static " << safeId(assignmentName) << " of(final int value) {" << EndLn
           out.indent(2) {
-            out << "value match {" << EndLn
+            out << "switch (value) {" << EndLn
             out.indent(2) {
               enumerations match {
                 case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
@@ -277,12 +276,12 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
                   var index = 0
                   items foreach {
                     case ast.Identifier(item) => {
-                      out << "case " << index << " => " << safeId(item) << EndLn
+                      out << "case " << index << ": " << safeId(item) << EndLn
                       index = index + 1
                     }
                     case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
                       val value = if (sign) n * -1 else n
-                      out << "case " << value << " => " << safeId(item) << EndLn
+                      out << "case " << value << ": " << safeId(item) << EndLn
                       index = index + 1
                     }
                   }
@@ -355,19 +354,18 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     }
   }
   
-  def generateEnumeratedValues(enumerations: ast.Enumerations, assignmentName:String): Unit = {
-    out.trace("/*", "*/")
+  def generateEnumeratedValues(enumerations: ast.Enumerations, assignmentName: String): Unit = {
     enumerations match {
       case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension) => {
         var index = 0
         items foreach {
           case ast.Identifier(item) => {
-            out << "val " << safeId(item) << " = " << safeId(assignmentName) << "(" << index << ")" << EndLn
+            out << "public static final " << safeId(assignmentName) << " " << safeId(item) << " = new " << safeId(assignmentName) << "(" << index << ");" << EndLn
             index = index + 1
           }
           case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
             val value = if (sign) n * -1 else n
-            out << "val " << safeId(item) << " = " << safeId(assignmentName) << "(" << value << ")" << EndLn
+            out << "public static final " << safeId(assignmentName) << safeId(item) << " = new " << safeId(assignmentName) << "(" << value << ");" << EndLn
             index = index + 1
           }
         }
