@@ -276,12 +276,12 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
                   var index = 0
                   items foreach {
                     case ast.Identifier(item) => {
-                      out << "case " << index << ": " << safeId(item) << EndLn
+                      out << "case " << index << ": return " << safeId(item) << ";" << EndLn
                       index = index + 1
                     }
                     case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
                       val value = if (sign) n * -1 else n
-                      out << "case " << value << ": " << safeId(item) << EndLn
+                      out << "case " << value << ": return " << safeId(item) << ";" << EndLn
                       index = index + 1
                     }
                   }
@@ -291,7 +291,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
                   }
                 }
               }
-              out << "case _ => " << safeId(assignmentName) << "(value)" << EndLn
+              out << "default: return new " << safeId(assignmentName) << "(value);" << EndLn
             }
             out << "}" << EndLn
           }
