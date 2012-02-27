@@ -487,7 +487,7 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         if (!firstTime) {
           out << "," << EndLn
         }
-        out << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier)
+        out << "final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier)
         firstTime = false
       }
     }
