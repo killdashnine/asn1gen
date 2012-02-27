@@ -555,7 +555,27 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
     rootAlternativeTypeList match {
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
-          generateChoiceFieldTransformer(choiceTypeName, namedType)
+          namedType match {
+            case ast.NamedType(
+              ast.Identifier(name),
+              _type)
+            => {
+              val safeElementName = safeId(name)
+              val safeChoiceType = safeId(choiceTypeName)
+              val safeChoiceChoice = safeId(choiceTypeName + "_" + name)
+              val safeElementType = safeId(asnTypeOf(_type))
+              out << EndLn
+              out << "public " << safeElementType << " with" << safeElementName << "(final " << safeElementType << " value) {" << EndLn
+              out.indent(2) {
+                out << "return new " << safeChoiceType << "("
+                out.indent(2) {
+                  out << EndLn << "new " << safeChoiceChoice << "(value)"
+                }
+                out << ");" << EndLn
+              }
+              out << "}" << EndLn
+            }
+          }
         }
       }
     }
@@ -583,25 +603,6 @@ class GenJava(packageName: String, namedType: NamedType, out: IndentWriter) {
         namedTypes foreach { namedType =>
           out << "type " << namedType.name.capitalise << " = " << choiceTypeName << "_" << namedType.name << EndLn
         }
-      }
-    }
-  }
-
-  def generateChoiceFieldTransformer(choiceTypeName: String, namedType: ast.NamedType): Unit = {
-    out.trace("/*", "*/")
-    namedType match {
-      case ast.NamedType(
-        ast.Identifier(name),
-        _type)
-      => {
-        val safeElementName = safeId(name)
-        val safeChoiceType = safeId(choiceTypeName)
-        val safeChoiceChoice = safeId(choiceTypeName + "_" + name)
-        val safeElementType = safeId(asnTypeOf(_type))
-        out << EndLn
-        out << "def " << safeElementName << "(f: (" << safeElementType << " => " << safeElementType << ")): " << safeChoiceType << " = this" << EndLn
-        out << EndLn
-        out << "def " << safeElementName << "(f: => " << safeElementType << "): " << safeChoiceType << " = " << safeChoiceChoice << "(f)" << EndLn
       }
     }
   }
