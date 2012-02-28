@@ -19,12 +19,12 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
       module.types.foreach { case (_, namedType: NamedType) =>
         val typePath = modulePath.child(namedType.name + ".java")
         typePath.openPrintStream { ps =>
-          val genJava = new GenJava(packageName, namedType, new IndentWriter(ps))
-          genJava.generateTypes(module)
+          val genJava = new GenJava(packageName, new IndentWriter(ps))
+          genJava.generateTypes(module, namedType)
         }
         val valuesPath = modulePath.child("Values.java")
         valuesPath.openPrintStream { ps =>
-          val genJava = new GenJava(packageName, namedType, new IndentWriter(ps))
+          val genJava = new GenJava(packageName, new IndentWriter(ps))
           genJava.generateValues(module)
         }
       }
@@ -67,13 +67,13 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
         modulePath.mkdir
         val typeFile = modulePath.child(namedType.name + ".java")
         typeFile.openPrintStream { ps =>
-          val genJava = new GenJava("moo", namedType, new IndentWriter(ps))
-          genJava.generateTypes(module)
+          val genJava = new GenJava("moo", new IndentWriter(ps))
+          genJava.generateTypes(module, namedType)
           println("Writing to " + typeFile)
         }
         val valuesFile = modulePath.child("Values.java")
         valuesFile.openPrintStream { ps =>
-          val genJava = new GenJava("moo", namedType, new IndentWriter(ps))
+          val genJava = new GenJava("moo", new IndentWriter(ps))
           genJava.generateValues(module)
           println("Writing to " + typeFile)
         }
