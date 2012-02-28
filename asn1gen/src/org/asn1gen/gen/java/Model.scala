@@ -20,7 +20,7 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
         val typePath = modulePath.child(namedType.name + ".java")
         typePath.openPrintStream { ps =>
           val genJava = new GenJava(packageName, new IndentWriter(ps))
-          genJava.generateTypes(module, namedType)
+          genJava.generateType(module, namedType)
         }
       }
       val valuesPath = modulePath.child("Values.java")
@@ -68,7 +68,7 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
         val typeFile = modulePath.child(namedType.name + ".java")
         typeFile.openPrintStream { ps =>
           val genJava = new GenJava("moo", new IndentWriter(ps))
-          genJava.generateTypes(module, namedType)
+          genJava.generateType(module, namedType)
           println("Writing to " + typeFile)
         }
       }
