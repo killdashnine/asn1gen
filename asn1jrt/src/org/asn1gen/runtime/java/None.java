@@ -3,11 +3,11 @@ package org.asn1gen.runtime.java;
 import java.util.Iterator;
 
 public class None<T> implements Option<T> {
-  private static final Nil<Object> instance_ = new Nil<Object>();
+  private static final None<Object> instance_ = new None<Object>();
   
   @SuppressWarnings("unchecked")
-  public static <T> Nil<T> instance() {
-    return (Nil<T>)instance_;
+  public static <T> None<T> instance() {
+    return (None<T>)instance_;
   }
   
   public boolean empty() {
