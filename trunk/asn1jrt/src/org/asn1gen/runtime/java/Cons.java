@@ -2,11 +2,11 @@ package org.asn1gen.runtime.java;
 
 import java.util.Iterator;
 
-public class Cons<T> implements Tail<T> {
+public class Cons<T> implements List<T> {
   public final T value;
-  public final Tail<T> tail;
+  public final List<T> tail;
   
-  public Cons(final T value, final Tail<T> tail) {
+  public Cons(final T value, final List<T> tail) {
     this.value = value;
     this.tail = tail;
   }
@@ -20,14 +20,14 @@ public class Cons<T> implements Tail<T> {
   }
 
   @Override
-  public Tail<T> tail() {
+  public List<T> tail() {
     return tail;
   }
 
   @Override
   public Iterator<T> iterator() {
     return new Iterator<T>() {
-      private Tail<T> cons = Cons.this;
+      private List<T> cons = Cons.this;
       
       @Override
       public boolean hasNext() {
