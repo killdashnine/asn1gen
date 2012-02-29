@@ -1,4 +1,4 @@
-package org.asn1gen.rt.java;
+package org.asn1gen.runtime.java;
 
 import java.util.Iterator;
 
