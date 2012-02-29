@@ -409,7 +409,7 @@ class GenJava(packageName: String, out: IndentWriter) {
               out << "@Override" << EndLn
               out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
               out.indent(2) {
-                out << "assert other != null;" << EndLn
+                out << "assert that != null;" << EndLn
                 out << EndLn
                 out << "return this.items.equals(that.items)" << EndLn
               }
