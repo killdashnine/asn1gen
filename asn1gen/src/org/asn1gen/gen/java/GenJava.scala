@@ -173,7 +173,7 @@ class GenJava(packageName: String, out: IndentWriter) {
           }
           out << "}" << EndLn
           out << EndLn
-          out << "public boolean equals(final " << safeAssignmentName << " that): Boolean = {" << EndLn
+          out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
           out.indent(2) {
             out << "assert that != null;" << EndLn
             out.trace("/*", "*/")
