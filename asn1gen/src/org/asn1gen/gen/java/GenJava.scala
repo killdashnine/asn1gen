@@ -19,6 +19,8 @@ class GenJava(packageName: String, out: IndentWriter) {
       out << "import " << symbolsFromModule.module << "._" << EndLn
     }
     out << EndLn
+    out << "import static org.asn1gen.runtime.java.Statics.*;" << EndLn
+    out << EndLn
     generate(namedType)
   }
   
@@ -553,9 +555,9 @@ class GenJava(packageName: String, out: IndentWriter) {
           out << "}" << EndLn
           out << EndLn
           out << "@Override" << EndLn
-          out << "public Option<" << safeElementType << "> " << safeName << "() {" << EndLn
+          out << "public Option<" << safeElementType << "> get" << safeName.capitalise << "() {" << EndLn
           out.indent(2) {
-            out << "return Some.of(this.element);" << EndLn
+            out << "return some(this.element);" << EndLn
           }
           out << "}" << EndLn
           out << EndLn
