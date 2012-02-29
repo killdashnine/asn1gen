@@ -598,13 +598,9 @@ class GenJava(packageName: String, out: IndentWriter) {
               val safeChoiceChoice = safeId(choiceTypeName + "_" + name)
               val safeElementType = safeId(asnTypeOf(_type))
               out << EndLn
-              out << "public " << safeElementType << " with" << safeElementName.capitalise << "(final " << safeElementType << " value) {" << EndLn
+              out << "public " << safeChoiceChoice << " with" << safeElementName.capitalise << "(final " << safeElementType << " value) {" << EndLn
               out.indent(2) {
-                out << "return new " << safeChoiceType << "("
-                out.indent(2) {
-                  out << EndLn << "new " << safeChoiceChoice << "(value)"
-                }
-                out << ");" << EndLn
+                out << "return new " << safeChoiceChoice << "(value);"
               }
               out << "}" << EndLn
             }
