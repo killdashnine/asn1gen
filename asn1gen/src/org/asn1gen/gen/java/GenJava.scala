@@ -566,7 +566,6 @@ class GenJava(packageName: String, out: IndentWriter) {
           }
           out << "}" << EndLn
           out << EndLn
-          out << "@Override" << EndLn
           out << "public String choiceName() {" << EndLn
           out.indent(2) {
             out << "return " << name.inspect << ";" << EndLn
