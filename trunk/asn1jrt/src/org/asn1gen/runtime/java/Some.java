@@ -1,43 +1,42 @@
-package org.asn1gen.rt.java;
+package org.asn1gen.runtime.java;
 
 import java.util.Iterator;
 
-public class Cons<T> implements Tail<T> {
+public class Some<T> implements Option<T> {
   public final T value;
-  public final Tail<T> tail;
   
-  public Cons(final T value, final Tail<T> tail) {
+  public Some(final T value) {
     this.value = value;
-    this.tail = tail;
   }
   
+  @Override
   public T value() {
-    return value;
+    return this.value;
   }
-  
+
+  @Override
   public boolean empty() {
     return false;
   }
 
   @Override
-  public Tail<T> tail() {
-    return tail;
-  }
-
-  @Override
   public Iterator<T> iterator() {
     return new Iterator<T>() {
-      private Tail<T> cons = Cons.this;
+      private Some<T> some = Some.this;
       
       @Override
       public boolean hasNext() {
-        return !cons.empty();
+        return some != null;
       }
 
       @Override
       public T next() {
-        final T value = cons.value();
-        cons = cons.tail();
+        if (some == null) {
+          throw new RuntimeException();
+        }
+        
+        final T value = some.value;
+        some = null;
         return value;
       }
 
