@@ -78,13 +78,13 @@ object NameOf {
   def rawTypeOf(builtinType: ast.UsefulType): String = {
     builtinType match {
       case ast.GeneralizedTime => {
-        return "org.asn1gen.java.runtime.AsnGeneralizedTime"
+        return "org.asn1gen.runtime.java.AsnGeneralizedTime"
       }
       case ast.ObjectDescriptor => {
-        return "org.asn1gen.java.runtime.AsnObjectDescriptor"
+        return "org.asn1gen.runtime.java.AsnObjectDescriptor"
       }
       case ast.UTCTime => {
-        return "org.asn1gen.java.runtime.AsnUtcTime"
+        return "org.asn1gen.runtime.java.AsnUtcTime"
       }
       case unmatched => {
         return "UnknownUsefulType(" + unmatched + ")"
@@ -104,13 +104,13 @@ object NameOf {
         rawTypeOf(characterString)
       }
       case _: ast.ChoiceType => {
-        return "org.asn1gen.java.runtime.AsnChoice"
+        return "org.asn1gen.runtime.java.AsnChoice"
       }
       case ast.EmbeddedPdvType => {
-        return "org.asn1gen.java.runtime.AsnEmbeddedPdv"
+        return "org.asn1gen.runtime.java.AsnEmbeddedPdv"
       }
       case ast.EnumeratedType(_) => {
-        return "org.asn1gen.java.runtime.AsnEnumeration"
+        return "org.asn1gen.runtime.java.AsnEnumeration"
       }
       case ast.EXTERNAL => {
         return "ExternalType"
@@ -122,13 +122,13 @@ object NameOf {
         return "Long"
       }
       case ast.NULL => {
-        return "org.asn1gen.java.runtime.AsnNull"
+        return "org.asn1gen.runtime.java.AsnNull"
       }
       case _: ast.ObjectClassFieldType => {
-        return "org.asn1gen.java.runtime.AsnObjectClassField"
+        return "org.asn1gen.runtime.java.AsnObjectClassField"
       }
       case ast.ObjectIdentifierType => {
-        return "org.asn1gen.java.runtime.AsnObjectIdentifier"
+        return "org.asn1gen.runtime.java.AsnObjectIdentifier"
       }
       case ast.OctetStringType => {
         return "String"
@@ -137,19 +137,19 @@ object NameOf {
         return "Double"
       }
       case ast.RelativeOidType => {
-        return "org.asn1gen.java.runtime.AsnRelativeOidType"
+        return "org.asn1gen.runtime.java.AsnRelativeOidType"
       }
       case ast.SequenceOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequenceOf"
+        return "org.asn1gen.runtime.java.AsnSequenceOf"
       }
       case ast.SequenceType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequence"
+        return "org.asn1gen.runtime.java.AsnSequence"
       }
       case ast.SetOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSetOf"
+        return "org.asn1gen.runtime.java.AsnSetOf"
       }
       case ast.SetType(_) => {
-        return "org.asn1gen.java.runtime.AsnSet"
+        return "org.asn1gen.runtime.java.AsnSet"
       }
       case ast.TaggedType(_, _, underlyingType) => {
         return rawTypeOf(underlyingType)
@@ -163,43 +163,43 @@ object NameOf {
   def rawTypeOf(characterString: ast.CharacterStringType): String = {
     characterString match {
       case ast.BMPString => {
-        return "org.asn1gen.java.runtime.AsnBmpString"
+        return "org.asn1gen.runtime.java.AsnBmpString"
       }
       case ast.GeneralString => {
-        return "org.asn1gen.java.runtime.AsnGeneralString"
+        return "org.asn1gen.runtime.java.AsnGeneralString"
       }
       case ast.GraphicString => {
-        return "org.asn1gen.java.runtime.AsnGraphicString"
+        return "org.asn1gen.runtime.java.AsnGraphicString"
       }
       case ast.IA5String => {
-        return "org.asn1gen.java.runtime.AsnIa5String"
+        return "org.asn1gen.runtime.java.AsnIa5String"
       }
       case ast.ISO646String => {
-        return "org.asn1gen.java.runtime.AsnIso646String"
+        return "org.asn1gen.runtime.java.AsnIso646String"
       }
       case ast.NumericString => {
-        return "org.asn1gen.java.runtime.AsnNumericString"
+        return "org.asn1gen.runtime.java.AsnNumericString"
       }
       case ast.PrintableString => {
         return "String"
       }
       case ast.T61String => {
-        return "org.asn1gen.java.runtime.AsnT61String"
+        return "org.asn1gen.runtime.java.AsnT61String"
       }
       case ast.TeletexString => {
-        return "org.asn1gen.java.runtime.AsnTeletexString"
+        return "org.asn1gen.runtime.java.AsnTeletexString"
       }
       case ast.UniversalString => {
-        return "org.asn1gen.java.runtime.AsnUniversalString"
+        return "org.asn1gen.runtime.java.AsnUniversalString"
       }
       case ast.UTF8String => {
         return "String"
       }
       case ast.VideotexString => {
-        return "org.asn1gen.java.runtime.AsnVideotexString"
+        return "org.asn1gen.runtime.java.AsnVideotexString"
       }
       case ast.VisibleString => {
-        return "org.asn1gen.java.runtime.AsnVisibleString"
+        return "org.asn1gen.runtime.java.AsnVisibleString"
       }
       case unknown => {
         return "UnknownCharacterString(" + unknown + ")"
@@ -285,13 +285,13 @@ object NameOf {
   def defaultNameOf(usefulType: ast.UsefulType): String = {
     usefulType match {
       case ast.GeneralizedTime => {
-        return "org.asn1gen.java.runtime.AsnGeneralizedTime"
+        return "org.asn1gen.runtime.java.AsnGeneralizedTime"
       }
       case ast.ObjectDescriptor => {
-        return "org.asn1gen.java.runtime.AsnObjectDescriptor"
+        return "org.asn1gen.runtime.java.AsnObjectDescriptor"
       }
       case ast.UTCTime => {
-        return "org.asn1gen.java.runtime.AsnUtcTime"
+        return "org.asn1gen.runtime.java.AsnUtcTime"
       }
       case unmatched => {
         return "UnknownUsefulType(" + unmatched + ")"
@@ -302,22 +302,22 @@ object NameOf {
   def defaultNameOf(builtinType: ast.BuiltinType): String = {
     builtinType match {
       case ast.BitStringType(_) => {
-        return "org.asn1gen.java.runtime.AsnBitString"
+        return "org.asn1gen.runtime.java.AsnBitString"
       }
       case ast.BOOLEAN => {
-        return "org.asn1gen.java.runtime.AsnFalse"
+        return "org.asn1gen.runtime.java.AsnFalse"
       }
       case characterString: ast.CharacterStringType => {
         defaultNameOf(characterString)
       }
       case _: ast.ChoiceType => {
-        return "org.asn1gen.java.runtime.AsnChoice"
+        return "org.asn1gen.runtime.java.AsnChoice"
       }
       case ast.EmbeddedPdvType => {
-        return "org.asn1gen.java.runtime.AsnEmbeddedPdv"
+        return "org.asn1gen.runtime.java.AsnEmbeddedPdv"
       }
       case ast.EnumeratedType(_) => {
-        return "org.asn1gen.java.runtime.AsnEnumeration"
+        return "org.asn1gen.runtime.java.AsnEnumeration"
       }
       case ast.EXTERNAL => {
         return "ExternalType"
@@ -329,34 +329,34 @@ object NameOf {
         return "0L"
       }
       case ast.NULL => {
-        return "org.asn1gen.java.runtime.AsnNull"
+        return "org.asn1gen.runtime.java.AsnNull"
       }
       case _: ast.ObjectClassFieldType => {
-        return "org.asn1gen.java.runtime.AsnObjectClassField"
+        return "org.asn1gen.runtime.java.AsnObjectClassField"
       }
       case ast.ObjectIdentifierType => {
-        return "org.asn1gen.java.runtime.AsnObjectIdentifier"
+        return "org.asn1gen.runtime.java.AsnObjectIdentifier"
       }
       case ast.OctetStringType => {
-        return "org.asn1gen.java.runtime.AsnOctetString"
+        return "org.asn1gen.runtime.java.AsnOctetString"
       }
       case ast.REAL => {
         return "0.0"
       }
       case ast.RelativeOidType => {
-        return "org.asn1gen.java.runtime.AsnRelativeOidType"
+        return "org.asn1gen.runtime.java.AsnRelativeOidType"
       }
       case ast.SequenceOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequenceOf"
+        return "org.asn1gen.runtime.java.AsnSequenceOf"
       }
       case ast.SequenceType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequence"
+        return "org.asn1gen.runtime.java.AsnSequence"
       }
       case ast.SetOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSetOf"
+        return "org.asn1gen.runtime.java.AsnSetOf"
       }
       case ast.SetType(_) => {
-        return "org.asn1gen.java.runtime.AsnSet"
+        return "org.asn1gen.runtime.java.AsnSet"
       }
       case ast.TaggedType(_, _, underlyingType) => {
         return defaultNameOf(underlyingType)
@@ -370,43 +370,43 @@ object NameOf {
   def defaultNameOf(characterString: ast.CharacterStringType): String = {
     characterString match {
       case ast.BMPString => {
-        return "org.asn1gen.java.runtime.AsnBmpString"
+        return "org.asn1gen.runtime.java.AsnBmpString"
       }
       case ast.GeneralString => {
-        return "org.asn1gen.java.runtime.AsnGeneralString"
+        return "org.asn1gen.runtime.java.AsnGeneralString"
       }
       case ast.GraphicString => {
-        return "org.asn1gen.java.runtime.AsnGraphicString"
+        return "org.asn1gen.runtime.java.AsnGraphicString"
       }
       case ast.IA5String => {
-        return "org.asn1gen.java.runtime.AsnIa5String"
+        return "org.asn1gen.runtime.java.AsnIa5String"
       }
       case ast.ISO646String => {
-        return "org.asn1gen.java.runtime.AsnIso646String"
+        return "org.asn1gen.runtime.java.AsnIso646String"
       }
       case ast.NumericString => {
-        return "org.asn1gen.java.runtime.AsnNumericString"
+        return "org.asn1gen.runtime.java.AsnNumericString"
       }
       case ast.PrintableString => {
         return "\"\""
       }
       case ast.T61String => {
-        return "org.asn1gen.java.runtime.AsnT61String"
+        return "org.asn1gen.runtime.java.AsnT61String"
       }
       case ast.TeletexString => {
-        return "org.asn1gen.java.runtime.AsnTeletexString"
+        return "org.asn1gen.runtime.java.AsnTeletexString"
       }
       case ast.UniversalString => {
-        return "org.asn1gen.java.runtime.AsnUniversalString"
+        return "org.asn1gen.runtime.java.AsnUniversalString"
       }
       case ast.UTF8String => {
         return "\"\""
       }
       case ast.VideotexString => {
-        return "org.asn1gen.java.runtime.AsnVideotexString"
+        return "org.asn1gen.runtime.java.AsnVideotexString"
       }
       case ast.VisibleString => {
-        return "org.asn1gen.java.runtime.AsnVisibleString"
+        return "org.asn1gen.runtime.java.AsnVisibleString"
       }
       case unknown => {
         return "UnknownCharacterString(" + unknown + ")"
@@ -445,13 +445,13 @@ object NameOf {
   def rawDefaultOf(usefulType: ast.UsefulType): String = {
     usefulType match {
       case ast.GeneralizedTime => {
-        return "org.asn1gen.java.runtime.AsnGeneralizedTime"
+        return "org.asn1gen.runtime.java.AsnGeneralizedTime"
       }
       case ast.ObjectDescriptor => {
-        return "org.asn1gen.java.runtime.AsnObjectDescriptor"
+        return "org.asn1gen.runtime.java.AsnObjectDescriptor"
       }
       case ast.UTCTime => {
-        return "org.asn1gen.java.runtime.AsnUtcTime"
+        return "org.asn1gen.runtime.java.AsnUtcTime"
       }
       case unmatched => {
         return "UnknownUsefulType(" + unmatched + ")"
@@ -462,7 +462,7 @@ object NameOf {
   def rawDefaultOf(builtinType: ast.BuiltinType): String = {
     builtinType match {
       case ast.BitStringType(_) => {
-        return "org.asn1gen.java.runtime.AsnBitString"
+        return "org.asn1gen.runtime.java.AsnBitString"
       }
       case ast.BOOLEAN => {
         return "false"
@@ -471,13 +471,13 @@ object NameOf {
         rawDefaultOf(characterString)
       }
       case _: ast.ChoiceType => {
-        return "org.asn1gen.java.runtime.AsnChoice"
+        return "org.asn1gen.runtime.java.AsnChoice"
       }
       case ast.EmbeddedPdvType => {
-        return "org.asn1gen.java.runtime.AsnEmbeddedPdv"
+        return "org.asn1gen.runtime.java.AsnEmbeddedPdv"
       }
       case ast.EnumeratedType(_) => {
-        return "org.asn1gen.java.runtime.AsnEnumeration"
+        return "org.asn1gen.runtime.java.AsnEnumeration"
       }
       case ast.EXTERNAL => {
         return "ExternalType"
@@ -489,13 +489,13 @@ object NameOf {
         return "0L"
       }
       case ast.NULL => {
-        return "org.asn1gen.java.runtime.AsnNull"
+        return "org.asn1gen.runtime.java.AsnNull"
       }
       case _: ast.ObjectClassFieldType => {
-        return "org.asn1gen.java.runtime.AsnObjectClassField"
+        return "org.asn1gen.runtime.java.AsnObjectClassField"
       }
       case ast.ObjectIdentifierType => {
-        return "org.asn1gen.java.runtime.AsnObjectIdentifier"
+        return "org.asn1gen.runtime.java.AsnObjectIdentifier"
       }
       case ast.OctetStringType => {
         return "\"\""
@@ -504,19 +504,19 @@ object NameOf {
         return "0.0"
       }
       case ast.RelativeOidType => {
-        return "org.asn1gen.java.runtime.AsnRelativeOidType"
+        return "org.asn1gen.runtime.java.AsnRelativeOidType"
       }
       case ast.SequenceOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequenceOf"
+        return "org.asn1gen.runtime.java.AsnSequenceOf"
       }
       case ast.SequenceType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequence"
+        return "org.asn1gen.runtime.java.AsnSequence"
       }
       case ast.SetOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSetOf"
+        return "org.asn1gen.runtime.java.AsnSetOf"
       }
       case ast.SetType(_) => {
-        return "org.asn1gen.java.runtime.AsnSet"
+        return "org.asn1gen.runtime.java.AsnSet"
       }
       case ast.TaggedType(_, _, underlyingType) => {
         return rawDefaultOf(underlyingType)
@@ -605,13 +605,13 @@ object NameOf {
   def asnTypeOf(builtinType: ast.UsefulType): String = {
     builtinType match {
       case ast.GeneralizedTime => {
-        return "org.asn1gen.java.runtime.AsnGeneralizedTime"
+        return "org.asn1gen.runtime.java.AsnGeneralizedTime"
       }
       case ast.ObjectDescriptor => {
-        return "org.asn1gen.java.runtime.AsnObjectDescriptor"
+        return "org.asn1gen.runtime.java.AsnObjectDescriptor"
       }
       case ast.UTCTime => {
-        return "org.asn1gen.java.runtime.AsnUtcTime"
+        return "org.asn1gen.runtime.java.AsnUtcTime"
       }
       case unmatched => {
         return "UnknownUsefulType(" + unmatched + ")"
@@ -622,22 +622,22 @@ object NameOf {
   def asnTypeOf(builtinType: ast.BuiltinType): String = {
     builtinType match {
       case ast.BitStringType(_) => {
-        return "org.asn1gen.java.runtime.AsnBitString"
+        return "org.asn1gen.runtime.java.AsnBitString"
       }
       case ast.BOOLEAN => {
-        return "org.asn1gen.java.runtime.AsnBoolean"
+        return "org.asn1gen.runtime.java.AsnBoolean"
       }
       case characterString: ast.CharacterStringType => {
         asnTypeOf(characterString)
       }
       case _: ast.ChoiceType => {
-        return "org.asn1gen.java.runtime.AsnChoice"
+        return "org.asn1gen.runtime.java.AsnChoice"
       }
       case ast.EmbeddedPdvType => {
-        return "org.asn1gen.java.runtime.AsnEmbeddedPdv"
+        return "org.asn1gen.runtime.java.AsnEmbeddedPdv"
       }
       case ast.EnumeratedType(_) => {
-        return "org.asn1gen.java.runtime.AsnEnumeration"
+        return "org.asn1gen.runtime.java.AsnEnumeration"
       }
       case ast.EXTERNAL => {
         return "ExternalType"
@@ -646,37 +646,37 @@ object NameOf {
         return "InstanceOfType"
       }
       case ast.INTEGER(_) => {
-        return "org.asn1gen.java.runtime.AsnInteger"
+        return "org.asn1gen.runtime.java.AsnInteger"
       }
       case ast.NULL => {
-        return "org.asn1gen.java.runtime.AsnNull"
+        return "org.asn1gen.runtime.java.AsnNull"
       }
       case _: ast.ObjectClassFieldType => {
-        return "org.asn1gen.java.runtime.AsnObjectClassField"
+        return "org.asn1gen.runtime.java.AsnObjectClassField"
       }
       case ast.ObjectIdentifierType => {
-        return "org.asn1gen.java.runtime.AsnObjectIdentifier"
+        return "org.asn1gen.runtime.java.AsnObjectIdentifier"
       }
       case ast.OctetStringType => {
-        return "org.asn1gen.java.runtime.AsnOctetString"
+        return "org.asn1gen.runtime.java.AsnOctetString"
       }
       case ast.REAL => {
-        return "org.asn1gen.java.runtime.AsnReal"
+        return "org.asn1gen.runtime.java.AsnReal"
       }
       case ast.RelativeOidType => {
-        return "org.asn1gen.java.runtime.AsnRelativeOidType"
+        return "org.asn1gen.runtime.java.AsnRelativeOidType"
       }
       case ast.SequenceOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequenceOf"
+        return "org.asn1gen.runtime.java.AsnSequenceOf"
       }
       case ast.SequenceType(_) => {
-        return "org.asn1gen.java.runtime.AsnSequence"
+        return "org.asn1gen.runtime.java.AsnSequence"
       }
       case ast.SetOfType(_) => {
-        return "org.asn1gen.java.runtime.AsnSetOf"
+        return "org.asn1gen.runtime.java.AsnSetOf"
       }
       case ast.SetType(_) => {
-        return "org.asn1gen.java.runtime.AsnSet"
+        return "org.asn1gen.runtime.java.AsnSet"
       }
       case ast.TaggedType(_, _, underlyingType) => {
         return asnTypeOf(underlyingType)
@@ -690,43 +690,43 @@ object NameOf {
   def asnTypeOf(characterString: ast.CharacterStringType): String = {
     characterString match {
       case ast.BMPString => {
-        return "org.asn1gen.java.runtime.AsnBmpString"
+        return "org.asn1gen.runtime.java.AsnBmpString"
       }
       case ast.GeneralString => {
-        return "org.asn1gen.java.runtime.AsnGeneralString"
+        return "org.asn1gen.runtime.java.AsnGeneralString"
       }
       case ast.GraphicString => {
-        return "org.asn1gen.java.runtime.AsnGraphicString"
+        return "org.asn1gen.runtime.java.AsnGraphicString"
       }
       case ast.IA5String => {
-        return "org.asn1gen.java.runtime.AsnIa5String"
+        return "org.asn1gen.runtime.java.AsnIa5String"
       }
       case ast.ISO646String => {
-        return "org.asn1gen.java.runtime.AsnIso646String"
+        return "org.asn1gen.runtime.java.AsnIso646String"
       }
       case ast.NumericString => {
-        return "org.asn1gen.java.runtime.AsnNumericString"
+        return "org.asn1gen.runtime.java.AsnNumericString"
       }
       case ast.PrintableString => {
-        return "org.asn1gen.java.runtime.AsnPrintableString"
+        return "org.asn1gen.runtime.java.AsnPrintableString"
       }
       case ast.T61String => {
-        return "org.asn1gen.java.runtime.AsnT61String"
+        return "org.asn1gen.runtime.java.AsnT61String"
       }
       case ast.TeletexString => {
-        return "org.asn1gen.java.runtime.AsnTeletexString"
+        return "org.asn1gen.runtime.java.AsnTeletexString"
       }
       case ast.UniversalString => {
-        return "org.asn1gen.java.runtime.AsnUniversalString"
+        return "org.asn1gen.runtime.java.AsnUniversalString"
       }
       case ast.UTF8String => {
-        return "org.asn1gen.java.runtime.AsnUtf8String"
+        return "org.asn1gen.runtime.java.AsnUtf8String"
       }
       case ast.VideotexString => {
-        return "org.asn1gen.java.runtime.AsnVideotexString"
+        return "org.asn1gen.runtime.java.AsnVideotexString"
       }
       case ast.VisibleString => {
-        return "org.asn1gen.java.runtime.AsnVisibleString"
+        return "org.asn1gen.runtime.java.AsnVisibleString"
       }
       case unknown => {
         return "UnknownCharacterString(" + unknown + ")"

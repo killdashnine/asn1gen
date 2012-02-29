@@ -14,7 +14,7 @@ class GenJava(packageName: String, out: IndentWriter) {
     out << EndLn
     out << "package " << packageName << ";" << EndLn
     out << EndLn
-    out << "import org.asn1gen.java.runtime;" << EndLn
+    out << "import org.asn1gen.runtime.java.*;" << EndLn
     module.imports foreach { symbolsFromModule =>
       out << "import " << symbolsFromModule.module << "._" << EndLn
     }
@@ -27,7 +27,7 @@ class GenJava(packageName: String, out: IndentWriter) {
     out << EndLn
     out << "package " << packageName << ";" << EndLn
     out << EndLn
-    out << "import org.asn1gen.java.runtime;" << EndLn
+    out << "import org.asn1gen.runtime.java;" << EndLn
     module.imports foreach { symbolsFromModule =>
       out << "import " << symbolsFromModule.module << "._" << EndLn
     }
@@ -125,7 +125,7 @@ class GenJava(packageName: String, out: IndentWriter) {
       case ast.ChoiceType(
         ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
-        out << "abstract class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnChoice {" << EndLn
+        out << "abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
         out.indent(2) {
           out << "public abstract " << safeAssignmentName << " element();" << EndLn
           out << EndLn
@@ -141,7 +141,7 @@ class GenJava(packageName: String, out: IndentWriter) {
       }
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
-        out << "class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
+        out << "class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
@@ -149,7 +149,7 @@ class GenJava(packageName: String, out: IndentWriter) {
           componentTypeList.componentTypes
         }.flatten
         out.ensureEmptyLines(1)
-        out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnSequence {" << EndLn
+        out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
         out.indent(2) {
           generateSequenceFieldDefines(assignmentName, list)
           out << EndLn
@@ -222,7 +222,7 @@ class GenJava(packageName: String, out: IndentWriter) {
       => {
         var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
-        out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnEnumeration {" << EndLn
+        out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnEnumeration {" << EndLn
         out.indent(2) {
           out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(0);" << EndLn
           out << EndLn
@@ -265,7 +265,7 @@ class GenJava(packageName: String, out: IndentWriter) {
                 }
               }
             }
-            out << "throw new org.asn1gen.java.runtime.BadEnumerationException(" << EndLn
+            out << "throw new org.asn1gen.runtime.java.BadEnumerationException(" << EndLn
             out.indent(2) {
               out << "\"Unrecogonised enumeration value + '\" + name + \"'\");" << EndLn
             }
@@ -310,10 +310,10 @@ class GenJava(packageName: String, out: IndentWriter) {
       }
       case bitStringType: ast.BitStringType => {
         out.ensureEmptyLines(1)
-        out << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
+        out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
         out << EndLn
         out << EndLn
-        out << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBitString" << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
       }
       case ast.INTEGER(None) => {
         out.ensureEmptyLines(1)
@@ -323,15 +323,15 @@ class GenJava(packageName: String, out: IndentWriter) {
       }
       case ast.BOOLEAN => {
         out.ensureEmptyLines(1)
-        out << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnBoolean" << EndLn
+        out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBoolean" << EndLn
         out << EndLn
-        out << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnFalse" << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnFalse" << EndLn
       }
       case ast.OctetStringType => {
         out.ensureEmptyLines(1)
-        out << "type " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
+        out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
         out << EndLn
-        out << "lazy val " << safeAssignmentName << " = org.asn1gen.java.runtime.AsnOctetString" << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
       }
       case ast.PrintableString => {
         out.ensureEmptyLines(1)
@@ -389,13 +389,13 @@ class GenJava(packageName: String, out: IndentWriter) {
           case ast.TypeReference(referencedType) => {
             val safeReferenceType = safeId(referencedType)
             out.ensureEmptyLines(1)
-            out << "public class " << safeAssignmentName << " extends org.asn1gen.java.runtime.AsnList {" << EndLn
+            out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnList {" << EndLn
             out.indent(2) {
-              out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.java.runtime.Nil.<" << safeReferenceType << ">instance());" << EndLn
+              out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.runtime.java.Nil.<" << safeReferenceType << ">instance());" << EndLn
               out << EndLn
-              out << "public final org.asn1gen.java.runtime.List<" << safeReferenceType << "> items;" << EndLn
+              out << "public final org.asn1gen.runtime.java.List<" << safeReferenceType << "> items;" << EndLn
               out << EndLn
-              out << "public " << safeAssignmentName << " withItems(final org.asn1gen.java.runtime.List<" << safeReferenceType << "> value) {" << EndLn
+              out << "public " << safeAssignmentName << " withItems(final org.asn1gen.runtime.java.List<" << safeReferenceType << "> value) {" << EndLn
               out.indent(2) {
                 out << "return new " << safeAssignmentName << "(value);" << EndLn
               }
