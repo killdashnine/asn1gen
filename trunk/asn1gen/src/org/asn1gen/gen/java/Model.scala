@@ -16,8 +16,8 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     modules foreach { case (moduleName, module) =>
       val modulePath = directory.child(moduleName)
       modulePath.mkdir
-      val genJava = new GenJava(modulePath, "moo")
-      genJava.generate(moduleName, module)
+      val genJava = new GenJava(modulePath, moduleName)
+      genJava.generate(module)
     }
   }
   
@@ -52,8 +52,8 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     val berDirectory = codecDirectory.child("ber")
     berDirectory.mkdir
     modules foreach { case (moduleName, module) =>
-      val genJava = new GenJava(outDirectory, "moo")
-      genJava.generate(moduleName, module)
+      val genJava = new GenJava(outDirectory, moduleName)
+      genJava.generate(module)
     }
     modules foreach { case (moduleName, module) =>
       val moduleFile = metaDirectory.child(moduleName + ".java")
