@@ -1,7 +1,7 @@
 package org.asn1gen.runtime.java;
 
 @SuppressWarnings("serial")
-public class BadEnumerationException extends Exception {
+public class BadEnumerationException extends RuntimeException {
   public BadEnumerationException() {
   }
   
