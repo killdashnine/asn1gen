@@ -140,14 +140,14 @@ class GenJavaBerEncoder(packageName: String, out: IndentWriter) {
         out << "value: " << safeAssignmentName
         out << "): _io_.ByteStreamer =" << EndLn
         out.indent(2) {
-          out << "encode(value.asInstanceOf[org.asn1gen.java.runtime.AsnEnumeration])" << EndLn
+          out << "encode(value.asInstanceOf[org.asn1gen.runtime.java.AsnEnumeration])" << EndLn
         }
         out << EndLn
         out << "def encodeData("
         out << "value: " << safeAssignmentName
         out << "): _io_.ByteStreamer =" << EndLn
         out.indent(2) {
-          out << "encodeData(value.asInstanceOf[org.asn1gen.java.runtime.AsnEnumeration])" << EndLn
+          out << "encodeData(value.asInstanceOf[org.asn1gen.runtime.java.AsnEnumeration])" << EndLn
         }
         out << EndLn
       }
