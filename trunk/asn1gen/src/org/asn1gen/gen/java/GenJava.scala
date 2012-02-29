@@ -531,7 +531,7 @@ class GenJava(packageName: String, out: IndentWriter) {
         out.ensureEmptyLines(1)
         out << "public class " << safeChoiceChoice << " extends " << safeId(assignmentName) << " {" << EndLn
         out.indent(2) {
-          out << "public final static " << asnTypeOf(_type) << " EMPTY = new " << asnTypeOf(_type) << "();" << EndLn
+          out << "public final static " << safeChoiceChoice << " EMPTY = new " << safeChoiceChoice << "();" << EndLn
           out << EndLn
           out << "public final " << asnTypeOf(_type) << " element;" << EndLn
           out << EndLn
