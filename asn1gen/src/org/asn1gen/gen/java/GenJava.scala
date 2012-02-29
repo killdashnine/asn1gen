@@ -9,22 +9,20 @@ import org.asn1gen.io._
 import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable.Set
 
-class GenJava(packageName: String) {
-  def generate(outDirectory: File, moduleName: String, module: Module): Unit = {
+class GenJava(outDirectory: File, packageName: String) {
+  def generate(moduleName: String, module: Module): Unit = {
       val modulePath = outDirectory.child(moduleName)
       modulePath.mkdir
       module.types.foreach { case (_, namedType: NamedType) =>
         val typeFile = modulePath.child(namedType.name + ".java")
         typeFile.openPrintStream { ps =>
-          val genJava = new GenJava("moo")
-          genJava.generateType(module, namedType)(new IndentWriter(ps))
+          generateType(module, namedType)(new IndentWriter(ps))
           println("Writing to " + typeFile)
         }
       }
       val valuesFile = modulePath.child("Values.java")
       valuesFile.openPrintStream { ps =>
-        val genJava = new GenJava("moo")
-        genJava.generateValues(module)(new IndentWriter(ps))
+        generateValues(module)(new IndentWriter(ps))
         println("Writing to " + valuesFile)
       }
   }
