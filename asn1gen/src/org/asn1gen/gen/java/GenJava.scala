@@ -636,7 +636,7 @@ class GenJava(packageName: String, out: IndentWriter) {
         out << EndLn
         out << "public Option<" << safeType << "> get" << safeName.capitalise << "() {" << EndLn
         out.indent(2) {
-    	    out << "return None.instance;" << EndLn
+    	    out << "return None.instance();" << EndLn
     	  }
         out << "}" << EndLn
       }
