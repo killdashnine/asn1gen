@@ -141,7 +141,10 @@ class GenJava(packageName: String, out: IndentWriter) {
       }
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
-        out << "class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
+        out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
+        out.indent(2) {
+          out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
+        }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
@@ -151,6 +154,8 @@ class GenJava(packageName: String, out: IndentWriter) {
         out.ensureEmptyLines(1)
         out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
         out.indent(2) {
+          out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
+          out << EndLn
           generateSequenceFieldDefines(assignmentName, list)
           out << EndLn
           out << "public " << safeAssignmentName << "(" << EndLn
