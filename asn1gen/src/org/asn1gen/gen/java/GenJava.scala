@@ -248,7 +248,7 @@ class GenJava(packageName: String, out: IndentWriter) {
               => {
                 items foreach {
                   case ast.Identifier(item) => {
-                    out << "if (name.equals(" << safeId(item).inspect << ") {" << EndLn
+                    out << "if (name.equals(" << safeId(item).inspect << ")) {" << EndLn
                     out.indent(2) {
                       out << "return " << safeId(item) << ";" << EndLn
                     }
@@ -256,7 +256,7 @@ class GenJava(packageName: String, out: IndentWriter) {
                     out << EndLn
                   }
                   case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
-                    out << "if (name.equals(" << safeId(item).inspect << ") {" << EndLn
+                    out << "if (name.equals(" << safeId(item).inspect << ")) {" << EndLn
                     out.indent(2) {
                       out << "return " << safeId(item) << ";" << EndLn
                     }
