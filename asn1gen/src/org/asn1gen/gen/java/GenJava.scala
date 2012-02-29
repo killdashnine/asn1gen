@@ -553,7 +553,7 @@ class GenJava(packageName: String, out: IndentWriter) {
           out << "}" << EndLn
           out << EndLn
           out << "@Override" << EndLn
-          out << "public Option<" << safeElementType << "> " << safeName << "{" << EndLn
+          out << "public Option<" << safeElementType << "> " << safeName << "() {" << EndLn
           out.indent(2) {
             out << "return Some.of(this.element);" << EndLn
           }
