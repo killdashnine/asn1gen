@@ -188,7 +188,7 @@ class GenJava(packageName: String, out: IndentWriter) {
               }
             }
             out << EndLn
-            out << "return true" << EndLn
+            out << "return true;" << EndLn
           }
           out << "}" << EndLn
           out << EndLn
@@ -411,7 +411,7 @@ class GenJava(packageName: String, out: IndentWriter) {
               out.indent(2) {
                 out << "assert that != null;" << EndLn
                 out << EndLn
-                out << "return this.items.equals(that.items)" << EndLn
+                out << "return this.items.equals(that.items);" << EndLn
               }
               out << "}" << EndLn
               out << EndLn
