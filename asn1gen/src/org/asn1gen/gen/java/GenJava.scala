@@ -586,6 +586,7 @@ class GenJava(outDirectory: File, moduleName: String) {
           ast.TaggedType(
             ast.Tag(_, ast.Number(tagNumber)), _, _type),
           _) => {
+        generatePackageAndImports(module, out)
         val safeName = safeId(name)
         val safeElementType = safeId(rawTypeOf(_type))
         val safeChoiceType = safeId(assignmentName)
