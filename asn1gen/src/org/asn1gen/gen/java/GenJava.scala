@@ -604,6 +604,12 @@ class GenJava(outDirectory: File, moduleName: String) {
           }
           out << "}" << EndLn
           out << EndLn
+          out << "public " << asnTypeOf(_type) << " element() {" << EndLn
+          out.indent(2) {
+            out << "return this.element;" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
           out << "public int choiceId() {" << EndLn
           out.indent(2) {
             out << "return " << tagNumber << ";" << EndLn
