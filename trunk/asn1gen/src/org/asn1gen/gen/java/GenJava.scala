@@ -151,7 +151,12 @@ class GenJava(outDirectory: File, moduleName: String) {
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
         }
         out << "}" << EndLn
-        generateChoices(assignmentName, rootAlternativeTypeList)
+        val valuesFile = modulePath.child("Values.java")
+        valuesFile.openPrintStream { ps =>
+          generateChoices(assignmentName, rootAlternativeTypeList)(new IndentWriter(ps))
+          println("Writing to " + valuesFile)
+        }
+
         val firstNamedType =
           rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
         out << EndLn
@@ -171,7 +176,21 @@ class GenJava(outDirectory: File, moduleName: String) {
         out.ensureEmptyLines(1)
         out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
         out.indent(2) {
-          out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
+          out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "("
+          out.indent(2) {
+            var delim = ""
+            list foreach {
+              case ast.NamedComponentType(
+                ast.NamedType(ast.Identifier(identifier), _type),
+                value)
+              => {
+                out << delim << EndLn
+                out << safeId(asnTypeOf(_type, value)) << ".EMPTY"
+                delim = ","
+              }
+            }
+          }
+          out << ");" << EndLn
           out << EndLn
           generateSequenceFieldDefines(assignmentName, list)
           out << EndLn
