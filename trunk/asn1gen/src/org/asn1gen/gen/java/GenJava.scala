@@ -144,9 +144,6 @@ class GenJava(outDirectory: File, moduleName: String) {
       => {
         out << "abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
         out.indent(2) {
-          out << "public abstract " << safeAssignmentName << " element();" << EndLn
-          out << EndLn
-          out << "public abstract int choiceId();" << EndLn
           generateSimpleGetters(rootAlternativeTypeList)
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
         }

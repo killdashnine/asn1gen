@@ -1,4 +1,7 @@
 package org.asn1gen.runtime.java;
 
-public class AsnChoice implements AsnType {
+public abstract class AsnChoice implements AsnType {
+  public abstract AsnType element();
+
+  public abstract int choiceId();
 }
