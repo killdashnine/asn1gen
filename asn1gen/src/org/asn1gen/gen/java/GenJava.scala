@@ -151,10 +151,13 @@ class GenJava(outDirectory: File, moduleName: String) {
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
         }
         out << "}" << EndLn
-        val valuesFile = modulePath.child("Values.java")
-        valuesFile.openPrintStream { ps =>
-          generateChoices(assignmentName, rootAlternativeTypeList)(new IndentWriter(ps))
-          println("Writing to " + valuesFile)
+        out.trace("/*", "*/")
+        rootAlternativeTypeList match {
+          case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+            namedTypes foreach { namedType =>
+              generateChoices(assignmentName, namedType)
+            }
+          }
         }
 
         val firstNamedType =
@@ -558,29 +561,31 @@ class GenJava(outDirectory: File, moduleName: String) {
   
   def generateChoices(
       assignmentName: String,
-      rootAlternativeTypeList: ast.RootAlternativeTypeList)(implicit out: IndentWriter): Unit = {
-    out.trace("/*", "*/")
-    rootAlternativeTypeList match {
-      case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
-        namedTypes foreach { namedType =>
-          generateChoices(assignmentName, namedType)
-        }
-      }
-    }
-  }
-  
-  def generateChoices(
-      assignmentName: String,
       namedType: ast.NamedType)(implicit out: IndentWriter): Unit = {
     out.trace("/*", "*/")
     namedType match {
       case ast.NamedType(
         ast.Identifier(name),
-        ast.Type(
+        choiceType)
+      => {
+        val valuesFile = modulePath.child(safeId(assignmentName) + "_" + safeId(name) + ".java")
+        valuesFile.openPrintStream { ps =>
+          println("Writing to " + valuesFile)
+          generateChoice(assignmentName, name, choiceType)(new IndentWriter(ps))
+        }
+      }
+      case x => {
+        throw new org.asn1gen.gen.AsnCodeGenerationException("CHOICE members need to be tagged: " + x)
+      }
+    }
+  }
+  
+  def generateChoice(assignmentName: String, name: String, choiceType: ast.Type)(implicit out: IndentWriter): Unit = {
+    choiceType match {
+      case ast.Type(
           ast.TaggedType(
             ast.Tag(_, ast.Number(tagNumber)), _, _type),
-          _))
-      => {
+          _) => {
         val safeName = safeId(name)
         val safeElementType = safeId(rawTypeOf(_type))
         val safeChoiceType = safeId(assignmentName)
@@ -625,9 +630,6 @@ class GenJava(outDirectory: File, moduleName: String) {
           out << "}" << EndLn
         }
         out << "}" << EndLn
-      }
-      case x => {
-        throw new org.asn1gen.gen.AsnCodeGenerationException("CHOICE members need to be tagged: " + x)
       }
     }
   }
