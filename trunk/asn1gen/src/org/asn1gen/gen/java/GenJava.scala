@@ -594,7 +594,7 @@ class GenJava(outDirectory: File, moduleName: String) {
         out.ensureEmptyLines(1)
         out << "public class " << safeChoiceChoice << " extends " << safeId(assignmentName) << " {" << EndLn
         out.indent(2) {
-          out << "public final static " << safeChoiceChoice << " EMPTY = new " << safeChoiceChoice << "();" << EndLn
+          out << "public final static " << safeChoiceChoice << " EMPTY = new " << safeChoiceChoice << "(" << asnTypeOf(_type) << ".EMPTY);" << EndLn
           out << EndLn
           out << "public final " << asnTypeOf(_type) << " element;" << EndLn
           out << EndLn
