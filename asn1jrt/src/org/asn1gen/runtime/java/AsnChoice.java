@@ -1,5 +1,4 @@
 package org.asn1gen.runtime.java;
 
-public class AsnChoice {
-
+public class AsnChoice implements AsnType {
 }
