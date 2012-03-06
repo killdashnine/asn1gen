@@ -34,30 +34,19 @@ public class BerEncoder {
   
   public BerWriter encode(final AsnInteger value) {
     return new BerWriter() {
-      public void writePositive(final OutputStream os, final long subValue) throws IOException {
+      public void write(final OutputStream os, final long subValue) throws IOException {
         if (subValue == 0) {
-          os.write(ZERO_BYTE);
+          os.write(0x0);
+        } else if (subValue == -1L) {
+          os.write(0xff);
         } else {
-          writePositive(os, subValue >> 8);
+          write(os, subValue >> 8);
           os.write((int)(subValue & 0xff));
         }
-      }
-      
-      public void writeNegative(final OutputStream os, final long subValue) throws IOException {
-        /*if (subValue == 0) {
-          os.write(ZERO_BYTE);
-        } else {
-          writePositive(os, subValue >> 8);
-          os.write((int)(subValue & 0xff));
-        }*/
       }
       
       public void write(final OutputStream os) throws IOException {
-        if (value.value >= 0) {
-          writePositive(os, value.value);
-        } else {
-          writeNegative(os, value.value);
-        }
+        write(os, value.value);
       }
     };
   }
