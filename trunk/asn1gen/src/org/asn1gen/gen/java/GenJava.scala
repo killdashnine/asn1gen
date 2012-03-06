@@ -436,6 +436,12 @@ class GenJava(outDirectory: File, moduleName: String) {
               out << EndLn
               out << "public final org.asn1gen.runtime.java.List<" << safeReferenceType << "> items;" << EndLn
               out << EndLn
+              out << "public " << safeAssignmentName << "(final org.asn1gen.runtime.java.List<" << safeReferenceType << "> items) {" << EndLn
+              out.indent(2) {
+                out << "this.items = items;" << EndLn
+              }
+              out << "}" << EndLn
+              out << EndLn
               out << "public " << safeAssignmentName << " withItems(final org.asn1gen.runtime.java.List<" << safeReferenceType << "> value) {" << EndLn
               out.indent(2) {
                 out << "return new " << safeAssignmentName << "(value);" << EndLn
