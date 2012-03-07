@@ -8,4 +8,8 @@ public class AsnInteger implements AsnType {
   public AsnInteger(final long value) {
     this.value = value;
   }
+  
+  public AsnInteger withValue(final long value) {
+    return new AsnInteger(value);
+  }
 }
