@@ -10,12 +10,10 @@ import org.asn1gen.junit.Assert._
 import test.asn1.genruntime.BerDecoder
 import _root_.org.asn1gen.io._
 import _root_.org.asn1gen.runtime.codec.BerEncoder._
-import org.specs._
-import org.specs.runner._
+import org.junit.runner.RunWith
 
-class TestBerEncoder extends JUnit4(TestBerEncoder)
-
-object TestBerEncoder extends SpecificationWithJUnit {
+@RunWith(classOf[org.specs2.runner.JUnitRunner])
+class  TestBerEncoder extends org.specs2.mutable.SpecificationWithJUnit {
   "Encoder for 0" >> {
     val encoder = encodeFixed(0)
     

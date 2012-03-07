@@ -1,11 +1,9 @@
 package test.org.asn1gen.runtime.codec
 
-import org.specs._
-import org.specs.runner._
+import org.junit.runner.RunWith
 
-class TestSpecs extends JUnit4(TestSpecs)
-
-object TestSpecs extends SpecificationWithJUnit {
+@RunWith(classOf[org.specs2.runner.JUnitRunner])
+class TestSpecs extends org.specs2.mutable.SpecificationWithJUnit {
   "'hello world' has 11 characters" in {
      "hello world".size must_== 11
   }
