@@ -87,7 +87,7 @@ public class BerEncoder {
       break;
     }
     
-    if (tagId <= 0 && tagId <= 30) {
+    if (tagId <= 30) {
       value |= (int)tagId;
       
       return preceeding.ibyte(value);
