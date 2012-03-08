@@ -1,7 +1,7 @@
 package org.asn1gen.runtime.java;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.DataOutputStream;
 
 public abstract class BerWriter {
   public final int length;
@@ -10,76 +10,126 @@ public abstract class BerWriter {
     this.length = length;
   }
   
-  public abstract void write(final OutputStream os) throws IOException;
+  public abstract void write(final DataOutputStream os) throws IOException;
 
-  public static BerWriter writeByte(final byte value) {
-    return new BerWriter(1) {
+  public static final BerWriter EMPTY = new BerWriter(0) {
+    @Override
+    public void write(final DataOutputStream os) throws IOException {
+    }
+  };
+  
+  public BerWriter bbyte(final byte value) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
       @Override
-      public void write(final OutputStream os) throws IOException {
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
         os.write(((int)value) & 0xff);
       }
     };
   }
-
-  public static BerWriter writeUnsignedByte(final int value) {
-    return new BerWriter(1) {
+  
+  public BerWriter bbytes(final byte ...values) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
       @Override
-      public void write(final OutputStream os) throws IOException {
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.write(values, 0, values.length);
+      }
+    };
+  }
+
+  public BerWriter sbytes(final short ...values) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        for (final short value: values) {
+          os.write(value & 0xff);
+        }
+      }
+    };
+  }
+
+  public BerWriter ibytes(final int ...values) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        for (final int value: values) {
+          os.write(value & 0xff);
+        }
+      }
+    };
+  }
+  
+  public BerWriter lbytes(final long ...values) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        for (final long value: values) {
+          os.write((int)value & 0xff);
+        }
+      }
+    };
+  }
+
+  public BerWriter sbyte(final short value) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
         os.write(value & 0xff);
       }
     };
   }
-
-  public static BerWriter writeUnsignedByte(final long value) {
-    return new BerWriter(1) {
+  
+  public BerWriter ibyte(final int value) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
       @Override
-      public void write(final OutputStream os) throws IOException {
-        os.write((int)(value & 0xff));
-      }
-    };
-  }
-
-  public static BerWriter writeBytes(final byte... values) {
-    return new BerWriter(values.length) {
-      @Override
-      public void write(final OutputStream os) throws IOException {
-        for (final byte value: values) {
-          os.write(((int)value) & 0xff);
-        }
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.write(value & 0xff);
       }
     };
   }
   
-  public static int bytesIn(final BerWriter... berWriters) {
-    int length = 0;
-    
-    for (final BerWriter berWriter: berWriters) {
-      length += berWriter.length;
-    }
-    
-    return length;
+  public BerWriter lbyte(final long value) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 1) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.write(((int)value) & 0xff);
+      }
+    };
   }
   
-  public static BerWriter write(final BerWriter... berWriters) {
-    return new BerWriter(bytesIn(berWriters)) {
+  public BerWriter then(final BerWriter berWriter) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + berWriter.length) {
       @Override
-      public void write(final OutputStream os) throws IOException {
-        for (final BerWriter berWriter: berWriters) {
-          berWriter.write(os);
-        }
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        berWriter.write(os);
       }
     };
   }
 
-  public static BerWriter writeVariableInteger(final long value) {
+  public BerWriter writeVariableInteger(final long value) {
     if (value == 0) {
-      return writeUnsignedByte(0x0);
+      return EMPTY.ibyte(0x00);
     } else if (value == -1L) {
-      return writeUnsignedByte(0xff);
+      return EMPTY.ibyte(0xff);
     } else {
-      return write(
-          writeVariableInteger(value >> 8),
-          writeUnsignedByte(value & 0xff));
+      return writeVariableInteger(value >> 8).ibyte(0xff);
     }
   }
 }
