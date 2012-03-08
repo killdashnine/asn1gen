@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public abstract class BerWriter {
-  public final int bytes;
+  public final int length;
   
-  protected BerWriter(final int bytes) {
-    this.bytes = bytes;
+  protected BerWriter(final int length) {
+    this.length = length;
   }
   
   public abstract void write(final OutputStream os) throws IOException;
@@ -51,13 +51,13 @@ public abstract class BerWriter {
   }
   
   public static int bytesIn(final BerWriter... berWriters) {
-    int bytes = 0;
+    int length = 0;
     
     for (final BerWriter berWriter: berWriters) {
-      bytes += berWriter.bytes;
+      length += berWriter.length;
     }
     
-    return bytes;
+    return length;
   }
   
   public static BerWriter write(final BerWriter... berWriters) {

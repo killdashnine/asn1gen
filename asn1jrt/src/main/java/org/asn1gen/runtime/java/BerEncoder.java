@@ -26,7 +26,7 @@ public class BerEncoder {
     return BerWriter.write(
         BerWriter.writeUnsignedByte(2),
         // TODO: Use proper length
-        BerWriter.writeUnsignedByte(dataWriter.bytes),
+        BerWriter.writeUnsignedByte(dataWriter.length),
         dataWriter);
   }
 }
