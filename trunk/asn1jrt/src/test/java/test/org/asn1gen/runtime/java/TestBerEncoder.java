@@ -1,0 +1,119 @@
+package test.org.asn1gen.runtime.java;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+import org.asn1gen.runtime.java.AsnClass;
+import org.asn1gen.runtime.java.AsnForm;
+import org.asn1gen.runtime.java.BerEncoder;
+import org.asn1gen.runtime.java.BerWriter;
+import org.junit.Assert;
+import org.junit.Test;
+
+public class TestBerEncoder {
+  public static byte[] writeToByteArray(final BerWriter berWriter) throws IOException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final DataOutputStream dos = new DataOutputStream(baos);
+    berWriter.write(dos);
+    dos.flush();
+    baos.flush();
+    return baos.toByteArray();
+  }
+  
+  @Test
+  public void test_18_1_tag_a() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {0}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_b() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.APPLICATION, AsnForm.PRIMITIVE, 0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {0x40}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_c() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.CONTEXT_SPECIFIC, AsnForm.PRIMITIVE, 0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {(byte)0x80}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_d() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.PRIVATE, AsnForm.PRIMITIVE, 0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {(byte)0xc0}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_e() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {0x20}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_f() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 1);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {0x01}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_g() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 30);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {30}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_h() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 31);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {31, 31}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_i() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x7f);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {31, 0x7f}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_j() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x80);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {31, (byte)0x81, 0x00}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_k() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x4080);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {31, (byte)0x81, (byte)0x81, 0x00}, result);
+  }
+  
+  @Test
+  public void test_18_1_tag_l() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, Long.MAX_VALUE);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {31, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 0x7f}, result);
+  }
+}
