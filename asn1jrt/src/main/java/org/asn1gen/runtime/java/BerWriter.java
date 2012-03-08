@@ -31,7 +31,7 @@ public abstract class BerWriter {
   
   public BerWriter bbytes(final byte ...values) {
     final BerWriter outer = this;
-    return new BerWriter(outer.length + 1) {
+    return new BerWriter(outer.length + values.length) {
       @Override
       public void write(final DataOutputStream os) throws IOException {
         outer.write(os);
@@ -42,7 +42,7 @@ public abstract class BerWriter {
 
   public BerWriter sbytes(final short ...values) {
     final BerWriter outer = this;
-    return new BerWriter(outer.length + 1) {
+    return new BerWriter(outer.length + values.length) {
       @Override
       public void write(final DataOutputStream os) throws IOException {
         outer.write(os);
@@ -55,7 +55,7 @@ public abstract class BerWriter {
 
   public BerWriter ibytes(final int ...values) {
     final BerWriter outer = this;
-    return new BerWriter(outer.length + 1) {
+    return new BerWriter(outer.length + values.length) {
       @Override
       public void write(final DataOutputStream os) throws IOException {
         outer.write(os);
@@ -68,7 +68,7 @@ public abstract class BerWriter {
   
   public BerWriter lbytes(final long ...values) {
     final BerWriter outer = this;
-    return new BerWriter(outer.length + 1) {
+    return new BerWriter(outer.length + values.length) {
       @Override
       public void write(final DataOutputStream os) throws IOException {
         outer.write(os);
