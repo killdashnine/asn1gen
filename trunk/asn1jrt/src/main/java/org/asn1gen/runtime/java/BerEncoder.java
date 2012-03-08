@@ -2,7 +2,6 @@ package org.asn1gen.runtime.java;
 
 
 public class BerEncoder {
-  private static final byte[] TRUE_BYTES = new byte[] { 1, 1, -1 };
   private static final byte[] FALSE_BYTES = new byte[] { 1, 1, 0 };
   private static final byte[] NULL_BYTES = new byte[] { 5, 0, 0 };
   
@@ -11,22 +10,22 @@ public class BerEncoder {
   
   public BerWriter encode(final AsnBoolean value) {
     if (value.value) {
-      return BerWriter.writeBytes(TRUE_BYTES);
+      return BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
     } else {
-      return BerWriter.writeBytes(FALSE_BYTES);
+      return BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);
     }
   }
   
   public BerWriter encode(final AsnNull value) {
-    return BerWriter.writeBytes(NULL_BYTES);
+    return BerWriter.EMPTY.ibyte(0x05).ibyte(0x00).ibyte(0x00);
   }
   
   public BerWriter encode(final AsnInteger value) {
-    final BerWriter dataWriter = BerWriter.writeVariableInteger(value.value);
-    return BerWriter.write(
-        BerWriter.writeUnsignedByte(2),
+    final BerWriter dataWriter = BerWriter.EMPTY.writeVariableInteger(value.value);
+    return BerWriter.EMPTY
+        .ibyte(2)
         // TODO: Use proper length
-        BerWriter.writeUnsignedByte(dataWriter.length),
-        dataWriter);
+        .ibyte(dataWriter.length)
+        .then(dataWriter);
   }
 }
