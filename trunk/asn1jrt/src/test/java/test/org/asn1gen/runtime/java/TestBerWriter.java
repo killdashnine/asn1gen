@@ -135,7 +135,7 @@ public class TestBerWriter {
   @Test
   public void bbytes_00() throws IOException {
     final BerWriter berWriter = BerWriter.EMPTY.bbytes((byte)0, (byte)1, (byte)0x7f, (byte)0xff);
-    Assert.assertEquals("BerWriter has correct length", 1, berWriter.length);
+    Assert.assertEquals("BerWriter has correct length", 4, berWriter.length);
     final ByteArrayOutputStream os = new ByteArrayOutputStream();
     final DataOutputStream dos = new DataOutputStream(os);
     berWriter.write(dos);
