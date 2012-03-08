@@ -2,6 +2,7 @@ package org.asn1gen.runtime.java;
 
 import java.io.IOException;
 import java.io.DataOutputStream;
+import java.nio.charset.Charset;
 
 public abstract class BerWriter {
   public final int length;
@@ -36,6 +37,17 @@ public abstract class BerWriter {
       public void write(final DataOutputStream os) throws IOException {
         outer.write(os);
         os.write(values, 0, values.length);
+      }
+    };
+  }
+
+  public BerWriter write(final byte[] values, final int start, final int length) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + length) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.write(values, start, length);
       }
     };
   }
@@ -131,5 +143,50 @@ public abstract class BerWriter {
     } else {
       return writeVariableInteger(value >> 8).ibyte(0xff);
     }
+  }
+
+  public BerWriter i2(final short value) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 2) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.writeShort(value);
+      }
+    };
+  }
+
+  public BerWriter i4(final int value) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 4) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.writeInt(value);
+      }
+    };
+  }
+  
+  public BerWriter i8(final long value) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + 8) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.writeLong(value);
+      }
+    };
+  }
+  
+  public BerWriter string(final String value, final Charset charset) {
+    final BerWriter outer = this;
+    final byte[] data = value.getBytes(charset);
+    return new BerWriter(outer.length + data.length) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        outer.write(os);
+        os.write(data);
+      }
+    };
   }
 }
