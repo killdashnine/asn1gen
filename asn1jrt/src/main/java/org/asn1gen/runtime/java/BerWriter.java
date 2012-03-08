@@ -123,7 +123,7 @@ public abstract class BerWriter {
       }
     };
   }
-  
+
   public BerWriter then(final BerWriter berWriter) {
     final BerWriter outer = this;
     return new BerWriter(outer.length + berWriter.length) {
@@ -135,6 +135,17 @@ public abstract class BerWriter {
     };
   }
 
+  public BerWriter after(final BerWriter berWriter) {
+    final BerWriter outer = this;
+    return new BerWriter(outer.length + berWriter.length) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        berWriter.write(os);
+        outer.write(os);
+      }
+    };
+  }
+  
   public BerWriter writeVariableInteger(final long value) {
     if (value == 0) {
       return EMPTY.ibyte(0x00);
