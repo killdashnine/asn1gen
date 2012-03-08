@@ -17,17 +17,42 @@ public class BerEncoder {
     return BerWriter.EMPTY.ibyte(0x05).ibyte(0x00).ibyte(0x00);
   }
 
-  public BerWriter complexTagId(final BerWriter preceeding, final long tagId) {
-    return complexTagId(preceeding, tagId, 0x00);
+  public BerWriter tagIdTail(final BerWriter preceeding, final long tagId) {
+    return tagIdTail(preceeding, tagId, 0x00);
   }
   
-  public BerWriter complexTagId(final BerWriter preceeding, final long tagId, final int terminus) {
+  public BerWriter tagIdTail(final BerWriter preceeding, final long tagId, final int terminus) {
     final long excessTagId = tagId >>> 7;
     final int capturedTagId = (int)tagId & 0x7f;
     if (excessTagId != 0) {
-      return complexTagId(preceeding, excessTagId, 0x80).ibyte(capturedTagId | terminus);
+      return tagIdTail(preceeding, excessTagId, 0x80).ibyte(capturedTagId | terminus);
     } else {
       return preceeding.lbyte(capturedTagId | terminus);
+    }
+  }
+
+  public BerWriter length(final BerWriter preceeding, final long value) {
+    if (value < 0) {
+      throw new IllegalArgumentException();
+    }
+    
+    if (value <= 127) {
+      return preceeding.lbyte(value);
+    }
+    
+    final BerWriter tail = lengthTail(BerWriter.EMPTY, value);
+    
+    return preceeding.ibyte(tail.length | 0x80).then(tail);
+  }
+  
+  public BerWriter lengthTail(final BerWriter preceeding, final long value) {
+    final long excessValue = value >>> 8;
+    final long capturedValue = value & 0xff;
+    
+    if (excessValue > 0) {
+      return lengthTail(preceeding, excessValue).lbyte(capturedValue);
+    } else {
+      return preceeding.lbyte(capturedValue);
     }
   }
   
@@ -69,7 +94,7 @@ public class BerEncoder {
     } else {
       value |= 0x1f; // 0001 1111
       
-      return complexTagId(preceeding.ibyte(value), tagId);
+      return tagIdTail(preceeding.ibyte(value), tagId);
     }
   }
   
