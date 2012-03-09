@@ -5,16 +5,16 @@ public class BerEncoder {
   public BerEncoder() {
   }
   
-  public BerWriter encode(final AsnBoolean value) {
+  public BerWriter encode(final BerWriter preceeding, final AsnBoolean value) {
     if (value.value) {
-      return BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
+      return preceeding.ibyte(0x01).ibyte(0x01).ibyte(0xff);
     } else {
-      return BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);
+      return preceeding.ibyte(0x01).ibyte(0x01).ibyte(0x00);
     }
   }
   
-  public BerWriter encode(final AsnNull value) {
-    return BerWriter.EMPTY.ibyte(0x05).ibyte(0x00).ibyte(0x00);
+  public BerWriter encode(final BerWriter preceeding, final AsnNull value) {
+    return preceeding.ibyte(0x05).ibyte(0x00).ibyte(0x00);
   }
 
   public BerWriter tagIdTail(final BerWriter preceeding, final long tagId) {
