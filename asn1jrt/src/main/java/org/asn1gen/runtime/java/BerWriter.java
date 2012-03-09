@@ -147,12 +147,12 @@ public abstract class BerWriter {
   }
   
   public BerWriter writeVariableInteger(final long value) {
-    if (value == 0) {
-      return EMPTY.ibyte(0x00);
-    } else if (value == -1L) {
-      return EMPTY.ibyte(0xff);
+    if ((value & 0xffffffffffffff00L) == 0xffffffffffffff00L) {
+      return EMPTY.lbyte(value);
+    } else if ((value | 0x00000000000000ffL) == 0x00000000000000ffL) {
+      return EMPTY.lbyte(value);
     } else {
-      return writeVariableInteger(value >> 8).ibyte(0xff);
+      return writeVariableInteger(value >> 8).lbyte(value & 0xff);
     }
   }
 
