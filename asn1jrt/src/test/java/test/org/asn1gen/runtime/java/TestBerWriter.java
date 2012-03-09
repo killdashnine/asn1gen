@@ -143,5 +143,4 @@ public class TestBerWriter {
     os.flush();
     Assert.assertTrue(Arrays.equals(os.toByteArray(), new byte[] { 0, 1, 0x7f, (byte)0xff }));
   }
-
 }

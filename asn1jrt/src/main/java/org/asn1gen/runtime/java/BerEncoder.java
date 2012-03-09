@@ -1,50 +1,52 @@
 package org.asn1gen.runtime.java;
 
 public class BerEncoder {
-  public BerEncoder() {
+  public static final BerWriter EMPTY = BerWriter.EMPTY;
+  public static final BerWriter TRUE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
+  public static final BerWriter FALSE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);
+  public static final BerWriter NULL = BerWriter.EMPTY.ibyte(0x05).ibyte(0x00).ibyte(0x00);
+  
+  public static BerWriter encode(final AsnBoolean value) {
+    return encode(value.value);
   }
   
-  public BerWriter encode(final BerWriter preceeding, final AsnBoolean value) {
-    if (value.value) {
-      return preceeding.ibyte(0x01).ibyte(0x01).ibyte(0xff);
-    } else {
-      return preceeding.ibyte(0x01).ibyte(0x01).ibyte(0x00);
-    }
+  public static BerWriter encode(final boolean value) {
+    return value ? TRUE : FALSE;
   }
   
-  public BerWriter encode(final BerWriter preceeding, final AsnNull value) {
-    return preceeding.ibyte(0x05).ibyte(0x00).ibyte(0x00);
+  public static BerWriter encode(final AsnNull value) {
+    return NULL;
   }
 
-  public BerWriter tagIdTail(final BerWriter preceeding, final long tagId) {
-    return tagIdTail(preceeding, tagId, 0x00);
+  public static BerWriter tagIdTail(final long tagId) {
+    return tagIdTail(tagId, 0x00);
   }
   
-  public BerWriter tagIdTail(final BerWriter preceeding, final long tagId, final int terminus) {
+  public static BerWriter tagIdTail(final long tagId, final int terminus) {
     final long excessTagId = tagId >>> 7;
     final int capturedTagId = (int)tagId & 0x7f;
     if (excessTagId != 0) {
-      return tagIdTail(preceeding, excessTagId, 0x80).ibyte(capturedTagId | terminus);
+      return tagIdTail(excessTagId, 0x80).ibyte(capturedTagId | terminus);
     } else {
-      return preceeding.lbyte(capturedTagId | terminus);
+      return EMPTY.lbyte(capturedTagId | terminus);
     }
   }
 
-  public BerWriter length(final BerWriter preceeding, final long value) {
+  public static BerWriter length(final long value) {
     if (value < 0) {
       throw new IllegalArgumentException();
     }
     
     if (value <= 127) {
-      return preceeding.lbyte(value);
+      return EMPTY.lbyte(value);
     }
     
     final BerWriter tail = i8sig(BerWriter.EMPTY, value);
     
-    return preceeding.ibyte(tail.length | 0x80).then(tail);
+    return EMPTY.ibyte(tail.length | 0x80).then(tail);
   }
   
-  public BerWriter i8sig(final BerWriter preceeding, final long value) {
+  public static BerWriter i8sig(final BerWriter preceeding, final long value) {
     final long excessValue = value >>> 8;
     final long capturedValue = value & 0xff;
     
@@ -55,7 +57,7 @@ public class BerEncoder {
     }
   }
   
-  public BerWriter tag(final BerWriter preceeding, final AsnClass clazz, final AsnForm form, final long tagId) {
+  public static BerWriter tag(final AsnClass clazz, final AsnForm form, final long tagId) {
     if (tagId < 0) {
       throw new IllegalArgumentException();
     }
@@ -89,15 +91,15 @@ public class BerEncoder {
     if (tagId <= 30) {
       value |= (int)tagId;
       
-      return preceeding.ibyte(value);
+      return EMPTY.ibyte(value);
     } else {
       value |= 0x1f; // 0001 1111
       
-      return tagIdTail(preceeding.ibyte(value), tagId);
+      return EMPTY.ibyte(value).then(tagIdTail(tagId));
     }
   }
   
-  public BerWriter encode(final AsnInteger value) {
+  public static BerWriter encode(final AsnInteger value) {
     final BerWriter dataWriter = BerWriter.EMPTY.writeVariableInteger(value.value);
     return BerWriter.EMPTY
         .ibyte(2)
@@ -106,7 +108,7 @@ public class BerEncoder {
         .then(dataWriter);
   }
   
-  public BerWriter d(final double value) {
+  public static BerWriter d(final double value) {
     if (value == 0) {
       return BerWriter.EMPTY.ibyte(9).ibyte(0);
     }
@@ -132,7 +134,7 @@ public class BerEncoder {
     return BerWriter.EMPTY.ibyte(9).ibyte(realData.length + 1).then(realData);
   }
   
-  public BerWriter encode(final AsnReal value) {
+  public static BerWriter encode(final AsnReal value) {
     return d(value.value);
   }
 }

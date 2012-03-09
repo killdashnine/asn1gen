@@ -23,175 +23,158 @@ public class TestBerEncoder {
   
   @Test
   public void test_18_1_tag_a() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {0}, result);
   }
   
   @Test
   public void test_18_1_tag_b() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.APPLICATION, AsnForm.PRIMITIVE, 0);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.APPLICATION, AsnForm.PRIMITIVE, 0);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {0x40}, result);
   }
   
   @Test
   public void test_18_1_tag_c() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.CONTEXT_SPECIFIC, AsnForm.PRIMITIVE, 0);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.CONTEXT_SPECIFIC, AsnForm.PRIMITIVE, 0);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x80}, result);
   }
   
   @Test
   public void test_18_1_tag_d() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.PRIVATE, AsnForm.PRIMITIVE, 0);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.PRIVATE, AsnForm.PRIMITIVE, 0);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0xc0}, result);
   }
   
   @Test
   public void test_18_1_tag_e() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 0);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 0);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {0x20}, result);
   }
   
   @Test
   public void test_18_1_tag_f() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 1);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 1);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {0x01}, result);
   }
   
   @Test
   public void test_18_1_tag_g() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 30);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 30);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {30}, result);
   }
   
   @Test
   public void test_18_1_tag_h() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 31);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 31);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {31, 31}, result);
   }
   
   @Test
   public void test_18_1_tag_i() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x7f);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x7f);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {31, 0x7f}, result);
   }
   
   @Test
   public void test_18_1_tag_j() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x80);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x80);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {31, (byte)0x81, 0x00}, result);
   }
   
   @Test
   public void test_18_1_tag_k() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x4080);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 0x4080);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {31, (byte)0x81, (byte)0x81, 0x00}, result);
   }
 
   @Test
   public void test_18_1_tag_l() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, Long.MAX_VALUE);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, Long.MAX_VALUE);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {31, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 0x7f}, result);
   }
   
   @Test(expected=IllegalArgumentException.class)
   public void test_18_1_tag_m() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.tag(BerWriter.EMPTY, AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, -1);
+    final BerWriter berWriter = BerEncoder.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, -1);
     writeToByteArray(berWriter);
   }
 
   @Test
   public void test_18_1_length_a() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0);
+    final BerWriter berWriter = BerEncoder.length(0);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {0}, result);
   }
 
   @Test
   public void test_18_1_length_b() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0x7f);
+    final BerWriter berWriter = BerEncoder.length(0x7f);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {0x7f}, result);
   }
 
   @Test
   public void test_18_1_length_c() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0x80);
+    final BerWriter berWriter = BerEncoder.length(0x80);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x81, (byte)0x80}, result);
   }
 
   @Test
   public void test_18_1_length_d() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0x81);
+    final BerWriter berWriter = BerEncoder.length(0x81);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x81, (byte)0x81}, result);
   }
 
   @Test
   public void test_18_1_length_e() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0xff);
+    final BerWriter berWriter = BerEncoder.length(0xff);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x81, (byte)0xff}, result);
   }
   
   @Test
   public void test_18_1_length_f() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0x100);
+    final BerWriter berWriter = BerEncoder.length(0x100);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x82, (byte)0x01, (byte)0x00}, result);
   }
   
   @Test
   public void test_18_1_length_g() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0xffff);
+    final BerWriter berWriter = BerEncoder.length(0xffff);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x82, (byte)0xff, (byte)0xff}, result);
   }
   
   @Test
   public void test_18_1_length_h() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0x76543210);
+    final BerWriter berWriter = BerEncoder.length(0x76543210);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x84, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10}, result);
   }
   
   @Test(expected=IllegalArgumentException.class)
   public void test_18_1_length_i() throws IOException {
-    final BerEncoder encoder = new BerEncoder();
-    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, -1);
+    final BerWriter berWriter = BerEncoder.length(-1);
     writeToByteArray(berWriter);
+  }
+  
+  @Test
+  public void test_18_2_1_boolean_1() {
+    
   }
 }
