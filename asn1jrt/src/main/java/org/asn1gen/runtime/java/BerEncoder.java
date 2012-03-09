@@ -4,7 +4,7 @@ public class BerEncoder {
   public static final BerWriter EMPTY = BerWriter.EMPTY;
   public static final BerWriter TRUE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
   public static final BerWriter FALSE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);
-  public static final BerWriter NULL = BerWriter.EMPTY.ibyte(0x05).ibyte(0x00).ibyte(0x00);
+  public static final BerWriter NULL = BerWriter.EMPTY.ibyte(0x05).ibyte(0x00);
   
   public static BerWriter encode(final AsnBoolean value) {
     return encode(value.value);
@@ -99,13 +99,17 @@ public class BerEncoder {
     }
   }
   
-  public static BerWriter encode(final AsnInteger value) {
-    final BerWriter dataWriter = BerWriter.EMPTY.writeVariableInteger(value.value);
+  public static BerWriter encode(final long value) {
+    final BerWriter dataWriter = BerWriter.EMPTY.writeVariableInteger(value);
     return BerWriter.EMPTY
         .ibyte(2)
         // TODO: Use proper length
         .ibyte(dataWriter.length)
         .then(dataWriter);
+  }
+  
+  public static BerWriter encode(final AsnInteger value) {
+    return encode(value.value);
   }
   
   public static BerWriter d(final double value) {
