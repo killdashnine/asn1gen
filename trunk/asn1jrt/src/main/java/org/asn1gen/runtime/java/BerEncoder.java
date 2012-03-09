@@ -1,6 +1,5 @@
 package org.asn1gen.runtime.java;
 
-
 public class BerEncoder {
   public BerEncoder() {
   }
@@ -40,17 +39,17 @@ public class BerEncoder {
       return preceeding.lbyte(value);
     }
     
-    final BerWriter tail = lengthTail(BerWriter.EMPTY, value);
+    final BerWriter tail = i8sig(BerWriter.EMPTY, value);
     
     return preceeding.ibyte(tail.length | 0x80).then(tail);
   }
   
-  public BerWriter lengthTail(final BerWriter preceeding, final long value) {
+  public BerWriter i8sig(final BerWriter preceeding, final long value) {
     final long excessValue = value >>> 8;
     final long capturedValue = value & 0xff;
     
     if (excessValue > 0) {
-      return lengthTail(preceeding, excessValue).lbyte(capturedValue);
+      return i8sig(preceeding, excessValue).lbyte(capturedValue);
     } else {
       return preceeding.lbyte(capturedValue);
     }
@@ -105,5 +104,35 @@ public class BerEncoder {
         // TODO: Use proper length
         .ibyte(dataWriter.length)
         .then(dataWriter);
+  }
+  
+  public BerWriter d(final double value) {
+    if (value == 0) {
+      return BerWriter.EMPTY.ibyte(9).ibyte(0);
+    }
+    
+    if (value == Double.POSITIVE_INFINITY) {
+      return BerWriter.EMPTY.ibyte(9).ibyte(1).ibyte(0x40);
+    }
+    
+    if (value == Double.NEGATIVE_INFINITY) {
+      return BerWriter.EMPTY.ibyte(9).ibyte(1).ibyte(0x41);
+    }
+    
+    final long rawValue = java.lang.Double.doubleToRawLongBits(value);
+    final long sign = (rawValue >> 63) & 0x1;
+    final int scale = 0;
+    final int base = 0; // binary
+    final BerWriter encodedMantissa = i8sig(BerWriter.EMPTY, rawValue & 0x000fffffffffffffL);
+    final BerWriter encodedExponent = i8sig(BerWriter.EMPTY, (rawValue >> 52) & 0x7ff);
+    final BerWriter encodedDescriptor = BerWriter.EMPTY.lbyte(
+        (0x80 | (sign << 6) | (base << 4) | (scale << 2) | (encodedExponent.length & 0x3)));
+    final BerWriter realData = encodedDescriptor.then(encodedExponent).then(encodedMantissa);
+    
+    return BerWriter.EMPTY.ibyte(9).ibyte(realData.length + 1).then(realData);
+  }
+  
+  public BerWriter encode(final AsnReal value) {
+    return d(value.value);
   }
 }
