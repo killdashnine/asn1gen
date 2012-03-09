@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.asn1gen.runtime.java.AsnBoolean;
 import org.asn1gen.runtime.java.AsnClass;
 import org.asn1gen.runtime.java.AsnForm;
+import org.asn1gen.runtime.java.AsnNull;
 import org.asn1gen.runtime.java.BerEncoder;
 import org.asn1gen.runtime.java.BerWriter;
 import org.junit.Assert;
@@ -174,7 +176,50 @@ public class TestBerEncoder {
   }
   
   @Test
-  public void test_18_2_1_boolean_1() {
-    
+  public void test_18_2_1_boolean_a() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(false);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {1, 1, 0}, result);
+  }
+  
+  @Test
+  public void test_18_2_1_boolean_b() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(true);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertEquals(3, result.length);
+    Assert.assertEquals(1, result[0]);
+    Assert.assertEquals(1, result[1]);
+    Assert.assertTrue(0 != result[2]);
+  }
+  
+  @Test
+  public void test_18_2_1_boolean_c() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(AsnBoolean.FALSE);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {1, 1, 0}, result);
+  }
+  
+  @Test
+  public void test_18_2_1_boolean_d() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(AsnBoolean.TRUE);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertEquals(3, result.length);
+    Assert.assertEquals(1, result[0]);
+    Assert.assertEquals(1, result[1]);
+    Assert.assertTrue(0 != result[2]);
+  }
+  
+  @Test
+  public void test_18_2_2_null() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(AsnNull.EMPTY);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {5, 0}, result);
+  }
+
+  @Test
+  public void test_18_2_3_integerl() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(-27066);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {2, 2, (byte)0x96, 0x46}, result);
   }
 }
