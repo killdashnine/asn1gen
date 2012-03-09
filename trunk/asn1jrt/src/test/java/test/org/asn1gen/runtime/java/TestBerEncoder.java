@@ -179,4 +179,19 @@ public class TestBerEncoder {
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {(byte)0x82, (byte)0xff, (byte)0xff}, result);
   }
+  
+  @Test
+  public void test_18_1_length_h() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, 0x76543210);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {(byte)0x84, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10}, result);
+  }
+  
+  @Test(expected=IllegalArgumentException.class)
+  public void test_18_1_length_i() throws IOException {
+    final BerEncoder encoder = new BerEncoder();
+    final BerWriter berWriter = encoder.length(BerWriter.EMPTY, -1);
+    writeToByteArray(berWriter);
+  }
 }
