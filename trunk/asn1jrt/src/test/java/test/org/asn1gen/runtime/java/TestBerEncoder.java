@@ -217,9 +217,37 @@ public class TestBerEncoder {
   }
 
   @Test
-  public void test_18_2_3_integerl() throws IOException {
+  public void test_18_2_3_integer_a() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-27066);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {2, 2, (byte)0x96, 0x46}, result);
+  }
+
+  @Test
+  public void test_18_2_3_integer_b() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(5256);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {2, 2, 0x14, (byte)0x88}, result);
+  }
+
+  @Test
+  public void test_18_2_3_integer_c() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {2, 1, 0}, result);
+  }
+
+  @Test
+  public void test_18_2_3_integer_d() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(0xffffffffffabafbfL);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {2, 3, (byte)0xab, (byte)0xaf, (byte)0xbf}, result);
+  }
+  
+  @Test
+  public void test_18_2_3_integer_e() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(0x545040);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {2, 3, (byte)0x54, (byte)0x50, (byte)0x40}, result);
   }
 }
