@@ -120,6 +120,34 @@ public class BerEncoder {
     return BerWriter.lbyteThen((significand >> 56) & 0xff, significand(significand << 8));
   }
   
+  public static int trailingZeros(final long value, final int shiftTest) {
+    if (shiftTest == 1) {
+      final long nibble = value & 3;
+      
+      if (nibble == 0) {
+        return 2;
+      }
+      
+      if (nibble == 2) {
+        return 1;
+      }
+      
+      return 0;
+    }
+    
+    final long bitMask = (1L << shiftTest) - 1;
+    
+    if ((value & bitMask) == 0) {
+      return shiftTest + trailingZeros(value >> shiftTest, shiftTest / 2);
+    } else {
+      return trailingZeros(value, shiftTest / 2);
+    }
+  }
+  
+  public static int trailingZeros(final long value) {
+    return trailingZeros(value, 32);
+  }
+  
   public static BerWriter encode(final double value) {
     if (value == 0) {
       return BerWriter.EMPTY.ibyte(9).ibyte(0);
