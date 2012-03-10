@@ -279,12 +279,13 @@ public class TestBerEncoder {
     Assert.assertArrayEquals(new byte[] {9, 3, (byte)0x80, 0, 1}, result);
   }
   
-  /*@Test
+  @Test
   public void test_18_2_5_real_e() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(2.0);
     final byte[] result = writeToByteArray(berWriter);
-    Assert.assertArrayEquals(new byte[] {9, 1, 0x41}, result);
-  }*/
+    System.out.print("result: "); berWriter.dumpln();
+    Assert.assertArrayEquals(new byte[] {9, 3, (byte)0x80, 1, 1}, result);
+  }
   
   public void printRawDouble(final double value) {
     long l1 = Double.doubleToLongBits(value);

@@ -137,7 +137,8 @@ public class BerEncoder {
     final long sign = (rawValue >> 63) & 0x1;
     final int scale = 0;
     final int base = 0; // binary
-    final long exponent = (rawValue >> 52) & 0x7ff - 1023;
+    final long rawExponent = (rawValue >> 52) & 0x7ff;
+    final long exponent = ((rawValue >> 52) & 0x7ff) - 1023;
     final long mantissa = rawValue & 0x000fffffffffffffL;
     final long encMantissa = (mantissa | 0x00010000000000000L) << 4;
     final BerWriter encodedMantissa = significand(encMantissa);
