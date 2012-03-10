@@ -1,5 +1,6 @@
 package org.asn1gen.runtime.java;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.DataOutputStream;
 import java.nio.charset.Charset;
@@ -209,5 +210,38 @@ public abstract class BerWriter {
         that.write(os);
       }
     };
+  }
+  
+  public void dumpln() {
+    dump();
+    System.out.println();
+  }
+  
+  public void dump() {
+      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final DataOutputStream dos = new DataOutputStream(baos);
+    try {
+      try {
+        try {
+          this.write(dos);
+        } finally {
+          dos.flush();
+        }
+      } finally {
+        baos.flush();
+      }
+    } catch (final IOException e) {
+      e.printStackTrace(System.err);
+    }
+    
+    boolean first = true;
+    final String hex = "0123456789abcdef";
+    for (final byte b: baos.toByteArray()) {
+      if (!first) {
+        System.out.print(" ");
+      }
+      System.out.print(hex.charAt((b >> 4) & 0xf));
+      System.out.print(hex.charAt(b & 0xf));
+    }
   }
 }
