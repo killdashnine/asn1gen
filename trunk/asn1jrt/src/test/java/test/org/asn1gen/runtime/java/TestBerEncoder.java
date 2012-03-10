@@ -330,8 +330,10 @@ public class TestBerEncoder {
     Assert.assertEquals(4, BerEncoder.trailingZeros(0x0000000000000010L, 2));
     
     Assert.assertEquals(64, BerEncoder.trailingZeros(0x0000000000000000L));
-    for (int i = 0; i < 64; ++i) {
-      Assert.assertEquals(i, BerEncoder.trailingZeros(1L << i));
+    for (long j = 1; j < 0xfffffL; j += 2) {
+      for (int i = 0; i < 64; ++i) {
+        Assert.assertEquals(i, BerEncoder.trailingZeros(j << i));
+      }
     }
   }
   
