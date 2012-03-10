@@ -112,7 +112,15 @@ public class BerEncoder {
     return encode(value.value);
   }
   
-  public static BerWriter d(final double value) {
+  private static BerWriter significand(final long significand) {
+    if (significand == 0) {
+      return BerWriter.EMPTY;
+    }
+    
+    return BerWriter.lbyteThen((significand >> 56) & 0xff, significand(significand << 8));
+  }
+  
+  public static BerWriter encode(final double value) {
     if (value == 0) {
       return BerWriter.EMPTY.ibyte(9).ibyte(0);
     }
@@ -125,20 +133,23 @@ public class BerEncoder {
       return BerWriter.EMPTY.ibyte(9).ibyte(1).ibyte(0x41);
     }
     
-    final long rawValue = java.lang.Double.doubleToRawLongBits(value);
+    final long rawValue = java.lang.Double.doubleToLongBits(value);
     final long sign = (rawValue >> 63) & 0x1;
     final int scale = 0;
     final int base = 0; // binary
-    final BerWriter encodedMantissa = i8sig(BerWriter.EMPTY, rawValue & 0x000fffffffffffffL);
-    final BerWriter encodedExponent = i8sig(BerWriter.EMPTY, (rawValue >> 52) & 0x7ff);
+    final long exponent = (rawValue >> 52) & 0x7ff - 1023;
+    final long mantissa = rawValue & 0x000fffffffffffffL;
+    final long encMantissa = (mantissa | 0x00010000000000000L) << 4;
+    final BerWriter encodedMantissa = significand(encMantissa);
+    final BerWriter encodedExponent = i8sig(BerWriter.EMPTY, exponent);
     final BerWriter encodedDescriptor = BerWriter.EMPTY.lbyte(
-        (0x80 | (sign << 6) | (base << 4) | (scale << 2) | (encodedExponent.length & 0x3)));
+        (0x80 | (sign << 6) | (base << 4) | (scale << 2) | ((encodedExponent.length - 1) & 0x3)));
     final BerWriter realData = encodedDescriptor.then(encodedExponent).then(encodedMantissa);
     
-    return BerWriter.EMPTY.ibyte(9).ibyte(realData.length + 1).then(realData);
+    return BerWriter.EMPTY.ibyte(9).ibyte(realData.length).then(realData);
   }
   
   public static BerWriter encode(final AsnReal value) {
-    return d(value.value);
+    return encode(value.value);
   }
 }

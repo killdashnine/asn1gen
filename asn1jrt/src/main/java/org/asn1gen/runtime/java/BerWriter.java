@@ -200,4 +200,14 @@ public abstract class BerWriter {
       }
     };
   }
+
+  public static BerWriter lbyteThen(final long value, final BerWriter that) {
+     return new BerWriter(that.length + 1) {
+      @Override
+      public void write(final DataOutputStream os) throws IOException {
+        os.write(((int)value) & 0xff);
+        that.write(os);
+      }
+    };
+  }
 }

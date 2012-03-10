@@ -250,4 +250,60 @@ public class TestBerEncoder {
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {2, 3, (byte)0x54, (byte)0x50, (byte)0x40}, result);
   }
+  
+  @Test
+  public void test_18_2_5_real_a() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(0.0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {9, 0}, result);
+  }
+  
+  @Test
+  public void test_18_2_5_real_b() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(Double.POSITIVE_INFINITY);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {9, 1, 0x40}, result);
+  }
+  
+  @Test
+  public void test_18_2_5_real_c() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(Double.NEGATIVE_INFINITY);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {9, 1, 0x41}, result);
+  }
+  
+  @Test
+  public void test_18_2_5_real_d() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(1.0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {9, 3, (byte)0x80, 0, 1}, result);
+  }
+  
+  /*@Test
+  public void test_18_2_5_real_e() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(2.0);
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(new byte[] {9, 1, 0x41}, result);
+  }*/
+  
+  public void printRawDouble(final double value) {
+    long l1 = Double.doubleToLongBits(value);
+    int i3 = (int)((Double.doubleToLongBits(value) >> 52) & 0x7FF) - 1075;
+    long l2 = i3 == 0 ? (l1 & 0xFFFFFFFF) << 1 : l1 & 0xFFFFFFFF | 0x0;
+    System.out.println(value + " " + Double.doubleToLongBits(value) + " " + i3 + " " + l2);
+  }
+  
+  @Test
+  public void listDoubles() throws IOException {
+    //printRawDouble(Double.POSITIVE_INFINITY);
+    //printRawDouble(Double.NEGATIVE_INFINITY);
+    //printRawDouble(0.0);
+    //printRawDouble(1.0);
+    //printRawDouble(2.0);
+    //printRawDouble(3.0);
+    //printRawDouble(4.0);
+    //printRawDouble(5.0);
+    //printRawDouble(6.0);
+    //printRawDouble(7.0);
+  }
 }
