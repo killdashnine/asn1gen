@@ -278,7 +278,7 @@ public class TestBerEncoder {
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(new byte[] {9, 3, (byte)0x80, 0, 1}, result);
   }
-  
+
   @Test
   public void test_18_2_5_real_e() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(2.0);
@@ -286,12 +286,53 @@ public class TestBerEncoder {
     System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(new byte[] {9, 3, (byte)0x80, 1, 1}, result);
   }
+
+  @Test
+  public void test_18_2_5_real_f() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(3.0);
+    final byte[] result = writeToByteArray(berWriter);
+    System.out.print("result: "); berWriter.dumpln();
+    Assert.assertArrayEquals(new byte[] {9, 3, (byte)0x80, 0, 3}, result);
+  }
   
   public void printRawDouble(final double value) {
     long l1 = Double.doubleToLongBits(value);
     int i3 = (int)((Double.doubleToLongBits(value) >> 52) & 0x7FF) - 1075;
     long l2 = i3 == 0 ? (l1 & 0xFFFFFFFF) << 1 : l1 & 0xFFFFFFFF | 0x0;
     System.out.println(value + " " + Double.doubleToLongBits(value) + " " + i3 + " " + l2);
+  }
+  
+  @Test
+  public void testTrailingZeros() {
+    Assert.assertEquals(2, BerEncoder.trailingZeros(0x0000000000000000L, 1));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000001L, 1));
+    Assert.assertEquals(1, BerEncoder.trailingZeros(0x0000000000000002L, 1));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000003L, 1));
+    
+    Assert.assertEquals(4, BerEncoder.trailingZeros(0x0000000000000000L, 2));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000001L, 2));
+    Assert.assertEquals(1, BerEncoder.trailingZeros(0x0000000000000002L, 2));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000003L, 2));
+    Assert.assertEquals(2, BerEncoder.trailingZeros(0x0000000000000004L, 2));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000005L, 2));
+    Assert.assertEquals(1, BerEncoder.trailingZeros(0x0000000000000006L, 2));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000007L, 2));
+    Assert.assertEquals(3, BerEncoder.trailingZeros(0x0000000000000008L, 2));
+    Assert.assertEquals(4, BerEncoder.trailingZeros(0x0000000000000000L, 2));
+    
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000009L, 2));
+    Assert.assertEquals(1, BerEncoder.trailingZeros(0x000000000000000aL, 2));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x000000000000000bL, 2));
+    Assert.assertEquals(2, BerEncoder.trailingZeros(0x000000000000000cL, 2));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x000000000000000dL, 2));
+    Assert.assertEquals(1, BerEncoder.trailingZeros(0x000000000000000eL, 2));
+    Assert.assertEquals(0, BerEncoder.trailingZeros(0x000000000000000fL, 2));
+    Assert.assertEquals(4, BerEncoder.trailingZeros(0x0000000000000010L, 2));
+    
+    Assert.assertEquals(64, BerEncoder.trailingZeros(0x0000000000000000L));
+    for (int i = 0; i < 64; ++i) {
+      Assert.assertEquals(i, BerEncoder.trailingZeros(1L << i));
+    }
   }
   
   @Test
