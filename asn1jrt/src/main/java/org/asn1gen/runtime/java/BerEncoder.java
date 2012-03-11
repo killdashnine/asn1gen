@@ -195,8 +195,8 @@ public class BerEncoder {
     return EMPTY.ibyte(3).ibyte(data.length).then(data);
   }
 
-  public static BerWriter encode(final AsnOctetString value) {
+  public static BerWriter encode(final AsnUtf8String value) {
     final BerWriter data = EMPTY.bbytes(value.value.getBytes(Charset.forName("UTF-8")));
-    return EMPTY.ibyte(4).ibyte(data.length).then(data);
+    return EMPTY.ibyte(12).ibyte(data.length).then(data);
   }
 }
