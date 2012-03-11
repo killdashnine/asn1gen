@@ -47,10 +47,12 @@ public class BerEncoder {
   }
   
   public static BerWriter i8sig(final BerWriter preceeding, final long value) {
-    final long excessValue = value >>> 8;
+    final long excessValue = value >> 8;
     final long capturedValue = value & 0xff;
     
-    if (excessValue > 0) {
+    if (excessValue == -1) {
+      return preceeding.lbyte(capturedValue);
+    } else if (excessValue > 0) {
       return i8sig(preceeding, excessValue).lbyte(capturedValue);
     } else {
       return preceeding.lbyte(capturedValue);

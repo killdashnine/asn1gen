@@ -306,6 +306,14 @@ public class TestBerEncoder {
   }
   
   @Test
+  public void test_18_2_5_real_g() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(0.1);
+    final byte[] result = writeToByteArray(berWriter);
+    System.out.print("result: "); berWriter.dumpln();
+    Assert.assertArrayEquals(ibytes(0x09, 0x09, 0x80, 0xc9, 0x0c, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcd), result);
+  }
+  
+  @Test
   public void testTrailingZeros() {
     Assert.assertEquals(2, BerEncoder.trailingZeros(0x0000000000000000L, 1));
     Assert.assertEquals(0, BerEncoder.trailingZeros(0x0000000000000001L, 1));
