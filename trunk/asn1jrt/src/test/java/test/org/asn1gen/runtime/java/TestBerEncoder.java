@@ -9,7 +9,7 @@ import org.asn1gen.runtime.java.AsnBoolean;
 import org.asn1gen.runtime.java.AsnClass;
 import org.asn1gen.runtime.java.AsnForm;
 import org.asn1gen.runtime.java.AsnNull;
-import org.asn1gen.runtime.java.AsnOctetString;
+import org.asn1gen.runtime.java.AsnUtf8String;
 import org.asn1gen.runtime.java.BerEncoder;
 import org.asn1gen.runtime.java.BerWriter;
 import org.junit.Assert;
@@ -412,14 +412,14 @@ public class TestBerEncoder {
 
   @Test
   public void test_18_2_7_octetstring_a() throws IOException {
-    final BerWriter berWriter = BerEncoder.encode(new AsnOctetString(""));
+    final BerWriter berWriter = BerEncoder.encode(new AsnUtf8String(""));
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(ibytes(0x04, 0x00), result);
   }
 
   @Test
   public void test_18_2_7_octetstring_b() throws IOException {
-    final BerWriter berWriter = BerEncoder.encode(new AsnOctetString("Hello world"));
+    final BerWriter berWriter = BerEncoder.encode(new AsnUtf8String("Hello world"));
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(ibytes(0x04, 0x0b, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64), result);
   }
