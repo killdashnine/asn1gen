@@ -41,21 +41,21 @@ public class BerEncoder {
       return EMPTY.lbyte(value);
     }
     
-    final BerWriter tail = i8sig(BerWriter.EMPTY, value);
+    final BerWriter tail = i8sig(value);
     
     return EMPTY.ibyte(tail.length | 0x80).then(tail);
   }
   
-  public static BerWriter i8sig(final BerWriter preceeding, final long value) {
+  public static BerWriter i8sig(final long value) {
     final long excessValue = value >> 8;
     final long capturedValue = value & 0xff;
     
     if (excessValue == -1) {
-      return preceeding.lbyte(capturedValue);
+      return EMPTY.lbyte(capturedValue);
     } else if (excessValue > 0) {
-      return i8sig(preceeding, excessValue).lbyte(capturedValue);
+      return i8sig(excessValue).lbyte(capturedValue);
     } else {
-      return preceeding.lbyte(capturedValue);
+      return EMPTY.lbyte(capturedValue);
     }
   }
   
@@ -164,8 +164,8 @@ public class BerEncoder {
     final long mantissaShift = trailingZeros(mantissa);
     final long significand = mantissa >> mantissaShift;
     final long trueExponent = exponent - 52 + mantissaShift;
-    final BerWriter encodedMantissa = i8sig(BerWriter.EMPTY, significand);
-    final BerWriter encodedExponent = i8sig(BerWriter.EMPTY, trueExponent);
+    final BerWriter encodedMantissa = i8sig(significand);
+    final BerWriter encodedExponent = i8sig(trueExponent);
     final BerWriter encodedDescriptor = BerWriter.EMPTY.lbyte(
         (0x80 | (sign << 6) | (base << 4) | (scale << 2) | ((encodedExponent.length - 1) & 0x3)));
     final BerWriter realData = encodedDescriptor.then(encodedExponent).then(encodedMantissa);
