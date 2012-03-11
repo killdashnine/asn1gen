@@ -376,9 +376,37 @@ public class TestBerEncoder {
   
   @Test
   public void test_18_2_6_bitstring_a() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(new AsnBitString(0xff, 8));
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(ibytes(0x03, 0x02, 0x00, 0xff), result);
+  }
+
+  @Test
+  public void test_18_2_6_bitstring_b() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(new AsnBitString(0xff, 11));
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(ibytes(0x03, 0x03, 0x05, 0x1f, 0xe0), result);
+  }
+
+  @Test
+  public void test_18_2_6_bitstring_c() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(new AsnBitString(0xdeadbeef, 32));
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(ibytes(0x03, 0x05, 0x00, 0xde, 0xad, 0xbe, 0xef), result);
+  }
+
+  @Test
+  public void test_18_2_6_bitstring_d() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(new AsnBitString(0xdeadbeefdeadbeefL, 64));
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(ibytes(0x03, 0x09, 0x00, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef), result);
+  }
+
+  @Test
+  public void test_18_2_6_bitstring_e() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(new AsnBitString(0x5eadbeefdeadbeefL, 63));
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(ibytes(0x03, 0x09, 0x01, 0xbd, 0x5b, 0x7d, 0xdf, 0xbd, 0x5b, 0x7d, 0xde), result);
   }
 
   @Test
