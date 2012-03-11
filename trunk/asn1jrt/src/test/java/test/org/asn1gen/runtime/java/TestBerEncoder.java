@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.asn1gen.runtime.java.AsnBitString;
 import org.asn1gen.runtime.java.AsnBoolean;
 import org.asn1gen.runtime.java.AsnClass;
 import org.asn1gen.runtime.java.AsnForm;
@@ -366,12 +367,18 @@ public class TestBerEncoder {
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0xc0, 0xca, 0x0c, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcd), result);
   }
 
-
   @Test
   public void test_18_2_5_real_p() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-0.3);
     final byte[] result = writeToByteArray(berWriter);
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0xc0, 0xca, 0x13, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), result);
+  }
+  
+  @Test
+  public void test_18_2_6_bitstring_a() throws IOException {
+    final BerWriter berWriter = BerEncoder.encode(new AsnBitString(0xff, 11));
+    final byte[] result = writeToByteArray(berWriter);
+    Assert.assertArrayEquals(ibytes(0x03, 0x03, 0x05, 0x1f, 0xe0), result);
   }
 
   @Test
