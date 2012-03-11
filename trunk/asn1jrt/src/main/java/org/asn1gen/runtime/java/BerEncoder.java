@@ -1,5 +1,7 @@
 package org.asn1gen.runtime.java;
 
+import java.nio.charset.Charset;
+
 public class BerEncoder {
   public static final BerWriter EMPTY = BerWriter.EMPTY;
   public static final BerWriter TRUE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
@@ -191,5 +193,10 @@ public class BerEncoder {
     final BerWriter data = EMPTY.ibyte(excess).then(encodeBitStringBits(value.value << excess, encodeLength));
     
     return EMPTY.ibyte(3).ibyte(data.length).then(data);
+  }
+
+  public static BerWriter encode(final AsnOctetString value) {
+    final BerWriter data = EMPTY.bbytes(value.value.getBytes(Charset.forName("UTF-8")));
+    return EMPTY.ibyte(4).ibyte(data.length).then(data);
   }
 }
