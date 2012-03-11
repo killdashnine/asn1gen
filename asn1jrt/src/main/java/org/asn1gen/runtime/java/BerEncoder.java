@@ -176,4 +176,20 @@ public class BerEncoder {
   public static BerWriter encode(final AsnReal value) {
     return encode(value.value);
   }
+  
+  private static BerWriter encodeBitStringBits(final long value, final int length) {
+    if (length <= 0) {
+      return EMPTY;
+    }
+    
+    return encodeBitStringBits(value >> 8, length - 1).lbyte(value & 0xff);
+  }
+
+  public static BerWriter encode(final AsnBitString value) {
+    final int excess = (64 - value.length) % 8;
+    final int encodeLength = (value.length + excess) / 8;
+    final BerWriter data = EMPTY.ibyte(excess).then(encodeBitStringBits(value.value << excess, encodeLength));
+    
+    return EMPTY.ibyte(3).ibyte(data.length).then(data);
+  }
 }
