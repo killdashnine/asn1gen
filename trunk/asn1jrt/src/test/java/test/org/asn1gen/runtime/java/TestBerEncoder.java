@@ -293,7 +293,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_e() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(2.0);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x03, 0x80, 0x01, 0x01), result);
   }
 
@@ -301,7 +300,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_f() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(3.0);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x03, 0x80, 0x00, 0x03), result);
   }
   
@@ -309,7 +307,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_g() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(0.1);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0x80, 0xc9, 0x0c, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcd), result);
   }
 
@@ -317,7 +314,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_h() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(0.2);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0x80, 0xca, 0x0c, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcd), result);
   }
 
@@ -325,7 +321,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_i() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(0.3);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0x80, 0xca, 0x13, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), result);
   }
 
@@ -333,7 +328,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_j() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(1.1);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0x80, 0xcd, 0x08, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcd), result);
   }
 
@@ -341,7 +335,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_k() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-1.0);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x03, 0xc0, 0x00, 0x01), result);
   }
 
@@ -349,7 +342,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_l() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-3.0);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x03, 0xc0, 0x00, 0x03), result);
   }
 
@@ -357,7 +349,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_m() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-4.0);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x03, 0xc0, 0x02, 0x01), result);
   }
 
@@ -365,7 +356,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_n() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-0.1);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0xc0, 0xc9, 0x0c, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcd), result);
   }
 
@@ -373,7 +363,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_o() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-0.2);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0xc0, 0xca, 0x0c, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcd), result);
   }
 
@@ -382,7 +371,6 @@ public class TestBerEncoder {
   public void test_18_2_5_real_p() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(-0.3);
     final byte[] result = writeToByteArray(berWriter);
-    System.out.print("result: "); berWriter.dumpln();
     Assert.assertArrayEquals(ibytes(0x09, 0x09, 0xc0, 0xca, 0x13, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33), result);
   }
 
