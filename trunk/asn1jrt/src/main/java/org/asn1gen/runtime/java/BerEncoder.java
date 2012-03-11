@@ -112,14 +112,6 @@ public class BerEncoder {
     return encode(value.value);
   }
   
-  private static BerWriter significand(final long significand) {
-    if (significand == 0) {
-      return BerWriter.EMPTY;
-    }
-    
-    return BerWriter.lbyteThen((significand >> 56) & 0xff, significand(significand << 8));
-  }
-  
   public static int trailingZeros(final long value, final int shiftTest) {
     if (shiftTest == 1) {
       final long nibble = value & 3;
@@ -165,12 +157,13 @@ public class BerEncoder {
     final long sign = (rawValue >> 63) & 0x1;
     final int scale = 0;
     final int base = 0; // binary
-    final long rawExponent = (rawValue >> 52) & 0x7ff;
     final long exponent = ((rawValue >> 52) & 0x7ff) - 1023;
-    final long mantissa = rawValue & 0x000fffffffffffffL;
-    final long encMantissa = (mantissa | 0x00010000000000000L) << 4;
-    final BerWriter encodedMantissa = significand(encMantissa);
-    final BerWriter encodedExponent = i8sig(BerWriter.EMPTY, exponent);
+    final long mantissa = (rawValue & 0x000fffffffffffffL) | 0x0010000000000000L;
+    final long mantissaShift = trailingZeros(mantissa);
+    final long significand = mantissa >> mantissaShift;
+    final long trueExponent = exponent - 52 + mantissaShift;
+    final BerWriter encodedMantissa = i8sig(BerWriter.EMPTY, significand);
+    final BerWriter encodedExponent = i8sig(BerWriter.EMPTY, trueExponent);
     final BerWriter encodedDescriptor = BerWriter.EMPTY.lbyte(
         (0x80 | (sign << 6) | (base << 4) | (scale << 2) | ((encodedExponent.length - 1) & 0x3)));
     final BerWriter realData = encodedDescriptor.then(encodedExponent).then(encodedMantissa);
