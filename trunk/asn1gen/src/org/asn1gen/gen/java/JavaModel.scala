@@ -10,9 +10,9 @@ import scala.io.Source
 
 case class JavaModel(
     modules: HashMap[String, Module], 
-    namespace: String = "", 
+    namespace: Option[String] = None, 
     pathOut: File = new File(".")) extends Asn1Parser {
-  lazy val namespacePath = pathOut / namespace.replaceAll(".", "/")
+  lazy val namespacePath = pathOut / namespace.getOrElse("").replaceAll(".", "/")
   lazy val pathModel = namespacePath / "model"
   lazy val pathMeta = namespacePath / "meta"
   lazy val pathCodec = namespacePath / "codec"
