@@ -16,15 +16,21 @@ class GenJava(outDirectory: File, moduleName: String) {
   def generate(implicit module: Module): Unit = {
     module.types.foreach { case (_, namedType: NamedType) =>
       val typeFile = modulePath.child(namedType.name + ".java")
-      typeFile.openPrintStream { ps =>
-        generateType(namedType)(module, new IndentWriter(ps))
+      typeFile.withIndentWriter { out =>
+        generateType(namedType)(module, out)
         println("Writing to " + typeFile)
       }
     }
     val valuesFile = modulePath.child("Values.java")
-    valuesFile.openPrintStream { ps =>
-      generateValues(module, new IndentWriter(ps))
+    valuesFile.withIndentWriter { out =>
+      generateValues(module, out)
       println("Writing to " + valuesFile)
+    }
+    val codecPath = modulePath / "codec"
+    codecPath.mkdir
+    val berEncoderFile = codecPath / "BerEncoder.java"
+    berEncoderFile.withIndentWriter { out =>
+      generateBerEncoder(module, out)
     }
   }
   
@@ -48,6 +54,13 @@ class GenJava(outDirectory: File, moduleName: String) {
   }
   
   def generateValues(implicit module: Module, out: IndentWriter): Unit = {
+    generatePackageAndImports(module, out)
+    module.values foreach { case (name, namedValue) =>
+      generate(namedValue)
+    }
+  }
+  
+  def generateBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(module, out)
     module.values foreach { case (name, namedValue) =>
       generate(namedValue)
