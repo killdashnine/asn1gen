@@ -8,9 +8,9 @@ import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable._
 import scala.io.Source
 
-case class Model(
-    modules: HashMap[String, Module],
-    namespace: String = "",
+case class JavaModel(
+    modules: HashMap[String, Module], 
+    namespace: String = "", 
     pathOut: File = new File(".")) extends Asn1Parser {
   lazy val namespacePath = pathOut / namespace.replaceAll(".", "/")
   lazy val pathModel = namespacePath / "model"
@@ -28,7 +28,7 @@ case class Model(
     }
   }
   
-  def load(file: File): Model = {
+  def load(file: File): JavaModel = {
     val text = Source.fromFile(file).mkString
     parse(root, text) match {
       case Success(moduleDefinition, _) =>
@@ -38,7 +38,7 @@ case class Model(
         if (modules.contains(name)) {
           throw new ModuleLoadException("Module " + name + " already exists")
         }
-        Model(modules + (refactoredModuleDefinition.name -> Module.from(refactoredModuleDefinition)))
+        JavaModel(modules + (refactoredModuleDefinition.name -> Module.from(refactoredModuleDefinition)))
       case failure =>
         throw new ModuleLoadException("Parse failure: " + failure)
     }
@@ -74,6 +74,6 @@ case class Model(
   }
 }
 
-object Model {
-  def empty = Model(HashMap[String, Module]())
+object JavaModel {
+  def empty = JavaModel(HashMap[String, Module]())
 }
