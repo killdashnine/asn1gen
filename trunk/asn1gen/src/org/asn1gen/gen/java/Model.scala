@@ -8,14 +8,21 @@ import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable._
 import scala.io.Source
 
-case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
+case class Model(
+    modules: HashMap[String, Module],
+    namespace: String = "",
+    pathOut: File = new File(".")) extends Asn1Parser {
+  lazy val namespacePath = pathOut / namespace.replaceAll(".", "/")
+  lazy val pathModel = namespacePath / "model"
+  lazy val pathMeta = namespacePath / "meta"
+  lazy val pathCodec = namespacePath / "codec"
+  
   def parse[N](root: Parser[N], input: String) =
     phrase(root)(new lexical.Scanner(input))
   
-  def generateTo(packageName: String, directory: File): Unit = {
+  def generate(): Unit = {
     modules foreach { case (moduleName, module) =>
-      val modulePath = directory.child(moduleName)
-      modulePath.mkdir
+      val modulePath = (pathModel / moduleName).make
       val genJava = new GenJava(modulePath, moduleName)
       genJava.generate(module)
     }
@@ -43,20 +50,13 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     }
   }
   
-  def writeTo(outDirectory: File): Unit = {
-    outDirectory.mkdir
-    val metaDirectory = outDirectory.child("meta")
-    metaDirectory.mkdir
-    val codecDirectory = outDirectory.child("codec")
-    codecDirectory.mkdir
-    val berDirectory = codecDirectory.child("ber")
-    berDirectory.mkdir
+  def write(): Unit = {
     modules foreach { case (moduleName, module) =>
-      val genJava = new GenJava(outDirectory, moduleName)
+      val genJava = new GenJava(pathModel.make, moduleName)
       genJava.generate(module)
     }
     modules foreach { case (moduleName, module) =>
-      val moduleFile = metaDirectory.child(moduleName + ".java")
+      val moduleFile = pathMeta.make.child(moduleName + ".java")
       moduleFile.openPrintStream { ps =>
         val genJava = new GenJavaMeta("moo", new IndentWriter(ps))
         genJava.generate(module)
@@ -64,9 +64,9 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
       }
     }
     modules foreach { case (moduleName, module) =>
-      val moduleFile = berDirectory.child(moduleName + ".java")
-      moduleFile.openPrintStream { ps =>
-        val genJava = new GenJavaBerEncoder("moo", new IndentWriter(ps))
+      val moduleFile = pathCodec.make.child(moduleName + ".java")
+      moduleFile.withIndentWriter { out =>
+        val genJava = new GenJavaBerEncoder("moo", out)
         genJava.generate(module)
         println("Writing to " + moduleFile)
       }
