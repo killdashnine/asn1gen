@@ -9,7 +9,7 @@ import org.asn1gen.io._
 import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable.Set
 
-class GenJava(outDirectory: File, moduleName: String) {
+class GenJava(model: JavaModel, outDirectory: File, moduleName: String) {
   val modulePath = outDirectory.child(moduleName)
   modulePath.mkdir
 

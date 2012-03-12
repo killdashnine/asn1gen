@@ -23,7 +23,7 @@ case class JavaModel(
   def generate(): Unit = {
     modules foreach { case (moduleName, module) =>
       val modulePath = (pathModel / moduleName).make
-      val genJava = new GenJava(modulePath, moduleName)
+      val genJava = new GenJava(this, modulePath, moduleName)
       genJava.generate(module)
     }
   }
@@ -52,7 +52,7 @@ case class JavaModel(
   
   def write(): Unit = {
     modules foreach { case (moduleName, module) =>
-      val genJava = new GenJava(pathModel.make, moduleName)
+      val genJava = new GenJava(this, pathModel.make, moduleName)
       genJava.generate(module)
     }
     modules foreach { case (moduleName, module) =>
