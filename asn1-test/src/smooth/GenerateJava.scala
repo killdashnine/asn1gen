@@ -41,9 +41,7 @@ object GenerateJava extends Asn1Parser {
     
     // Output model
     try {
-      val outDirectory = new File("out")
-      outDirectory.mkdir
-      model.writeTo(outDirectory)
+      model.copy(pathOut = new File("out")).write()
     } catch {
       case e: AsnCodeGenerationException => {
         System.out.print("Error: ")

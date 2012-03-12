@@ -66,6 +66,11 @@ case class ExtraFile(file: File) {
     }
   }
   
+  def make: File = {
+    file.mkdir
+    file
+  }
+  
   def withPrintWriter[T](f: PrintWriter => T) = {
     this.withOutputStream { _.withPrintWriter(f) }
   }
