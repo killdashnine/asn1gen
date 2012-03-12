@@ -90,6 +90,8 @@ case class ExtraFile(file: File) {
   
   def child(childName: String) = new File(file, childName)
   
+  def /(childName: String) = new File(file, childName)
+  
   def children: Array[File] = file.listFiles
   
   def children(filter: File => Boolean): Array[File] = this.children.filter(filter)
