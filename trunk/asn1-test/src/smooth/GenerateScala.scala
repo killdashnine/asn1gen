@@ -23,7 +23,7 @@ object GenerateScala extends Asn1Parser {
       file.isFile && file.name.endsWith(".asn1")
     }
     
-    var model = (Model.empty /: children) { (model, child) =>
+    var model = (ScalaModel.empty /: children) { (model, child) =>
       println("Loading: " + child.name)
       model.load(child)
     }
