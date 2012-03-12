@@ -8,7 +8,7 @@ import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable._
 import scala.io.Source
 
-case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
+case class ScalaModel(modules: HashMap[String, Module]) extends Asn1Parser {
   def parse[N](root: Parser[N], input: String) =
     phrase(root)(new lexical.Scanner(input))
   
@@ -21,7 +21,7 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
     }
   }
   
-  def load(file: File): Model = {
+  def load(file: File): ScalaModel = {
     val text = Source.fromFile(file).mkString
     parse(root, text) match {
       case Success(moduleDefinition, _) =>
@@ -31,7 +31,7 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
         if (modules.contains(name)) {
           throw new ModuleLoadException("Module " + name + " already exists")
         }
-        Model(modules + (refactoredModuleDefinition.name -> Module.from(refactoredModuleDefinition)))
+        ScalaModel(modules + (refactoredModuleDefinition.name -> Module.from(refactoredModuleDefinition)))
       case failure =>
         throw new ModuleLoadException("Parse failure: " + failure)
     }
@@ -78,6 +78,6 @@ case class Model (modules: HashMap[String, Module]) extends Asn1Parser {
   }
 }
 
-object Model {
-  def empty = Model(HashMap[String, Module]())
+object ScalaModel {
+  def empty = ScalaModel(HashMap[String, Module]())
 }
