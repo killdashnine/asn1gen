@@ -10,8 +10,9 @@ import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable.Set
 
 class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], moduleName: String) {
-  val modulePath = outDirectory / "model" / moduleName
-  val codecPath = outDirectory / "codec"
+  val namespacePath = outDirectory / namespace.getOrElse("").replaceAll("\\.", "/")
+  val modulePath = namespacePath / "model" / moduleName
+  val codecPath = namespacePath / "codec" / moduleName
 
   def generate(implicit module: Module): Unit = {
     module.types.foreach { case (_, namedType: NamedType) =>
