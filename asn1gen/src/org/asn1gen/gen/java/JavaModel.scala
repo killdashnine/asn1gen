@@ -13,20 +13,11 @@ case class JavaModel(
     namespace: Option[String] = None, 
     pathOut: File = new File(".")) extends Asn1Parser {
   lazy val namespacePath = pathOut / namespace.getOrElse("").replaceAll(".", "/")
-  lazy val pathModel = namespacePath / "model"
-  lazy val pathMeta = namespacePath / "meta"
-  lazy val pathCodec = namespacePath / "codec"
+  println("--> namespace: " + namespace)
+  println("--> namespacePath: " + namespacePath)
   
   def parse[N](root: Parser[N], input: String) =
     phrase(root)(new lexical.Scanner(input))
-  
-  def generate(): Unit = {
-    modules foreach { case (moduleName, module) =>
-      val modulePath = (pathModel / moduleName).make
-      val genJava = new GenJava(this, modulePath, moduleName)
-      genJava.generate(module)
-    }
-  }
   
   def load(file: File): JavaModel = {
     val text = Source.fromFile(file).mkString
@@ -52,24 +43,8 @@ case class JavaModel(
   
   def write(): Unit = {
     modules foreach { case (moduleName, module) =>
-      val genJava = new GenJava(this, pathModel.make, moduleName)
+      val genJava = new GenJava(this, pathOut.make, namespace, moduleName)
       genJava.generate(module)
-    }
-    modules foreach { case (moduleName, module) =>
-      val moduleFile = pathMeta.make.child(moduleName + ".java")
-      moduleFile.openPrintStream { ps =>
-        val genJava = new GenJavaMeta("moo", new IndentWriter(ps))
-        genJava.generate(module)
-        println("Writing to " + moduleFile)
-      }
-    }
-    modules foreach { case (moduleName, module) =>
-      val moduleFile = pathCodec.make.child(moduleName + ".java")
-      moduleFile.withIndentWriter { out =>
-        val genJava = new GenJavaBerEncoder("moo", out)
-        genJava.generate(module)
-        println("Writing to " + moduleFile)
-      }
     }
   }
 }

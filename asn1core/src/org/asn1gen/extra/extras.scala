@@ -67,7 +67,7 @@ case class ExtraFile(file: File) {
   }
   
   def make: File = {
-    file.mkdir
+    file.mkdirs
     file
   }
   
