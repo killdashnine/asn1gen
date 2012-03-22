@@ -9,27 +9,26 @@ import org.asn1gen.io._
 import org.asn1gen.parsing.asn1.{ast => ast}
 import scala.collection.immutable.Set
 
-class GenJava(model: JavaModel, outDirectory: File, moduleName: String) {
-  val modulePath = outDirectory.child(moduleName)
-  modulePath.mkdir
+class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], moduleName: String) {
+  val modulePath = outDirectory / "model" / moduleName
+  val codecPath = outDirectory / "codec"
 
   def generate(implicit module: Module): Unit = {
     module.types.foreach { case (_, namedType: NamedType) =>
-      val typeFile = modulePath.child(namedType.name + ".java")
+      val typeFile = modulePath.make.child(namedType.name + ".java")
       typeFile.withIndentWriter { out =>
         generateType(namedType)(module, out)
         println("Writing to " + typeFile)
       }
     }
-    val valuesFile = modulePath.child("Values.java")
+    val valuesFile = modulePath.make.child("Values.java")
     valuesFile.withIndentWriter { out =>
       generateValues(module, out)
       println("Writing to " + valuesFile)
     }
-    val codecPath = modulePath / "codec"
-    codecPath.mkdir
-    val berEncoderFile = codecPath / "BerEncoder.java"
-    berEncoderFile.withIndentWriter { out =>
+    codecPath.make
+    val berCodecPath = codecPath / "BerEncoder.java"
+    berCodecPath.withIndentWriter { out =>
       generateBerEncoder(module, out)
     }
   }

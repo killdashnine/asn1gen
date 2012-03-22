@@ -26,7 +26,7 @@ object GenerateJava extends Asn1Parser {
     var model = (JavaModel.empty /: children) { (model, child) =>
       println("Loading: " + child.name)
       model.load(child)
-    }
+    }.copy(namespace = Some("moo"))
     
     model.modules foreach { case (name, module) =>
       module.types foreach { case (name, namedType) =>
