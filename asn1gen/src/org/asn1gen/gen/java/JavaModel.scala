@@ -12,10 +12,6 @@ case class JavaModel(
     modules: HashMap[String, Module], 
     namespace: Option[String] = None, 
     pathOut: File = new File(".")) extends Asn1Parser {
-  lazy val namespacePath = pathOut / namespace.getOrElse("").replaceAll(".", "/")
-  println("--> namespace: " + namespace)
-  println("--> namespacePath: " + namespacePath)
-  
   def parse[N](root: Parser[N], input: String) =
     phrase(root)(new lexical.Scanner(input))
   
