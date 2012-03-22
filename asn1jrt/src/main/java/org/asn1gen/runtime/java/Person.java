@@ -1,6 +1,6 @@
 package org.asn1gen.runtime.java;
 
-import ASNEXAMPLES.Book;
+import moo.model.ASNEXAMPLES.Book;
 
 public class Person {
   public static final Person EMPTY = new Person(
