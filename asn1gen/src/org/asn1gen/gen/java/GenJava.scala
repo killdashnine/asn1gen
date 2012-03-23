@@ -78,7 +78,6 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   }
   
   def generate(namedValue: NamedValue)(implicit module: Module, out: IndentWriter): Unit = {
-    out.trace("/*", "*/")
     namedValue match {
       case NamedValue(name, ast.Type(ast.INTEGER(None), _), ast.SignedNumber(negative, ast.Number(magnitude))) => {
         out << "public static AsnInteger " << name << " = new AsnInteger("
@@ -96,7 +95,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       case NamedValue(name, typePart, valuePart) => {
         typePart match {
           case ast.Type(ast.TypeReference(typeName), _) => {
-            out << "public static " << safeId(typeName) << " " << name << " = " << typeName << EndLn
+            out << "public static " << safeId(typeName) << " " << name << " = " << typeName
           }
         }
         out.indent(2) {
@@ -105,7 +104,8 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
               memberValues.foreach { memberValue =>
                 memberValue match {
                   case ast.NamedValue(ast.Identifier(id), value) => {
-                    out << "." << safeId(id) << " { " << "_ => "
+                    out << EndLn
+                    out << ".with" << safeId(id).capitalise << "("
                     value match {
                       case ast.CString(stringValue) => {
                         out << stringValue.inspect
@@ -116,12 +116,12 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                       case ast.BooleanValue(booleanValue) => {
                         out << booleanValue
                       }
-                      
                     }
-                    out << " }" << EndLn
+                    out << ")"
                   }
                 }
               }
+              out << ";" << EndLn
             }
           }
         }
