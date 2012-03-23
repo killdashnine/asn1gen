@@ -7,6 +7,10 @@ public class AsnOctetString implements AsnType {
   
   public final byte[] value;
   
+  public AsnOctetString(final String value) {
+    this.value = value.getBytes();
+  }
+  
   public AsnOctetString(final byte[] value) {
     this.value = value;
   }
