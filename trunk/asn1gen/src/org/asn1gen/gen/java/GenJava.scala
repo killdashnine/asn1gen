@@ -84,22 +84,22 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   def generate(namedValue: NamedValue)(implicit module: Module, out: IndentWriter): Unit = {
     namedValue match {
       case NamedValue(name, ast.Type(ast.INTEGER(None), _), ast.SignedNumber(negative, ast.Number(magnitude))) => {
-        out << "public static AsnInteger " << name << " = new AsnInteger("
+        out << "public static final AsnInteger " << name << " = new AsnInteger("
         if (negative) {
           out << "-"
         }
         out << magnitude << ");" << EndLn
       }
       case NamedValue(name, ast.Type(ast.BOOLEAN, _), ast.BooleanValue(booleanValue)) => {
-        out << "public static AsnBoolean " << name << " = AsnBoolean." << (if (booleanValue) "TRUE" else "FALSE") << ";" << EndLn
+        out << "public static final AsnBoolean " << name << " = AsnBoolean." << (if (booleanValue) "TRUE" else "FALSE") << ";" << EndLn
       }
       case NamedValue(name, ast.Type(ast.OctetStringType, _), ast.CString(stringValue)) => {
-        out << "public static AsnOctetString " << name << " = new AsnOctetString(" << stringValue.inspect << ");" << EndLn
+        out << "public static final AsnOctetString " << name << " = new AsnOctetString(" << stringValue.inspect << ");" << EndLn
       }
       case NamedValue(name, typePart, valuePart) => {
         typePart match {
           case ast.Type(ast.TypeReference(typeName), _) => {
-            out << "public static " << safeId(typeName) << " " << name << " = " << typeName << ".EMPTY"
+            out << "public static final " << safeId(typeName) << " " << name << " = " << typeName << ".EMPTY"
           }
         }
         out.indent(2) {
