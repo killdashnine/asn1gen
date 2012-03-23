@@ -84,9 +84,13 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     generatePackageAndImports(codecPackage(module))(module, out)
     out << "import " << modelPackage(module) << ";" << EndLn
     out << EndLn
-    module.values foreach { case (name, namedValue) =>
-      generate(namedValue)
+    out << "public class BerEncoder {" << EndLn
+    out.indent(2) {
+      module.types.foreach { case (_, namedType: NamedType) =>
+        generateBerEncoder(namedType)
+      }
     }
+    out << "}" << EndLn
   }
   
   def generate(namedValue: NamedValue)(implicit module: Module, out: IndentWriter): Unit = {
@@ -140,6 +144,32 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       }
       case x => {
         out << "/* unknown value " << x << " */" << EndLn
+      }
+    }
+  }
+  
+  def generateBerEncoder(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
+    namedType._type match {
+      case ast.Type(builtinType: ast.BuiltinType, _) => {
+        generateBerEncoder(builtinType, namedType.name)
+      }
+      case t@ast.Type(referencedType: ast.ReferencedType, _) => {
+        referencedType match {
+          case ast.TypeReference(name) => {
+            out.ensureEmptyLines(1)
+            out << "/* " << safeId(namedType.name) << " */" << EndLn
+          }
+          case _ => {
+            out << "/* referencedType" << EndLn
+            out << referencedType << EndLn
+            out << "*/" << EndLn
+          }
+        }
+      }
+      case t@ast.Type(_, _) => {
+        out << "/* unknown: " << namedType.name << EndLn
+        out << t << EndLn
+        out << "*/" << EndLn
       }
     }
   }
@@ -474,6 +504,313 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         out << "// Unmatched " << safeAssignmentName << ": " << unmatched << EndLn
       }
     }
+  }
+  
+  def generateBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
+    val safeAssignmentName = safeId(assignmentName)
+    out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
+    out.indent(2) {
+      builtinType match {
+        case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
+          out << "abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
+          out.indent(2) {
+            generateSimpleGetters(rootAlternativeTypeList)
+            generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
+          }
+          out << "}" << EndLn
+          out.trace("/*", "*/")
+          rootAlternativeTypeList match {
+            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+              namedTypes foreach { namedType =>
+                generateChoices(assignmentName, namedType)
+              }
+            }
+          }
+  
+          val firstNamedType =
+            rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
+          out << EndLn
+        }
+        case ast.SequenceType(ast.Empty) => {
+          out.ensureEmptyLines(1)
+          out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
+          out.indent(2) {
+            out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
+          }
+          out << "}" << EndLn
+        }
+        case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
+          val list = (list1.toList:::list2.toList).map { componentTypeList =>
+            componentTypeList.componentTypes
+          }.flatten
+          out.ensureEmptyLines(1)
+          out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
+          out.indent(2) {
+            out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "("
+            out.indent(2) {
+              var delim = ""
+              list foreach {
+                case ast.NamedComponentType(
+                  ast.NamedType(ast.Identifier(identifier), _type),
+                  value)
+                => {
+                  out << delim << EndLn
+                  out << safeId(asnTypeOf(_type, value)) << ".EMPTY"
+                  delim = ","
+                }
+              }
+            }
+            out << ");" << EndLn
+            out << EndLn
+            out.trace("/*", "*/")
+            list foreach {
+              case ast.NamedComponentType(
+                ast.NamedType(ast.Identifier(identifier), _type),
+                value)
+              => {
+                out << "public final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
+              }
+            }
+            out << EndLn
+            out << "public " << safeAssignmentName << "(" << EndLn
+            out.indent(2) {
+              out.indent(2) {
+                generateSequenceParameters(list)
+                out << ") {" << EndLn
+              }
+              list1 match {
+                case Some(ast.ComponentTypeList(list)) => {
+                  generateConstructorAssignments(assignmentName, list)
+                }
+                case None => ()
+              }
+            }
+            out << "}" << EndLn
+            out << EndLn
+            list foreach {
+              case ast.NamedComponentType(
+                ast.NamedType(ast.Identifier(identifier), _type),
+                value)
+              => {
+                out << "public final " << safeAssignmentName << " with" << safeId(identifier).capitalise << "(final " << safeId(asnTypeOf(_type, value)) << " value) {" << EndLn
+                out.indent(2) {
+                  out << "return new " << safeAssignmentName << "("
+                  out.indent(2) {
+                    var firstTime = true
+                    list foreach {
+                      case ast.NamedComponentType(
+                        ast.NamedType(ast.Identifier(subIdentifier), _type),
+                        value)
+                      => {
+                        if (!firstTime) {
+                          out << ","
+                        }
+                        out << EndLn
+                        if (identifier == subIdentifier) {
+                          out << "value"
+                        } else {
+                          out << "this." << safeId(subIdentifier)
+                        }
+                        firstTime = false
+                      }
+                    }
+                    out << ");" << EndLn
+                  }
+                }
+                out << "}" << EndLn
+              }
+              out << EndLn
+            }
+            out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
+            out.indent(2) {
+              out << "assert that != null;" << EndLn
+              out.trace("/*", "*/")
+              list foreach {
+                case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
+                  out << EndLn
+                  out << "if (!this." << safeId(identifier) << ".equals(that." + safeId(identifier) + ")) {" << EndLn
+                  out.indent(2) {
+                    out << "return false;" << EndLn
+                  }
+                  out << "}" << EndLn
+                }
+              }
+              out << EndLn
+              out << "return true;" << EndLn
+            }
+            out << "}" << EndLn
+            out << EndLn
+            out << "@Override" << EndLn
+            out << "public boolean equals(final Object that) {" << EndLn
+            out.indent(2) {
+              out << "if (that instanceof " << safeAssignmentName << ") {" << EndLn
+              out.indent(2) {
+                out << "return this.equals((" + safeAssignmentName + ")that);" << EndLn
+              }
+              out << "}" << EndLn
+              out << EndLn
+              out << "return true;" << EndLn
+            }
+            out << "}" << EndLn
+            out << EndLn
+            out << "@Override" << EndLn
+            out << "public int hashCode() {" << EndLn
+            out.indent(2) {
+              out << "return (0"
+              out.indent(2) {
+                list foreach {
+                  case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
+                    out << EndLn << "^ this." << safeId(identifier) << ".hashCode()"
+                  }
+                }
+              }
+              out << ");" << EndLn
+            }
+            out << "}" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
+        }
+        case ast.EnumeratedType(enumerations)
+        => {
+          var firstIndex: Option[Long] = None
+          out.ensureEmptyLines(1)
+          out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnEnumeration {" << EndLn
+          out.indent(2) {
+            out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(0);" << EndLn
+            out << EndLn
+            out << "public final long value;" << EndLn
+            out << EndLn
+            out << "public " << safeAssignmentName << "(final long value) {" << EndLn
+            out.indent(2) {
+              out << "this.value = value;" << EndLn
+            }
+            out << "}" << EndLn
+            out << EndLn
+            generateEnumeratedValues(enumerations, assignmentName)
+            out << EndLn
+            out << "public static " << safeId(assignmentName) << " of(final String name) {" << EndLn
+            out.indent(2) {
+              enumerations match {
+                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
+                => {
+                  items foreach {
+                    case ast.Identifier(item) => {
+                      out << "if (name.equals(" << safeId(item).inspect << ")) {" << EndLn
+                      out.indent(2) {
+                        out << "return " << safeId(item) << ";" << EndLn
+                      }
+                      out << "}" << EndLn
+                      out << EndLn
+                    }
+                    case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
+                      out << "if (name.equals(" << safeId(item).inspect << ")) {" << EndLn
+                      out.indent(2) {
+                        out << "return " << safeId(item) << ";" << EndLn
+                      }
+                      out << "}" << EndLn
+                      out << EndLn
+                    }
+                  }
+                  extension match {
+                    case None => {}
+                    case _ => out << extension << EndLn
+                  }
+                }
+              }
+              out << "throw new org.asn1gen.runtime.java.BadEnumerationException(" << EndLn
+              out.indent(2) {
+                out << "\"Unrecogonised enumeration value + '\" + name + \"'\");" << EndLn
+              }
+            }
+            out << "}" << EndLn
+            out << EndLn
+            out << "public static " << safeId(assignmentName) << " of(final int value) {" << EndLn
+            out.indent(2) {
+              out << "switch (value) {" << EndLn
+              out.indent(2) {
+                enumerations match {
+                  case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
+                  => {
+                    var index = 0
+                    items foreach {
+                      case ast.Identifier(item) => {
+                        out << "case " << index << ": return " << safeId(item) << ";" << EndLn
+                        index = index + 1
+                      }
+                      case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
+                        val value = if (sign) n * -1 else n
+                        out << "case " << value << ": return " << safeId(item) << ";" << EndLn
+                        index = index + 1
+                      }
+                    }
+                    extension match {
+                      case None => {}
+                      case _ => out << extension << EndLn
+                    }
+                  }
+                }
+                out << "default: return new " << safeId(assignmentName) << "(value);" << EndLn
+              }
+              out << "}" << EndLn
+            }
+            out << "}" << EndLn
+          }
+          out << "}" << EndLn
+        }
+        case setOfType: ast.SetOfType => {
+          generate(assignmentName, setOfType)
+        }
+        case bitStringType: ast.BitStringType => {
+          out.ensureEmptyLines(1)
+          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
+          out << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
+        }
+        case ast.INTEGER(None) => {
+          out.ensureEmptyLines(1)
+          out << "type " << safeAssignmentName << " = Long" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = 0L" << EndLn
+        }
+        case ast.BOOLEAN => {
+          out.ensureEmptyLines(1)
+          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBoolean" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnFalse" << EndLn
+        }
+        case ast.OctetStringType => {
+          out.ensureEmptyLines(1)
+          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
+        }
+        case ast.PrintableString => {
+          out.ensureEmptyLines(1)
+          out << "type " << safeAssignmentName << " = String" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
+        }
+        case ast.REAL => {
+          out.ensureEmptyLines(1)
+          out  << "type " << safeAssignmentName << " = Double" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
+        }
+        case ast.UTF8String => {
+          out.ensureEmptyLines(1)
+          out << "type " << safeAssignmentName << " = String" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
+        }
+        case unmatched => {
+          out.ensureEmptyLines(1)
+          out << "// Unmatched " << safeAssignmentName << ": " << unmatched << EndLn
+        }
+      }
+    }
+    out << "}" << EndLn
   }
   
   def generateEnumeratedValues(enumerations: ast.Enumerations, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
