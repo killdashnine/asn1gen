@@ -276,8 +276,8 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
               }
               out << "}" << EndLn
             }
+            out << EndLn
           }
-          out << EndLn
           out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
           out.indent(2) {
             out << "assert that != null;" << EndLn
