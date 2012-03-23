@@ -61,9 +61,13 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   
   def generateValues(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(valuePackage(module))(module, out)
-    module.values foreach { case (name, namedValue) =>
-      generate(namedValue)
+    out << "public class " << module.name << " {" << EndLn
+    out.indent(2) {
+      module.values foreach { case (name, namedValue) =>
+        generate(namedValue)
+      }
     }
+    out << "}" << EndLn
   }
   
   def generateBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
@@ -77,22 +81,22 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.trace("/*", "*/")
     namedValue match {
       case NamedValue(name, ast.Type(ast.INTEGER(None), _), ast.SignedNumber(negative, ast.Number(magnitude))) => {
-        out << "lazy val " << name << " = "
+        out << "public static AsnInteger " << name << " = new AsnInteger("
         if (negative) {
           out << "-"
         }
-        out << magnitude << EndLn
+        out << magnitude << ");" << EndLn
       }
       case NamedValue(name, ast.Type(ast.BOOLEAN, _), ast.BooleanValue(booleanValue)) => {
-        out << "lazy val " << name << " = " << booleanValue << EndLn
+        out << "public static AsnBoolean " << name << " = new AsnBoolean(" << booleanValue << ");" << EndLn
       }
       case NamedValue(name, ast.Type(ast.OctetStringType, _), ast.CString(stringValue)) => {
-        out << "lazy val " << name << " = " << stringValue.inspect << "" << EndLn
+        out << "public static AsnOctetString " << name << " = new AsnOctetString(" << stringValue.inspect << ");" << EndLn
       }
       case NamedValue(name, typePart, valuePart) => {
         typePart match {
           case ast.Type(ast.TypeReference(typeName), _) => {
-            out << "lazy val " << name << " = " << typeName << EndLn
+            out << "public static " << safeId(typeName) << " " << name << " = " << typeName << EndLn
           }
         }
         out.indent(2) {
