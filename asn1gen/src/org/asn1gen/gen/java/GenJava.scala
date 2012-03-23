@@ -99,7 +99,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       case NamedValue(name, typePart, valuePart) => {
         typePart match {
           case ast.Type(ast.TypeReference(typeName), _) => {
-            out << "public static " << safeId(typeName) << " " << name << " = " << typeName
+            out << "public static " << safeId(typeName) << " " << name << " = " << typeName << ".EMPTY"
           }
         }
         out.indent(2) {
@@ -112,7 +112,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                     out << ".with" << safeId(id).capitalise << "("
                     value match {
                       case ast.CString(stringValue) => {
-                        out << stringValue.inspect
+                        out << "new AsnOctetString(" << stringValue.inspect << ")"
                       }
                       case ast.ValueReference(valueReferenceName) => {
                         out << safeId(valueReferenceName)
