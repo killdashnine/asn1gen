@@ -61,6 +61,8 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   
   def generateValues(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(valuePackage(module))(module, out)
+    out << "import " << modelPackage(module) << ".*;" << EndLn
+    out << EndLn
     out << "public class " << module.name << " {" << EndLn
     out.indent(2) {
       module.values foreach { case (name, namedValue) =>
@@ -72,6 +74,8 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   
   def generateBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(codecPackage(module))(module, out)
+    out << "import " << modelPackage(module) << ";" << EndLn
+    out << EndLn
     module.values foreach { case (name, namedValue) =>
       generate(namedValue)
     }
@@ -215,7 +219,15 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           }
           out << ");" << EndLn
           out << EndLn
-          generateSequenceFieldDefines(assignmentName, list)
+          out.trace("/*", "*/")
+          list foreach {
+            case ast.NamedComponentType(
+              ast.NamedType(ast.Identifier(identifier), _type),
+              value)
+            => {
+              out << "public final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
+            }
+          }
           out << EndLn
           out << "public " << safeAssignmentName << "(" << EndLn
           out.indent(2) {
@@ -231,6 +243,40 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             }
           }
           out << "}" << EndLn
+          out << EndLn
+          list foreach {
+            case ast.NamedComponentType(
+              ast.NamedType(ast.Identifier(identifier), _type),
+              value)
+            => {
+              out << "public final " << safeAssignmentName << " with" << safeId(identifier).capitalise << "(final " << safeId(asnTypeOf(_type, value)) << " value) {" << EndLn
+              out.indent(2) {
+                out << "return new " << safeAssignmentName << "("
+                out.indent(2) {
+                  var firstTime = true
+                  list foreach {
+                    case ast.NamedComponentType(
+                      ast.NamedType(ast.Identifier(subIdentifier), _type),
+                      value)
+                    => {
+                      if (!firstTime) {
+                        out << ","
+                      }
+                      out << EndLn
+                      if (identifier == subIdentifier) {
+                        out << "value"
+                      } else {
+                        out << "this." << safeId(subIdentifier)
+                      }
+                      firstTime = false
+                    }
+                  }
+                  out << ");" << EndLn
+                }
+              }
+              out << "}" << EndLn
+            }
+          }
           out << EndLn
           out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
           out.indent(2) {
@@ -514,18 +560,6 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = Nil: List[" << asnTypeOf(builtinType) << "]"
           }
         }
-      }
-    }
-  }
-  
-  def generateSequenceFieldDefines(sequenceName: String, list: List[ast.ComponentType])(implicit module: Module, out: IndentWriter): Unit = {
-    out.trace("/*", "*/")
-    list foreach {
-      case ast.NamedComponentType(
-        ast.NamedType(ast.Identifier(identifier), _type),
-        value)
-      => {
-        out << "public final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
       }
     }
   }
