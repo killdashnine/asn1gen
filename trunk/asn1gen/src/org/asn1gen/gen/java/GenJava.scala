@@ -91,7 +91,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         out << magnitude << ");" << EndLn
       }
       case NamedValue(name, ast.Type(ast.BOOLEAN, _), ast.BooleanValue(booleanValue)) => {
-        out << "public static AsnBoolean " << name << " = new AsnBoolean(" << booleanValue << ");" << EndLn
+        out << "public static AsnBoolean " << name << " = AsnBoolean." << (if (booleanValue) "TRUE" else "FALSE") << ";" << EndLn
       }
       case NamedValue(name, ast.Type(ast.OctetStringType, _), ast.CString(stringValue)) => {
         out << "public static AsnOctetString " << name << " = new AsnOctetString(" << stringValue.inspect << ");" << EndLn
@@ -118,7 +118,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                         out << safeId(valueReferenceName)
                       }
                       case ast.BooleanValue(booleanValue) => {
-                        out << booleanValue
+                        out << "AsnBoolean." << (if (booleanValue) "TRUE" else "FALSE")
                       }
                     }
                     out << ")"
