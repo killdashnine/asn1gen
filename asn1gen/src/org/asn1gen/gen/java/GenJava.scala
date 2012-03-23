@@ -62,6 +62,14 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   def generateValues(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(valuePackage(module))(module, out)
     out << "import " << modelPackage(module) << ".*;" << EndLn
+    module.types.foreach { case (_, namedType: NamedType) =>
+      namedType._type match {
+        case ast.Type(ast.EnumeratedType(enumerations), _) => {
+          out << "import static " << modelPackage(module) << "." << safeId(namedType.name) << ".*;" << EndLn
+        }
+        case _ =>
+      }
+    }
     out << EndLn
     out << "public class " << module.name << " {" << EndLn
     out.indent(2) {
