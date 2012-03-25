@@ -34,9 +34,11 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       println("Writing to " + valueFile)
     }
     codecPath.make
-    val berCodecPath = codecPath / "BerEncoder.java"
-    berCodecPath.withIndentWriter { out =>
+    (codecPath / "BerEncoder.java").withIndentWriter { out =>
       generateBerEncoder(module, out)
+    }
+    (codecPath / "BerPartEncoder.java").withIndentWriter { out =>
+      generateBerPartEncoder(module, out)
     }
   }
   
@@ -47,7 +49,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out << EndLn
     out << "import org.asn1gen.runtime.java.*;" << EndLn
     module.imports foreach { symbolsFromModule =>
-      out << "import " << symbolsFromModule.module << "._" << EndLn
+      out << "import " << symbolsFromModule.module << ".*;" << EndLn
     }
     out << EndLn
     out << "import static org.asn1gen.runtime.java.Statics.*;" << EndLn
@@ -82,12 +84,28 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   
   def generateBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(codecPackage(module))(module, out)
-    out << "import " << modelPackage(module) << ";" << EndLn
+    out << "import " << modelPackage(module) << ".*;" << EndLn
+    out << "import static " << codecPackage(module) << ".BerPartEncoder.*;" << EndLn
     out << EndLn
     out << "public class BerEncoder {" << EndLn
     out.indent(2) {
       module.types.foreach { case (_, namedType: NamedType) =>
         generateBerEncoder(namedType)
+      }
+    }
+    out << "}" << EndLn
+  }
+  
+  def generateBerPartEncoder(implicit module: Module, out: IndentWriter): Unit = {
+    generatePackageAndImports(codecPackage(module))(module, out)
+    out << "import " << modelPackage(module) << ".*;" << EndLn
+    out << "import static org.asn1gen.runtime.java.BerEncoder.*;" << EndLn
+    out << "import static " << codecPackage(module) << ".BerEncoder.*;" << EndLn
+    out << EndLn
+    out << "public class BerPartEncoder {" << EndLn
+    out.indent(2) {
+      module.types.foreach { case (_, namedType: NamedType) =>
+        generateBerPartEncoder(namedType)
       }
     }
     out << "}" << EndLn
@@ -174,6 +192,32 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     }
   }
   
+  def generateBerPartEncoder(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
+    namedType._type match {
+      case ast.Type(builtinType: ast.BuiltinType, _) => {
+        generateBerPartEncoder(builtinType, namedType.name)
+      }
+      case t@ast.Type(referencedType: ast.ReferencedType, _) => {
+        referencedType match {
+          case ast.TypeReference(name) => {
+            out.ensureEmptyLines(1)
+            out << "/* " << safeId(namedType.name) << " */" << EndLn
+          }
+          case _ => {
+            out << "/* referencedType" << EndLn
+            out << referencedType << EndLn
+            out << "*/" << EndLn
+          }
+        }
+      }
+      case t@ast.Type(_, _) => {
+        out << "/* unknown: " << namedType.name << EndLn
+        out << t << EndLn
+        out << "*/" << EndLn
+      }
+    }
+  }
+  
   def generate(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
     namedType._type match {
       case ast.Type(builtinType: ast.BuiltinType, _) => {
@@ -207,7 +251,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       case ast.ChoiceType(
         ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
       => {
-        out << "abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
+        out << "public abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
         out.indent(2) {
           generateSimpleGetters(rootAlternativeTypeList)
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
@@ -508,304 +552,184 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   
   def generateBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
     val safeAssignmentName = safeId(assignmentName)
+    out.ensureEmptyLines(1)
     out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
     out.indent(2) {
       builtinType match {
         case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-          out << "abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
-          out.indent(2) {
-            generateSimpleGetters(rootAlternativeTypeList)
-            generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
-          }
-          out << "}" << EndLn
-          out.trace("/*", "*/")
-          rootAlternativeTypeList match {
-            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
-              namedTypes foreach { namedType =>
-                generateChoices(assignmentName, namedType)
-              }
-            }
-          }
-  
-          val firstNamedType =
-            rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
-          out << EndLn
+          out << "return encodePart(value);" << EndLn
         }
         case ast.SequenceType(ast.Empty) => {
-          out.ensureEmptyLines(1)
-          out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
-          out.indent(2) {
-            out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
-          }
-          out << "}" << EndLn
+          out << "return encodePart(value);" << EndLn
         }
         case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-          val list = (list1.toList:::list2.toList).map { componentTypeList =>
-            componentTypeList.componentTypes
-          }.flatten
-          out.ensureEmptyLines(1)
-          out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
-          out.indent(2) {
-            out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "("
-            out.indent(2) {
-              var delim = ""
-              list foreach {
-                case ast.NamedComponentType(
-                  ast.NamedType(ast.Identifier(identifier), _type),
-                  value)
-                => {
-                  out << delim << EndLn
-                  out << safeId(asnTypeOf(_type, value)) << ".EMPTY"
-                  delim = ","
-                }
-              }
-            }
-            out << ");" << EndLn
-            out << EndLn
-            out.trace("/*", "*/")
-            list foreach {
-              case ast.NamedComponentType(
-                ast.NamedType(ast.Identifier(identifier), _type),
-                value)
-              => {
-                out << "public final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
-              }
-            }
-            out << EndLn
-            out << "public " << safeAssignmentName << "(" << EndLn
-            out.indent(2) {
-              out.indent(2) {
-                generateSequenceParameters(list)
-                out << ") {" << EndLn
-              }
-              list1 match {
-                case Some(ast.ComponentTypeList(list)) => {
-                  generateConstructorAssignments(assignmentName, list)
-                }
-                case None => ()
-              }
-            }
-            out << "}" << EndLn
-            out << EndLn
-            list foreach {
-              case ast.NamedComponentType(
-                ast.NamedType(ast.Identifier(identifier), _type),
-                value)
-              => {
-                out << "public final " << safeAssignmentName << " with" << safeId(identifier).capitalise << "(final " << safeId(asnTypeOf(_type, value)) << " value) {" << EndLn
-                out.indent(2) {
-                  out << "return new " << safeAssignmentName << "("
-                  out.indent(2) {
-                    var firstTime = true
-                    list foreach {
-                      case ast.NamedComponentType(
-                        ast.NamedType(ast.Identifier(subIdentifier), _type),
-                        value)
-                      => {
-                        if (!firstTime) {
-                          out << ","
-                        }
-                        out << EndLn
-                        if (identifier == subIdentifier) {
-                          out << "value"
-                        } else {
-                          out << "this." << safeId(subIdentifier)
-                        }
-                        firstTime = false
-                      }
-                    }
-                    out << ");" << EndLn
-                  }
-                }
-                out << "}" << EndLn
-              }
-              out << EndLn
-            }
-            out << "public boolean equals(final " << safeAssignmentName << " that) {" << EndLn
-            out.indent(2) {
-              out << "assert that != null;" << EndLn
-              out.trace("/*", "*/")
-              list foreach {
-                case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
-                  out << EndLn
-                  out << "if (!this." << safeId(identifier) << ".equals(that." + safeId(identifier) + ")) {" << EndLn
-                  out.indent(2) {
-                    out << "return false;" << EndLn
-                  }
-                  out << "}" << EndLn
-                }
-              }
-              out << EndLn
-              out << "return true;" << EndLn
-            }
-            out << "}" << EndLn
-            out << EndLn
-            out << "@Override" << EndLn
-            out << "public boolean equals(final Object that) {" << EndLn
-            out.indent(2) {
-              out << "if (that instanceof " << safeAssignmentName << ") {" << EndLn
-              out.indent(2) {
-                out << "return this.equals((" + safeAssignmentName + ")that);" << EndLn
-              }
-              out << "}" << EndLn
-              out << EndLn
-              out << "return true;" << EndLn
-            }
-            out << "}" << EndLn
-            out << EndLn
-            out << "@Override" << EndLn
-            out << "public int hashCode() {" << EndLn
-            out.indent(2) {
-              out << "return (0"
-              out.indent(2) {
-                list foreach {
-                  case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _), value) => {
-                    out << EndLn << "^ this." << safeId(identifier) << ".hashCode()"
-                  }
-                }
-              }
-              out << ");" << EndLn
-            }
-            out << "}" << EndLn
-          }
-          out << "}" << EndLn
-          out << EndLn
+          out << "return encodePart(value);" << EndLn
         }
-        case ast.EnumeratedType(enumerations)
-        => {
-          var firstIndex: Option[Long] = None
-          out.ensureEmptyLines(1)
-          out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnEnumeration {" << EndLn
-          out.indent(2) {
-            out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(0);" << EndLn
-            out << EndLn
-            out << "public final long value;" << EndLn
-            out << EndLn
-            out << "public " << safeAssignmentName << "(final long value) {" << EndLn
-            out.indent(2) {
-              out << "this.value = value;" << EndLn
-            }
-            out << "}" << EndLn
-            out << EndLn
-            generateEnumeratedValues(enumerations, assignmentName)
-            out << EndLn
-            out << "public static " << safeId(assignmentName) << " of(final String name) {" << EndLn
-            out.indent(2) {
-              enumerations match {
-                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-                => {
-                  items foreach {
-                    case ast.Identifier(item) => {
-                      out << "if (name.equals(" << safeId(item).inspect << ")) {" << EndLn
-                      out.indent(2) {
-                        out << "return " << safeId(item) << ";" << EndLn
-                      }
-                      out << "}" << EndLn
-                      out << EndLn
-                    }
-                    case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
-                      out << "if (name.equals(" << safeId(item).inspect << ")) {" << EndLn
-                      out.indent(2) {
-                        out << "return " << safeId(item) << ";" << EndLn
-                      }
-                      out << "}" << EndLn
-                      out << EndLn
-                    }
-                  }
-                  extension match {
-                    case None => {}
-                    case _ => out << extension << EndLn
-                  }
-                }
-              }
-              out << "throw new org.asn1gen.runtime.java.BadEnumerationException(" << EndLn
-              out.indent(2) {
-                out << "\"Unrecogonised enumeration value + '\" + name + \"'\");" << EndLn
-              }
-            }
-            out << "}" << EndLn
-            out << EndLn
-            out << "public static " << safeId(assignmentName) << " of(final int value) {" << EndLn
-            out.indent(2) {
-              out << "switch (value) {" << EndLn
-              out.indent(2) {
-                enumerations match {
-                  case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-                  => {
-                    var index = 0
-                    items foreach {
-                      case ast.Identifier(item) => {
-                        out << "case " << index << ": return " << safeId(item) << ";" << EndLn
-                        index = index + 1
-                      }
-                      case ast.NamedNumber(ast.Identifier(item), ast.SignedNumber(sign, ast.Number(n))) => {
-                        val value = if (sign) n * -1 else n
-                        out << "case " << value << ": return " << safeId(item) << ";" << EndLn
-                        index = index + 1
-                      }
-                    }
-                    extension match {
-                      case None => {}
-                      case _ => out << extension << EndLn
-                    }
-                  }
-                }
-                out << "default: return new " << safeId(assignmentName) << "(value);" << EndLn
-              }
-              out << "}" << EndLn
-            }
-            out << "}" << EndLn
-          }
-          out << "}" << EndLn
+        case ast.EnumeratedType(enumerations) => {
+          out << "return encodePart(value);" << EndLn
         }
         case setOfType: ast.SetOfType => {
-          generate(assignmentName, setOfType)
+          out << "return encodePart(value);" << EndLn
         }
         case bitStringType: ast.BitStringType => {
-          out.ensureEmptyLines(1)
           out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
           out << EndLn
           out << EndLn
           out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
         }
         case ast.INTEGER(None) => {
-          out.ensureEmptyLines(1)
           out << "type " << safeAssignmentName << " = Long" << EndLn
           out << EndLn
           out << "lazy val " << safeAssignmentName << " = 0L" << EndLn
         }
         case ast.BOOLEAN => {
-          out.ensureEmptyLines(1)
           out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBoolean" << EndLn
           out << EndLn
           out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnFalse" << EndLn
         }
         case ast.OctetStringType => {
-          out.ensureEmptyLines(1)
           out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
           out << EndLn
           out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
         }
         case ast.PrintableString => {
-          out.ensureEmptyLines(1)
           out << "type " << safeAssignmentName << " = String" << EndLn
           out << EndLn
           out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
         }
         case ast.REAL => {
-          out.ensureEmptyLines(1)
           out  << "type " << safeAssignmentName << " = Double" << EndLn
           out << EndLn
           out << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
         }
         case ast.UTF8String => {
-          out.ensureEmptyLines(1)
           out << "type " << safeAssignmentName << " = String" << EndLn
           out << EndLn
           out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
         }
         case unmatched => {
-          out.ensureEmptyLines(1)
+          out << "// Unmatched " << safeAssignmentName << ": " << unmatched << EndLn
+        }
+      }
+    }
+    out << "}" << EndLn
+  }
+  
+  def generateBerPartEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
+    val safeAssignmentName = safeId(assignmentName)
+    out.ensureEmptyLines(1)
+    out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) {" << EndLn
+    out.indent(2) {
+      builtinType match {
+        case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
+          out.trace("/*", "*/")
+          //generateSimpleGetters(rootAlternativeTypeList)
+          //generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
+          out.trace("/*", "*/")
+          /*rootAlternativeTypeList match {
+            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+              namedTypes foreach { namedType =>
+                generateChoices(assignmentName, namedType)
+              }
+            }
+          }*/
+  
+          //val firstNamedType = rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
+          out << "final BerWriter dataWriter = BerWriter.EMPTY;" << EndLn
+          out << EndLn
+          out << "return dataWriter;" << EndLn
+          out << EndLn
+        }
+        case ast.SequenceType(ast.Empty) => {
+          out.trace("/*", "*/")
+          /*out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
+          out.indent(2) {
+            out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
+          }
+          out << "}" << EndLn*/
+        }
+        case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
+          val list = (list1.toList:::list2.toList).map { componentTypeList =>
+            componentTypeList.componentTypes
+          }.flatten
+          out << "final BerWriter dataWriter = BerWriter.EMPTY"
+          out.indent(4) {
+            list foreach {
+              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
+                out << EndLn
+                out << ".then(encode(value." << safeId(identifier) << "))"
+              }
+            }
+          }
+          out << ";" << EndLn
+          out << EndLn
+          out << "return dataWriter;" << EndLn
+        }
+        case ast.EnumeratedType(enumerations) => {
+          var firstIndex: Option[Long] = None
+          out << "return BerWriter.EMPTY;" << EndLn
+        }
+        case setOfType: ast.SetOfType => {
+          val safeAssignmentName = safeId(assignmentName)
+          setOfType match {
+            case ast.SetOfType(ast.Type(elementType, _)) => {
+              elementType match {
+                case ast.TypeReference(referencedType) => {
+                  val safeReferenceType = safeId(referencedType)
+                  out << "return BerWriter.EMPTY;" << EndLn
+                }
+                case sequenceType: ast.SequenceType => {
+                  assert(false)
+                  val assignmentElementName = assignmentName + "_element"
+                  val safeAssignmentElementName = safeId(assignmentElementName)
+                  out << "type " << safeAssignmentName << " = List[" << safeAssignmentElementName << "]" << EndLn
+                  out << "lazy val " << safeAssignmentName << " = Nil: List[" << safeAssignmentElementName << "]" << EndLn
+                  generate(sequenceType, assignmentElementName)
+                }
+                case builtinType: ast.BuiltinType => {
+                  out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = Nil: List[" << asnTypeOf(builtinType) << "]"
+                }
+              }
+            }
+          }
+        }
+        case bitStringType: ast.BitStringType => {
+          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
+          out << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
+        }
+        case ast.INTEGER(None) => {
+          out << "type " << safeAssignmentName << " = Long" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = 0L" << EndLn
+        }
+        case ast.BOOLEAN => {
+          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBoolean" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnFalse" << EndLn
+        }
+        case ast.OctetStringType => {
+          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
+        }
+        case ast.PrintableString => {
+          out << "type " << safeAssignmentName << " = String" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
+        }
+        case ast.REAL => {
+          out  << "type " << safeAssignmentName << " = Double" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
+        }
+        case ast.UTF8String => {
+          out << "type " << safeAssignmentName << " = String" << EndLn
+          out << EndLn
+          out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
+        }
+        case unmatched => {
           out << "// Unmatched " << safeAssignmentName << ": " << unmatched << EndLn
         }
       }
