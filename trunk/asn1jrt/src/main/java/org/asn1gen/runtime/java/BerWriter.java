@@ -244,4 +244,28 @@ public abstract class BerWriter {
       System.out.print(hex.charAt(b & 0xf));
     }
   }
+  
+  public BerWriter length(final long value) {
+    if (value < 0) {
+      throw new IllegalArgumentException();
+    }
+    
+    if (value <= 127) {
+      return this.lbyte(value);
+    }
+    
+    return this.lengthInit(value >> 7).lbyte(value & 0x7f);
+  }
+
+  private BerWriter lengthInit(final long value) {
+    if (value < 0) {
+      throw new IllegalArgumentException();
+    }
+    
+    if (value <= 127) {
+      return this.lbyte((value & 0x7f) | 0x80);
+    }
+    
+    return this.lengthInit(value >> 7).lbyte((value & 0x7f) | 0x80);
+  }
 }
