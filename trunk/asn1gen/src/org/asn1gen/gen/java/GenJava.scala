@@ -667,7 +667,9 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         case ast.EnumeratedType(enumerations) => {
           var firstIndex: Option[Long] = None
-          out << "return BerWriter.EMPTY;" << EndLn
+          out << "final BerWriter dataWriter = encode(value.value);" << EndLn
+          out << EndLn
+          out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 10).length(dataWriter.length).then(dataWriter);" << EndLn
         }
         case setOfType: ast.SetOfType => {
           val safeAssignmentName = safeId(assignmentName)
