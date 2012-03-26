@@ -676,7 +676,15 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
               elementType match {
                 case ast.TypeReference(referencedType) => {
                   val safeReferenceType = safeId(referencedType)
-                  out << "return BerWriter.EMPTY;" << EndLn
+                  out << "BerWriter dataWriter = BerWriter.EMPTY;" << EndLn
+                  out << EndLn
+                  out << "for (final " << referencedType << " item: value.items) {" << EndLn
+                  out.indent(2) {
+                    out << "dataWriter = dataWriter.then(encode(item));" << EndLn
+                  }
+                  out << "}" << EndLn
+                  out << EndLn
+                  out << "return BerWriter.EMPTY.ibyte(17).then(length(dataWriter.length)).then(dataWriter);" << EndLn
                 }
                 case sequenceType: ast.SequenceType => {
                   assert(false)
