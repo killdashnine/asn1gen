@@ -663,7 +663,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           }
           out << ";" << EndLn
           out << EndLn
-          out << "return dataWriter;" << EndLn
+          out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);" << EndLn
         }
         case ast.EnumeratedType(enumerations) => {
           var firstIndex: Option[Long] = None
