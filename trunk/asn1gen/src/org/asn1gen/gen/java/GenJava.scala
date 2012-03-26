@@ -684,7 +684,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                   }
                   out << "}" << EndLn
                   out << EndLn
-                  out << "return BerWriter.EMPTY.ibyte(17).then(length(dataWriter.length)).then(dataWriter);" << EndLn
+                  out << "return BerWriter.EMPTY.ibyte(17).length(dataWriter.length).then(dataWriter);" << EndLn
                 }
                 case sequenceType: ast.SequenceType => {
                   assert(false)

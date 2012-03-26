@@ -268,4 +268,60 @@ public abstract class BerWriter {
     
     return this.lengthInit(value >> 7).lbyte((value & 0x7f) | 0x80);
   }
+
+  public static BerWriter tagIdTail(final long tagId) {
+    return tagIdTail(tagId, 0x00);
+  }
+  
+  public static BerWriter tagIdTail(final long tagId, final int terminus) {
+    final long excessTagId = tagId >>> 7;
+    final int capturedTagId = (int)tagId & 0x7f;
+    if (excessTagId != 0) {
+      return tagIdTail(excessTagId, 0x80).ibyte(capturedTagId | terminus);
+    } else {
+      return EMPTY.lbyte(capturedTagId | terminus);
+    }
+  }
+
+  public BerWriter tag(final AsnClass clazz, final AsnForm form, final long tagId) {
+    if (tagId < 0) {
+      throw new IllegalArgumentException();
+    }
+    
+    int value = 0;
+
+    switch (clazz) {
+    case UNIVERSAL:
+      value |= 0x00; // 0000 0000
+      break;
+    case APPLICATION:
+      value |= 0x40; // 0100 0000
+      break;
+    case CONTEXT_SPECIFIC:
+      value |= 0x80; // 1000 0000
+      break;
+    case PRIVATE:
+      value |= 0xc0; // 1100 0000
+      break;
+    }
+    
+    switch (form) {
+    case PRIMITIVE:
+      value |= 0x00; // 0000 0000
+      break;
+    case CONSTRUCTED:
+      value |= 0x20; // 0010 0000
+      break;
+    }
+    
+    if (tagId <= 30) {
+      value |= (int)tagId;
+      
+      return EMPTY.ibyte(value);
+    } else {
+      value |= 0x1f; // 0001 1111
+      
+      return this.ibyte(value).then(tagIdTail(tagId));
+    }
+  }
 }
