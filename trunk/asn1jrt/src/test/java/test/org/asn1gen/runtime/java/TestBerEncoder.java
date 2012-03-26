@@ -414,14 +414,14 @@ public class TestBerEncoder {
   public void test_18_2_7_octetstring_a() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(new AsnUtf8String(""));
     final byte[] result = writeToByteArray(berWriter);
-    Assert.assertArrayEquals(ibytes(0x04, 0x00), result);
+    Assert.assertArrayEquals(ibytes(0x0c, 0x00), result);
   }
 
   @Test
   public void test_18_2_7_octetstring_b() throws IOException {
     final BerWriter berWriter = BerEncoder.encode(new AsnUtf8String("Hello world"));
     final byte[] result = writeToByteArray(berWriter);
-    Assert.assertArrayEquals(ibytes(0x04, 0x0b, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64), result);
+    Assert.assertArrayEquals(ibytes(0x0c, 0x0b, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64), result);
   }
 
   @Test
