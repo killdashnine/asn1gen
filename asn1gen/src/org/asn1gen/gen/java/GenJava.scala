@@ -34,11 +34,11 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       println("Writing to " + valueFile)
     }
     codecPath.make
-    (codecPath / "BerEncoder.java").withIndentWriter { out =>
-      generateBerEncoder(module, out)
+    (codecPath / "AsnToBerEncoder.java").withIndentWriter { out =>
+      generateAsnToBerEncoder(module, out)
     }
-    (codecPath / "BerPartEncoder.java").withIndentWriter { out =>
-      generateBerPartEncoder(module, out)
+    (codecPath / "AsnDataToBerEncoder.java").withIndentWriter { out =>
+      generateAsnDataToBerEncoder(module, out)
     }
   }
   
@@ -82,30 +82,30 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out << "}" << EndLn
   }
   
-  def generateBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnToBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(codecPackage(module))(module, out)
     out << "import " << modelPackage(module) << ".*;" << EndLn
-    out << "import static " << codecPackage(module) << ".BerPartEncoder.*;" << EndLn
+    out << "import static " << codecPackage(module) << ".AsnDataToBerEncoder.*;" << EndLn
     out << EndLn
-    out << "public class BerEncoder {" << EndLn
+    out << "public class AsnToBerEncoder {" << EndLn
     out.indent(2) {
       module.types.foreach { case (_, namedType: NamedType) =>
-        generateBerEncoder(namedType)
+        generateAsnToBerEncoder(namedType)
       }
     }
     out << "}" << EndLn
   }
   
-  def generateBerPartEncoder(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnDataToBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(codecPackage(module))(module, out)
     out << "import " << modelPackage(module) << ".*;" << EndLn
-    out << "import static org.asn1gen.runtime.java.BerEncoder.*;" << EndLn
-    out << "import static " << codecPackage(module) << ".BerEncoder.*;" << EndLn
+    out << "import static org.asn1gen.runtime.java.AsnToBerEncoder.*;" << EndLn
+    out << "import static " << codecPackage(module) << ".AsnToBerEncoder.*;" << EndLn
     out << EndLn
-    out << "public class BerPartEncoder {" << EndLn
+    out << "public class AsnDataToBerEncoder {" << EndLn
     out.indent(2) {
       module.types.foreach { case (_, namedType: NamedType) =>
-        generateBerPartEncoder(namedType)
+        generateAsnDataToBerEncoder(namedType)
       }
     }
     out << "}" << EndLn
@@ -166,10 +166,10 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     }
   }
   
-  def generateBerEncoder(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnToBerEncoder(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
     namedType._type match {
       case ast.Type(builtinType: ast.BuiltinType, _) => {
-        generateBerEncoder(builtinType, namedType.name)
+        generateAsnToBerEncoder(builtinType, namedType.name)
       }
       case t@ast.Type(referencedType: ast.ReferencedType, _) => {
         referencedType match {
@@ -192,10 +192,10 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     }
   }
   
-  def generateBerPartEncoder(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnDataToBerEncoder(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
     namedType._type match {
       case ast.Type(builtinType: ast.BuiltinType, _) => {
-        generateBerPartEncoder(builtinType, namedType.name)
+        generateAsnDataToBerEncoder(builtinType, namedType.name)
       }
       case t@ast.Type(referencedType: ast.ReferencedType, _) => {
         referencedType match {
@@ -550,26 +550,26 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     }
   }
   
-  def generateBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnToBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
     val safeAssignmentName = safeId(assignmentName)
     out.ensureEmptyLines(1)
     out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
     out.indent(2) {
       builtinType match {
         case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-          out << "return encodePart(value);" << EndLn
+          out << "return encodeData(value);" << EndLn
         }
         case ast.SequenceType(ast.Empty) => {
-          out << "return encodePart(value);" << EndLn
+          out << "return encodeData(value);" << EndLn
         }
         case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-          out << "return encodePart(value);" << EndLn
+          out << "return encodeData(value);" << EndLn
         }
         case ast.EnumeratedType(enumerations) => {
-          out << "return encodePart(value);" << EndLn
+          out << "return encodeData(value);" << EndLn
         }
         case setOfType: ast.SetOfType => {
-          out << "return encodePart(value);" << EndLn
+          out << "return encodeData(value);" << EndLn
         }
         case bitStringType: ast.BitStringType => {
           out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
@@ -615,15 +615,47 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out << "}" << EndLn
   }
   
-  def generateBerPartEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnDataToBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
     val safeAssignmentName = safeId(assignmentName)
     out.ensureEmptyLines(1)
-    out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) {" << EndLn
+    out << "public static BerWriter encodeData(final " << safeAssignmentName << " value) {" << EndLn
     out.indent(2) {
       builtinType match {
         case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
           out.trace("/*", "*/")
-          //generateSimpleGetters(rootAlternativeTypeList)
+          out << "switch (value.choiceId()) {" << EndLn
+          rootAlternativeTypeList match {
+            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+              namedTypes foreach { namedType =>
+                namedType match {
+                  case ast.NamedType(ast.Identifier(name), _type) => {
+                    val safeName = safeId(name)
+                    val safeType = safeId(asnTypeOf(_type))
+                    _type match {
+                      case ast.Type(ast.TaggedType(ast.Tag(ast.Empty(), ast.Number(tag)), ast.Empty(), taggedType), Nil) => {
+                        taggedType match {
+                          case ast.Type(ast.TypeReference(typeRef), Nil) => {
+                            out << "case " << tag << ":" << EndLn
+                            out.indent(2) {
+                              out << "assert value.element() instanceof " << safeId(typeRef) << ";" << EndLn
+                              out << "break;" << EndLn
+                            }
+                            out << "/* tag: " + tag + ", " + typeRef + "*/" << EndLn
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          out << "default:" << EndLn
+          out.indent(2) {
+            out << "assert false;" << EndLn
+          }
+          out << "}" << EndLn
+
           //generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
           out.trace("/*", "*/")
           /*rootAlternativeTypeList match {
@@ -1016,12 +1048,9 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   
   def generateSimpleGetters(namedType: ast.NamedType)(implicit module: Module, out: IndentWriter): Unit = {
     namedType match {
-      case ast.NamedType(
-        ast.Identifier(name),
-        _type)
-      => {
-    	val safeName = safeId(name)
-    	val safeType = safeId(asnTypeOf(_type))
+      case ast.NamedType(ast.Identifier(name), _type) => {
+      	val safeName = safeId(name)
+      	val safeType = safeId(asnTypeOf(_type))
         out << EndLn
         out << "public Option<" << safeType << "> get" << safeName.capitalise << "() {" << EndLn
         out.indent(2) {
