@@ -2,21 +2,21 @@ package org.asn1gen.runtime.java;
 
 import java.nio.charset.Charset;
 
-public class BerEncoder {
+public class AsnDataToBerEncoder {
   public static final BerWriter EMPTY = BerWriter.EMPTY;
-  public static final BerWriter TRUE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
-  public static final BerWriter FALSE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);
-  public static final BerWriter NULL = BerWriter.EMPTY.ibyte(0x05).ibyte(0x00);
-  
-  public static BerWriter encode(final AsnBoolean value) {
-    return encode(value.value);
+  public static final BerWriter TRUE = BerWriter.EMPTY.ibyte(0xff);
+  public static final BerWriter FALSE = BerWriter.EMPTY.ibyte(0x00);
+  public static final BerWriter NULL = BerWriter.EMPTY;
+
+  public static BerWriter encodeData(final AsnBoolean value) {
+    return encodeData(value.value);
   }
   
-  public static BerWriter encode(final boolean value) {
+  public static BerWriter encodeData(final boolean value) {
     return value ? TRUE : FALSE;
   }
   
-  public static BerWriter encode(final AsnNull value) {
+  public static BerWriter encodeData(final AsnNull value) {
     return NULL;
   }
 
@@ -33,17 +33,12 @@ public class BerEncoder {
     }
   }
   
-  public static BerWriter encode(final long value) {
-    final BerWriter dataWriter = BerWriter.EMPTY.writeVariableInteger(value);
-    return BerWriter.EMPTY
-        .ibyte(2)
-        // TODO: Use proper length
-        .ibyte(dataWriter.length)
-        .then(dataWriter);
+  public static BerWriter encodeData(final long value) {
+    return BerWriter.EMPTY.writeVariableInteger(value);
   }
   
-  public static BerWriter encode(final AsnInteger value) {
-    return encode(value.value);
+  public static BerWriter encodeData(final AsnInteger value) {
+    return encodeData(value.value);
   }
   
   public static int trailingZeros(final long value, final int shiftTest) {
@@ -74,17 +69,17 @@ public class BerEncoder {
     return trailingZeros(value, 32);
   }
   
-  public static BerWriter encode(final double value) {
+  public static BerWriter encodeData(final double value) {
     if (value == 0) {
-      return BerWriter.EMPTY.ibyte(9).ibyte(0);
+      return BerWriter.EMPTY;
     }
     
     if (value == Double.POSITIVE_INFINITY) {
-      return BerWriter.EMPTY.ibyte(9).ibyte(1).ibyte(0x40);
+      return BerWriter.EMPTY.ibyte(0x40);
     }
     
     if (value == Double.NEGATIVE_INFINITY) {
-      return BerWriter.EMPTY.ibyte(9).ibyte(1).ibyte(0x41);
+      return BerWriter.EMPTY.ibyte(0x41);
     }
     
     final long rawValue = java.lang.Double.doubleToLongBits(value);
@@ -100,13 +95,11 @@ public class BerEncoder {
     final BerWriter encodedExponent = i8sig(trueExponent);
     final BerWriter encodedDescriptor = BerWriter.EMPTY.lbyte(
         (0x80 | (sign << 6) | (base << 4) | (scale << 2) | ((encodedExponent.length - 1) & 0x3)));
-    final BerWriter realData = encodedDescriptor.then(encodedExponent).then(encodedMantissa);
-    
-    return BerWriter.EMPTY.ibyte(9).ibyte(realData.length).then(realData);
+    return encodedDescriptor.then(encodedExponent).then(encodedMantissa);
   }
   
-  public static BerWriter encode(final AsnReal value) {
-    return encode(value.value);
+  public static BerWriter encodeData(final AsnReal value) {
+    return encodeData(value.value);
   }
   
   private static BerWriter encodeBitStringBits(final long value, final int length) {
@@ -117,21 +110,17 @@ public class BerEncoder {
     return encodeBitStringBits(value >> 8, length - 1).lbyte(value & 0xff);
   }
 
-  public static BerWriter encode(final AsnBitString value) {
+  public static BerWriter encodeData(final AsnBitString value) {
     final int excess = (64 - value.length) % 8;
     final int encodeLength = (value.length + excess) / 8;
-    final BerWriter data = EMPTY.ibyte(excess).then(encodeBitStringBits(value.value << excess, encodeLength));
-    
-    return EMPTY.ibyte(3).ibyte(data.length).then(data);
+    return EMPTY.ibyte(excess).then(encodeBitStringBits(value.value << excess, encodeLength));
   }
 
-  public static BerWriter encode(final AsnOctetString value) {
-    final BerWriter data = EMPTY.bbytes(value.value);
-    return EMPTY.ibyte(4).ibyte(data.length).then(data);
+  public static BerWriter encodeData(final AsnOctetString value) {
+    return EMPTY.bbytes(value.value);
   }
 
-  public static BerWriter encode(final AsnUtf8String value) {
-    final BerWriter data = EMPTY.bbytes(value.value.getBytes(Charset.forName("UTF-8")));
-    return EMPTY.ibyte(12).ibyte(data.length).then(data);
+  public static BerWriter encodeData(final AsnUtf8String value) {
+    return EMPTY.bbytes(value.value.getBytes(Charset.forName("UTF-8")));
   }
 }
