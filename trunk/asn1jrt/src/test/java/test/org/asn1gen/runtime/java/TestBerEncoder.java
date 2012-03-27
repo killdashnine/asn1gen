@@ -7,11 +7,10 @@ import java.io.IOException;
 import org.asn1gen.runtime.java.AsnBitString;
 import org.asn1gen.runtime.java.AsnBoolean;
 import org.asn1gen.runtime.java.AsnClass;
-import org.asn1gen.runtime.java.AsnDataToBerEncoder;
 import org.asn1gen.runtime.java.AsnForm;
 import org.asn1gen.runtime.java.AsnNull;
-import org.asn1gen.runtime.java.AsnUtf8String;
 import org.asn1gen.runtime.java.AsnToBerEncoder;
+import org.asn1gen.runtime.java.AsnUtf8String;
 import org.asn1gen.runtime.java.BerWriter;
 import org.junit.Assert;
 import org.junit.Test;
@@ -427,35 +426,35 @@ public class TestBerEncoder {
 
   @Test
   public void testTrailingZeros() {
-    Assert.assertEquals(2, AsnDataToBerEncoder.trailingZeros(0x0000000000000000L, 1));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x0000000000000001L, 1));
-    Assert.assertEquals(1, AsnDataToBerEncoder.trailingZeros(0x0000000000000002L, 1));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x0000000000000003L, 1));
+    Assert.assertEquals(2, AsnToBerEncoder.trailingZeros(0x0000000000000000L, 1));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x0000000000000001L, 1));
+    Assert.assertEquals(1, AsnToBerEncoder.trailingZeros(0x0000000000000002L, 1));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x0000000000000003L, 1));
     
-    Assert.assertEquals(4, AsnDataToBerEncoder.trailingZeros(0x0000000000000000L, 2));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x0000000000000001L, 2));
-    Assert.assertEquals(1, AsnDataToBerEncoder.trailingZeros(0x0000000000000002L, 2));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x0000000000000003L, 2));
-    Assert.assertEquals(2, AsnDataToBerEncoder.trailingZeros(0x0000000000000004L, 2));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x0000000000000005L, 2));
-    Assert.assertEquals(1, AsnDataToBerEncoder.trailingZeros(0x0000000000000006L, 2));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x0000000000000007L, 2));
-    Assert.assertEquals(3, AsnDataToBerEncoder.trailingZeros(0x0000000000000008L, 2));
-    Assert.assertEquals(4, AsnDataToBerEncoder.trailingZeros(0x0000000000000000L, 2));
+    Assert.assertEquals(4, AsnToBerEncoder.trailingZeros(0x0000000000000000L, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x0000000000000001L, 2));
+    Assert.assertEquals(1, AsnToBerEncoder.trailingZeros(0x0000000000000002L, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x0000000000000003L, 2));
+    Assert.assertEquals(2, AsnToBerEncoder.trailingZeros(0x0000000000000004L, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x0000000000000005L, 2));
+    Assert.assertEquals(1, AsnToBerEncoder.trailingZeros(0x0000000000000006L, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x0000000000000007L, 2));
+    Assert.assertEquals(3, AsnToBerEncoder.trailingZeros(0x0000000000000008L, 2));
+    Assert.assertEquals(4, AsnToBerEncoder.trailingZeros(0x0000000000000000L, 2));
     
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x0000000000000009L, 2));
-    Assert.assertEquals(1, AsnDataToBerEncoder.trailingZeros(0x000000000000000aL, 2));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x000000000000000bL, 2));
-    Assert.assertEquals(2, AsnDataToBerEncoder.trailingZeros(0x000000000000000cL, 2));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x000000000000000dL, 2));
-    Assert.assertEquals(1, AsnDataToBerEncoder.trailingZeros(0x000000000000000eL, 2));
-    Assert.assertEquals(0, AsnDataToBerEncoder.trailingZeros(0x000000000000000fL, 2));
-    Assert.assertEquals(4, AsnDataToBerEncoder.trailingZeros(0x0000000000000010L, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x0000000000000009L, 2));
+    Assert.assertEquals(1, AsnToBerEncoder.trailingZeros(0x000000000000000aL, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x000000000000000bL, 2));
+    Assert.assertEquals(2, AsnToBerEncoder.trailingZeros(0x000000000000000cL, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x000000000000000dL, 2));
+    Assert.assertEquals(1, AsnToBerEncoder.trailingZeros(0x000000000000000eL, 2));
+    Assert.assertEquals(0, AsnToBerEncoder.trailingZeros(0x000000000000000fL, 2));
+    Assert.assertEquals(4, AsnToBerEncoder.trailingZeros(0x0000000000000010L, 2));
     
-    Assert.assertEquals(64, AsnDataToBerEncoder.trailingZeros(0x0000000000000000L));
+    Assert.assertEquals(64, AsnToBerEncoder.trailingZeros(0x0000000000000000L));
     for (long j = 1; j < 0xfffffL; j += 2) {
       for (int i = 0; i < 64; ++i) {
-        Assert.assertEquals(i, AsnDataToBerEncoder.trailingZeros(j << i));
+        Assert.assertEquals(i, AsnToBerEncoder.trailingZeros(j << i));
       }
     }
   }
