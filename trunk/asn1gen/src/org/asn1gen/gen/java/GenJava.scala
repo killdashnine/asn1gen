@@ -555,65 +555,65 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.ensureEmptyLines(1)
     builtinType match {
       case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encodePart_(value);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encode_(value);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
-        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encodePart_(value);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encode_(value);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encodePart_(value);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encode_(value);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.EnumeratedType(enumerations) => {
-        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encodePart_(value);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encode_(value);" << EndLn
         }
         out << "}" << EndLn
       }
       case setOfType: ast.SetOfType => {
-        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encodePart_(value);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encode_(value);" << EndLn
         }
@@ -666,7 +666,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.ensureEmptyLines(1)
     builtinType match {
       case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "switch (value.choiceId()) {" << EndLn
           rootAlternativeTypeList match {
@@ -695,30 +695,14 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           }
           out << "default:" << EndLn
           out.indent(2) {
-            out << "assert false;" << EndLn
+            out << "throw new AsnException();" << EndLn
           }
           out << "}" << EndLn
-          out << EndLn
-  
-          //generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
-          out.trace("/*", "*/")
-          /*rootAlternativeTypeList match {
-            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
-              namedTypes foreach { namedType =>
-                generateChoices(assignmentName, namedType)
-              }
-            }
-          }*/
-  
-          //val firstNamedType = rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
-          out << "final BerWriter dataWriter = BerWriter.EMPTY;" << EndLn
-          out << EndLn
-          out << "return dataWriter;" << EndLn
           out << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           var firstIndex: Option[Long] = None
           out << "final BerWriter dataWriter = encode(value);" << EndLn
@@ -728,20 +712,20 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
-        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out.trace("/*", "*/")
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out.trace("/*", "*/")
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           val list = (list1.toList:::list2.toList).map { componentTypeList =>
             componentTypeList.componentTypes
@@ -759,7 +743,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "final BerWriter dataWriter = encodePart(value);" << EndLn
           out << EndLn
@@ -768,13 +752,13 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         out << "}" << EndLn
       }
       case ast.EnumeratedType(enumerations) => {
-        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return encodePart(value.value);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           var firstIndex: Option[Long] = None
           out << "final BerWriter dataWriter = encodePart(value.value);" << EndLn
@@ -784,7 +768,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         out << "}" << EndLn
       }
       case setOfType: ast.SetOfType => {
-        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           val safeAssignmentName = safeId(assignmentName)
           setOfType match {
@@ -819,7 +803,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) {" << EndLn
+        out << "public static BerWriter encode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
         out.indent(2) {
           out << "final BerWriter dataWriter = encodePart(value);" << EndLn
           out << EndLn
