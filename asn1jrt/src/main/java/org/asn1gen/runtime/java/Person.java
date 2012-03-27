@@ -49,8 +49,8 @@ public class Person {
   
   public static BerWriter encode(final Person person) {
     final BerWriter data = BerWriter.EMPTY
-        .then(BerEncoder.encode(person.firstName))
-        .then(BerEncoder.encode(person.lastName));
+        .then(AsnToBerEncoder.encode(person.firstName))
+        .then(AsnToBerEncoder.encode(person.lastName));
     return BerWriter.EMPTY.ibyte(0x30).then(data);
   }
 }
