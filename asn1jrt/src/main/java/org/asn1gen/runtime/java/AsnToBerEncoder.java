@@ -4,20 +4,20 @@ import static org.asn1gen.runtime.java.AsnDataToBerEncoder.encodeData;
 
 public class AsnToBerEncoder {
   public static final BerWriter EMPTY = BerWriter.EMPTY;
-  public static final BerWriter TRUE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
-  public static final BerWriter FALSE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);
-  public static final BerWriter NULL = BerWriter.EMPTY.ibyte(0x05).ibyte(0x00);
+  public static final BerWriter ASN_TRUE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
+  public static final BerWriter ASN_FALSE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);
+  public static final BerWriter ASN_NULL = BerWriter.EMPTY.ibyte(0x05).ibyte(0x00);
   
   public static BerWriter encode(final AsnBoolean value) {
     return encode(value.value);
   }
   
   public static BerWriter encode(final boolean value) {
-    return value ? TRUE : FALSE;
+    return value ? ASN_TRUE : ASN_FALSE;
   }
   
   public static BerWriter encode(final AsnNull value) {
-    return NULL;
+    return ASN_NULL;
   }
 
   public static BerWriter encode(final long value) {
