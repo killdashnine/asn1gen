@@ -553,11 +553,68 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   def generateAsnToBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
     val safeAssignmentName = safeId(assignmentName)
     out.ensureEmptyLines(1)
+    builtinType match {
+      case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
+        out << "private static BerWriter encodeChoiceData(final " << safeAssignmentName << " value) {" << EndLn
+        out.indent(2) {
+          out << "switch (value.choiceId()) {" << EndLn
+          rootAlternativeTypeList match {
+            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+              namedTypes foreach { namedType =>
+                namedType match {
+                  case ast.NamedType(ast.Identifier(name), _type) => {
+                    val safeName = safeId(name)
+                    val safeType = safeId(asnTypeOf(_type))
+                    _type match {
+                      case ast.Type(ast.TaggedType(ast.Tag(ast.Empty(), ast.Number(tag)), ast.Empty(), taggedType), Nil) => {
+                        taggedType match {
+                          case ast.Type(ast.TypeReference(typeRef), Nil) => {
+                            out << "case " << tag << ":" << EndLn
+                            out.indent(2) {
+                              out << "assert value.element() instanceof " << safeId(typeRef) << ";" << EndLn
+                              out << "break;" << EndLn
+                            }
+                            out << "/* tag: " + tag + ", " + typeRef + "*/" << EndLn
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          out << "default:" << EndLn
+          out.indent(2) {
+            out << "assert false;" << EndLn
+          }
+          out << "}" << EndLn
+  
+          //generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
+          out.trace("/*", "*/")
+          /*rootAlternativeTypeList match {
+            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+              namedTypes foreach { namedType =>
+                generateChoices(assignmentName, namedType)
+              }
+            }
+          }*/
+  
+          //val firstNamedType = rootAlternativeTypeList.alternativeTypeList.namedTypes(0)
+          out << "final BerWriter dataWriter = BerWriter.EMPTY;" << EndLn
+          out << EndLn
+          out << "return dataWriter;" << EndLn
+          out << EndLn
+        }
+        out << "}" << EndLn
+      }
+      case _ =>
+    }
     out << "public static BerWriter encode(final " << safeAssignmentName << " value) {" << EndLn
     out.indent(2) {
       builtinType match {
         case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-          out << "return encodeData(value);" << EndLn
+          out << "return encodeChoiceData(value);" << EndLn
         }
         case ast.SequenceType(ast.Empty) => {
           out << "return encodeData(value);" << EndLn
@@ -618,11 +675,11 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   def generateAsnDataToBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
     val safeAssignmentName = safeId(assignmentName)
     out.ensureEmptyLines(1)
-    out << "public static BerWriter encodeData(final " << safeAssignmentName << " value) {" << EndLn
-    out.indent(2) {
-      builtinType match {
-        case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-          out.trace("/*", "*/")
+    builtinType match {
+      case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
+        out.trace("/*", "*/")
+        out << "public static BerWriter encodeData(final " << safeAssignmentName << " value) {" << EndLn
+        out.indent(2) {
           out << "switch (value.choiceId()) {" << EndLn
           rootAlternativeTypeList match {
             case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
@@ -655,7 +712,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             out << "assert false;" << EndLn
           }
           out << "}" << EndLn
-
+  
           //generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
           out.trace("/*", "*/")
           /*rootAlternativeTypeList match {
@@ -672,15 +729,23 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           out << "return dataWriter;" << EndLn
           out << EndLn
         }
-        case ast.SequenceType(ast.Empty) => {
-          out.trace("/*", "*/")
+        out << "}" << EndLn
+      }
+      case ast.SequenceType(ast.Empty) => {
+        out.trace("/*", "*/")
+        out << "public static BerWriter encodeData(final " << safeAssignmentName << " value) {" << EndLn
+        out.indent(2) {
           /*out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
           out.indent(2) {
             out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
           }
           out << "}" << EndLn*/
         }
-        case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
+        out << "}" << EndLn
+      }
+      case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
+        out << "public static BerWriter encodeData(final " << safeAssignmentName << " value) {" << EndLn
+        out.indent(2) {
           val list = (list1.toList:::list2.toList).map { componentTypeList =>
             componentTypeList.componentTypes
           }.flatten
@@ -697,13 +762,21 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           out << EndLn
           out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);" << EndLn
         }
-        case ast.EnumeratedType(enumerations) => {
+        out << "}" << EndLn
+      }
+      case ast.EnumeratedType(enumerations) => {
+        out << "public static BerWriter encodeData(final " << safeAssignmentName << " value) {" << EndLn
+        out.indent(2) {
           var firstIndex: Option[Long] = None
           out << "final BerWriter dataWriter = encode(value.value);" << EndLn
           out << EndLn
           out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 10).length(dataWriter.length).then(dataWriter);" << EndLn
         }
-        case setOfType: ast.SetOfType => {
+        out << "}" << EndLn
+      }
+      case setOfType: ast.SetOfType => {
+        out << "public static BerWriter encodeData(final " << safeAssignmentName << " value) {" << EndLn
+        out.indent(2) {
           val safeAssignmentName = safeId(assignmentName)
           setOfType match {
             case ast.SetOfType(ast.Type(elementType, _)) => {
@@ -735,48 +808,48 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             }
           }
         }
-        case bitStringType: ast.BitStringType => {
-          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
-          out << EndLn
-          out << EndLn
-          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
-        }
-        case ast.INTEGER(None) => {
-          out << "type " << safeAssignmentName << " = Long" << EndLn
-          out << EndLn
-          out << "lazy val " << safeAssignmentName << " = 0L" << EndLn
-        }
-        case ast.BOOLEAN => {
-          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBoolean" << EndLn
-          out << EndLn
-          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnFalse" << EndLn
-        }
-        case ast.OctetStringType => {
-          out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
-          out << EndLn
-          out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
-        }
-        case ast.PrintableString => {
-          out << "type " << safeAssignmentName << " = String" << EndLn
-          out << EndLn
-          out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
-        }
-        case ast.REAL => {
-          out  << "type " << safeAssignmentName << " = Double" << EndLn
-          out << EndLn
-          out << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
-        }
-        case ast.UTF8String => {
-          out << "type " << safeAssignmentName << " = String" << EndLn
-          out << EndLn
-          out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
-        }
-        case unmatched => {
-          out << "// Unmatched " << safeAssignmentName << ": " << unmatched << EndLn
-        }
+        out << "}" << EndLn
+      }
+      case bitStringType: ast.BitStringType => {
+        out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
+        out << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBitString" << EndLn
+      }
+      case ast.INTEGER(None) => {
+        out << "type " << safeAssignmentName << " = Long" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = 0L" << EndLn
+      }
+      case ast.BOOLEAN => {
+        out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnBoolean" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnFalse" << EndLn
+      }
+      case ast.OctetStringType => {
+        out << "type " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = org.asn1gen.runtime.java.AsnOctetString" << EndLn
+      }
+      case ast.PrintableString => {
+        out << "type " << safeAssignmentName << " = String" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
+      }
+      case ast.REAL => {
+        out  << "type " << safeAssignmentName << " = Double" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = 0.0" << EndLn
+      }
+      case ast.UTF8String => {
+        out << "type " << safeAssignmentName << " = String" << EndLn
+        out << EndLn
+        out << "lazy val " << safeAssignmentName << " = \"\"" << EndLn
+      }
+      case unmatched => {
+        out << "// Unmatched " << safeAssignmentName << ": " << unmatched << EndLn
       }
     }
-    out << "}" << EndLn
   }
   
   def generateEnumeratedValues(enumerations: ast.Enumerations, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
