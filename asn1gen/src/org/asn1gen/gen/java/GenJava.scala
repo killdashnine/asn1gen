@@ -698,7 +698,6 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             out << "throw new AsnException();" << EndLn
           }
           out << "}" << EndLn
-          out << EndLn
         }
         out << "}" << EndLn
         out << EndLn
