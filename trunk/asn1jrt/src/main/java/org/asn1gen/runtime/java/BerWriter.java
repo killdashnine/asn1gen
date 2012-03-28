@@ -220,13 +220,36 @@ public abstract class BerWriter {
   public void dump() {
     boolean first = true;
     final String hex = "0123456789abcdef";
+    
     for (final byte b: this.toByteArray()) {
       if (!first) {
         System.out.print(" ");
       }
+      
       System.out.print(hex.charAt((b >> 4) & 0xf));
       System.out.print(hex.charAt(b & 0xf));
+      first = false;
     }
+  }
+  
+  @Override
+  public String toString() {
+    boolean first = true;
+    final String hex = "0123456789abcdef";
+    String acc = "";
+    
+    for (final byte b: this.toByteArray()) {
+      if (!first) {
+        acc += " ";
+      }
+      
+      acc += (hex.charAt((b >> 4) & 0xf));
+      acc += (hex.charAt(b & 0xf));
+      
+      first = false;
+    }
+    
+    return acc;
   }
   
   public BerWriter length(final long value) {
@@ -310,17 +333,16 @@ public abstract class BerWriter {
   }
   
   public byte[] toByteArray() {
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final DataOutputStream dos = new DataOutputStream(baos);
-    
-    try {
-      this.write(dos);
-      dos.flush();
-      baos.flush();
+    try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+      try (final DataOutputStream dos = new DataOutputStream(baos)) {
+        this.write(dos);
+        dos.flush();
+        baos.flush();
+        return baos.toByteArray();
+      }
     } catch (final IOException e) {
       e.printStackTrace();
+      return new byte[0];
     }
-    
-    return baos.toByteArray();
   }
 }
