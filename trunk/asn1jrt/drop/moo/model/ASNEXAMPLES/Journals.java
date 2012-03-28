@@ -6,6 +6,7 @@ import org.asn1gen.runtime.java.*;
 
 import static org.asn1gen.runtime.java.Statics.*;
 
+@SuppressWarnings("unused")
 public class Journals extends org.asn1gen.runtime.java.AsnList {
   public static Journals EMPTY = new Journals(org.asn1gen.runtime.java.Nil.<Journal>instance());
 

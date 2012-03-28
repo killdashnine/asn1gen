@@ -6,18 +6,19 @@ import org.asn1gen.runtime.java.*;
 
 import static org.asn1gen.runtime.java.Statics.*;
 
+@SuppressWarnings("unused")
 public class Journal extends org.asn1gen.runtime.java.AsnSequence {
   public static final Journal EMPTY = new Journal(
     org.asn1gen.runtime.java.AsnOctetString.EMPTY,
     org.asn1gen.runtime.java.AsnOctetString.EMPTY);
 
-  /*GenJava.scala:304*/public final org.asn1gen.runtime.java.AsnOctetString title;
+  /*GenJava.scala:306*/public final org.asn1gen.runtime.java.AsnOctetString title;
   public final org.asn1gen.runtime.java.AsnOctetString edition;
 
   public Journal(
-      /*GenJava.scala:984*/final org.asn1gen.runtime.java.AsnOctetString title,
+      /*GenJava.scala:970*/final org.asn1gen.runtime.java.AsnOctetString title,
       final org.asn1gen.runtime.java.AsnOctetString edition) {
-    /*GenJava.scala:971*/this.title = title;
+    /*GenJava.scala:960*/this.title = title;
     this.edition = edition;
   }
 
@@ -35,7 +36,7 @@ public class Journal extends org.asn1gen.runtime.java.AsnSequence {
 
   public boolean equals(final Journal that) {
     assert that != null;
-    /*GenJava.scala:366*/
+    /*GenJava.scala:359*/
     if (!this.title.equals(that.title)) {
       return false;
     }

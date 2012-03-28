@@ -6,6 +6,7 @@ import org.asn1gen.runtime.java.*;
 
 import static org.asn1gen.runtime.java.Statics.*;
 
+@SuppressWarnings("unused")
 public class Books extends org.asn1gen.runtime.java.AsnList {
   public static Books EMPTY = new Books(org.asn1gen.runtime.java.Nil.<Book>instance());
 

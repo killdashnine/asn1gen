@@ -6,6 +6,7 @@ import org.asn1gen.runtime.java.*;
 
 import static org.asn1gen.runtime.java.Statics.*;
 
+@SuppressWarnings("unused")
 public class BookCover extends org.asn1gen.runtime.java.AsnEnumeration {
   public static BookCover EMPTY = new BookCover(0);
 

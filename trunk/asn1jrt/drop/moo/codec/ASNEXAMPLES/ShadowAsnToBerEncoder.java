@@ -10,6 +10,7 @@ import moo.model.ASNEXAMPLES.*;
 import static org.asn1gen.runtime.java.AsnToBerEncoder.*;
 import static moo.codec.ASNEXAMPLES.AsnToBerEncoder.*;
 
+@SuppressWarnings("unused")
 public class ShadowAsnToBerEncoder {
 
   public static BerWriter encodePart_(final Books value) throws AsnException {
