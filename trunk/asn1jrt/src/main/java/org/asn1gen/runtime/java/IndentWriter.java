@@ -33,8 +33,12 @@ public class IndentWriter extends PrintWriter {
     return this;
   }
   
-  public void indent(final int offset) {
+  public void indentByOffset(final int offset) {
     indent += offset;
+  }
+  
+  public Indent indent(final int offset) {
+    return new Indent(this, offset);
   }
   
   @Override
