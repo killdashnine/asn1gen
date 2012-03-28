@@ -218,25 +218,9 @@ public abstract class BerWriter {
   }
   
   public void dump() {
-      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final DataOutputStream dos = new DataOutputStream(baos);
-    try {
-      try {
-        try {
-          this.write(dos);
-        } finally {
-          dos.flush();
-        }
-      } finally {
-        baos.flush();
-      }
-    } catch (final IOException e) {
-      e.printStackTrace(System.err);
-    }
-    
     boolean first = true;
     final String hex = "0123456789abcdef";
-    for (final byte b: baos.toByteArray()) {
+    for (final byte b: this.toByteArray()) {
       if (!first) {
         System.out.print(" ");
       }
@@ -323,5 +307,20 @@ public abstract class BerWriter {
       
       return this.ibyte(value).then(tagIdTail(tagId));
     }
+  }
+  
+  public byte[] toByteArray() {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final DataOutputStream dos = new DataOutputStream(baos);
+    
+    try {
+      this.write(dos);
+      dos.flush();
+      baos.flush();
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+    
+    return baos.toByteArray();
   }
 }
