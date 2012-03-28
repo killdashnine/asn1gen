@@ -9,6 +9,7 @@ import static org.asn1gen.runtime.java.Statics.*;
 import moo.model.ASNEXAMPLES.*;
 import static moo.codec.ASNEXAMPLES.ShadowAsnToBerEncoder.*;
 
+@SuppressWarnings("unused")
 public class AsnToBerEncoder {
 
   public static BerWriter encodePart(final Books value) throws AsnException {

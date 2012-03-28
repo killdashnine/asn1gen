@@ -9,6 +9,7 @@ import static org.asn1gen.runtime.java.Statics.*;
 import moo.model.ASNEXAMPLES.*;
 import static moo.model.ASNEXAMPLES.BookCover.*;
 
+@SuppressWarnings("unused")
 public class ASNEXAMPLES {
   public static final Book defaultBook = Book.EMPTY
     .withIsbn(new AsnOctetString("default isbn"))

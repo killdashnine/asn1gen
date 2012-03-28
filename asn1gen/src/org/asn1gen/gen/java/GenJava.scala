@@ -73,6 +73,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       }
     }
     out << EndLn
+    out << "@SuppressWarnings(\"unused\")" << EndLn
     out << "public class " << module.name << " {" << EndLn
     out.indent(2) {
       module.values foreach { case (name, namedValue) =>
@@ -87,6 +88,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out << "import " << modelPackage(module) << ".*;" << EndLn
     out << "import static " << codecPackage(module) << ".ShadowAsnToBerEncoder.*;" << EndLn
     out << EndLn
+    out << "@SuppressWarnings(\"unused\")" << EndLn
     out << "public class AsnToBerEncoder {" << EndLn
     out.indent(2) {
       module.types.foreach { case (_, namedType: NamedType) =>
@@ -102,6 +104,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out << "import static org.asn1gen.runtime.java.AsnToBerEncoder.*;" << EndLn
     out << "import static " << codecPackage(module) << ".AsnToBerEncoder.*;" << EndLn
     out << EndLn
+    out << "@SuppressWarnings(\"unused\")" << EndLn
     out << "public class ShadowAsnToBerEncoder {" << EndLn
     out.indent(2) {
       module.types.foreach { case (_, namedType: NamedType) =>
@@ -249,8 +252,8 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     val safeAssignmentName = safeId(assignmentName)
     builtinType match {
       case ast.ChoiceType(
-        ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _))
-      => {
+        ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
+        out << "@SuppressWarnings(\"unused\")" << EndLn
         out << "public abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
         out.indent(2) {
           generateSimpleGetters(rootAlternativeTypeList)
@@ -272,6 +275,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       }
       case ast.SequenceType(ast.Empty) => {
         out.ensureEmptyLines(1)
+        out << "@SuppressWarnings(\"unused\")" << EndLn
         out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
         out.indent(2) {
           out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "();" << EndLn
@@ -283,16 +287,14 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           componentTypeList.componentTypes
         }.flatten
         out.ensureEmptyLines(1)
+        out << "@SuppressWarnings(\"unused\")" << EndLn
         out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnSequence {" << EndLn
         out.indent(2) {
           out << "public static final " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "("
           out.indent(2) {
             var delim = ""
             list foreach {
-              case ast.NamedComponentType(
-                ast.NamedType(ast.Identifier(identifier), _type),
-                value)
-              => {
+              case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
                 out << delim << EndLn
                 out << safeId(asnTypeOf(_type, value)) << ".EMPTY"
                 delim = ","
@@ -303,10 +305,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           out << EndLn
           out.trace("/*", "*/")
           list foreach {
-            case ast.NamedComponentType(
-              ast.NamedType(ast.Identifier(identifier), _type),
-              value)
-            => {
+            case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
               out << "public final " << safeId(asnTypeOf(_type, value)) << " " << safeId(identifier) << ";" << EndLn
             }
           }
@@ -327,20 +326,14 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           out << "}" << EndLn
           out << EndLn
           list foreach {
-            case ast.NamedComponentType(
-              ast.NamedType(ast.Identifier(identifier), _type),
-              value)
-            => {
+            case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
               out << "public final " << safeAssignmentName << " with" << safeId(identifier).capitalise << "(final " << safeId(asnTypeOf(_type, value)) << " value) {" << EndLn
               out.indent(2) {
                 out << "return new " << safeAssignmentName << "("
                 out.indent(2) {
                   var firstTime = true
                   list foreach {
-                    case ast.NamedComponentType(
-                      ast.NamedType(ast.Identifier(subIdentifier), _type),
-                      value)
-                    => {
+                    case ast.NamedComponentType(ast.NamedType(ast.Identifier(subIdentifier), _type), value) => {
                       if (!firstTime) {
                         out << ","
                       }
@@ -410,10 +403,10 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         out << "}" << EndLn
         out << EndLn
       }
-      case ast.EnumeratedType(enumerations)
-      => {
+      case ast.EnumeratedType(enumerations) => {
         var firstIndex: Option[Long] = None
         out.ensureEmptyLines(1)
+        out << "@SuppressWarnings(\"unused\")" << EndLn
         out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnEnumeration {" << EndLn
         out.indent(2) {
           out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(0);" << EndLn
@@ -431,8 +424,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           out << "public static " << safeId(assignmentName) << " of(final String name) {" << EndLn
           out.indent(2) {
             enumerations match {
-              case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-              => {
+              case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension) => {
                 items foreach {
                   case ast.Identifier(item) => {
                     out << "if (name.equals(" << safeId(item).inspect << ")) {" << EndLn
@@ -469,8 +461,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             out << "switch (value) {" << EndLn
             out.indent(2) {
               enumerations match {
-                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension)
-                => {
+                case ast.Enumerations(ast.RootEnumeration(ast.Enumeration(items)), extension) => {
                   var index = 0
                   items foreach {
                     case ast.Identifier(item) => {
@@ -883,6 +874,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           case ast.TypeReference(referencedType) => {
             val safeReferenceType = safeId(referencedType)
             out.ensureEmptyLines(1)
+            out << "@SuppressWarnings(\"unused\")" << EndLn
             out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnList {" << EndLn
             out.indent(2) {
               out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.runtime.java.Nil.<" << safeReferenceType << ">instance());" << EndLn
@@ -953,10 +945,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.trace("/*", "*/")
     var firstTime = true
     list foreach {
-      case ast.NamedComponentType(
-        ast.NamedType(ast.Identifier(identifier), _type),
-        value)
-      => {
+      case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
         if (!firstTime) {
           out << "," << EndLn
         }
@@ -971,10 +960,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.trace("/*", "*/")
     var firstTime = true
     list foreach {
-      case ast.NamedComponentType(
-        ast.NamedType(ast.Identifier(identifier), _type),
-        value)
-      => {
+      case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
         out << "this." << safeId(identifier) << " = " << safeId(identifier) << ";" << EndLn
       }
     }
@@ -984,10 +970,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.trace("/*", "*/")
     var firstTime = true
     list foreach {
-      case ast.NamedComponentType(
-        ast.NamedType(ast.Identifier(identifier), _type),
-        value)
-      => {
+      case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
         if (!firstTime) {
           out << "," << EndLn
         }
@@ -1002,10 +985,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       namedType: ast.NamedType)(implicit module: Module, out: IndentWriter): Unit = {
     out.trace("/*", "*/")
     namedType match {
-      case ast.NamedType(
-        ast.Identifier(name),
-        choiceType)
-      => {
+      case ast.NamedType(ast.Identifier(name), choiceType) => {
         val valuesFile = modelPath.child(safeId(assignmentName) + "_" + safeId(name) + ".java")
         valuesFile.openPrintStream { ps =>
           println("Writing to " + valuesFile)
@@ -1087,10 +1067,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
       case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
         namedTypes foreach { namedType =>
           namedType match {
-            case ast.NamedType(
-              ast.Identifier(name),
-              _type)
-            => {
+            case ast.NamedType(ast.Identifier(name), _type) => {
               val safeElementName = safeId(name)
               val safeChoiceType = safeId(choiceTypeName)
               val safeChoiceChoice = safeId(choiceTypeName + "_" + name)

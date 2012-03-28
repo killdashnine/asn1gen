@@ -41,7 +41,7 @@ object GenerateJava extends Asn1Parser {
     
     // Output model
     try {
-      model.copy(pathOut = new File("out")).write()
+      model.copy(pathOut = new File("../asn1jrt/drop")).write()
     } catch {
       case e: AsnCodeGenerationException => {
         System.out.print("Error: ")
