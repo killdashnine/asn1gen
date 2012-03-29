@@ -184,4 +184,8 @@ public class IndentWriter extends PrintWriter {
   public int getLine() {
     return line;
   }
+  
+  public IndentWriter $(final Delimeter delimeter) {
+    return delimeter.writeTo(this);
+  }
 }
