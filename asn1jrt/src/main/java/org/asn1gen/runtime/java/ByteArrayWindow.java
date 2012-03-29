@@ -58,4 +58,11 @@ public class ByteArrayWindow {
   public static ByteArrayWindow to(final byte[] array) {
     return new ByteArrayWindow(array, 0, array.length);
   }
+
+  public ByteArrayWindow until(final ByteArrayWindow nextWindow) {
+    assert this.array == nextWindow.array;
+    assert this.start <= nextWindow.start;
+    
+    return this.until(nextWindow.start - this.start);
+  }
 }

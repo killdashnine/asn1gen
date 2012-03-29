@@ -188,4 +188,14 @@ public class IndentWriter extends PrintWriter {
   public IndentWriter $(final Delimeter delimeter) {
     return delimeter.writeTo(this);
   }
+
+  public IndentWriter hex(final ByteArrayWindow window) {
+    final Delimeter delimeter = new Delimeter("", " ");
+    
+    for (int i = 0; i < window.length; ++i) {
+      this.$(delimeter).hex(window.get(i));
+    }
+    
+    return this;
+  }
 }
