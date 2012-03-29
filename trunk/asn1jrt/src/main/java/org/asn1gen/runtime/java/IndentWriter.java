@@ -159,7 +159,17 @@ public class IndentWriter extends PrintWriter {
     
     return this;
   }
+  
+  private IndentWriter nibble(final int nibble) {
+    return $(hexString.charAt(nibble));
+  }
+  
+  public IndentWriter hex(final byte value) {
+    return nibble((value >> 4) & 0xf).nibble(value & 0xf);
+  }
 
+  private static String hexString = "0123456789abcdef";
+  
   public IndentWriter trace(final String left, final String right) {
     try {
       throw new Exception();
