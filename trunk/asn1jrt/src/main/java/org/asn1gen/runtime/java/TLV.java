@@ -21,7 +21,7 @@ public class TLV {
       return;
     }
     
-    out.hex(window.get(0)).$(' ');
+    final byte tagByte = window.get(0);
     
     if (window.length == 1) {
       out.$("<missing length part>");
@@ -29,26 +29,54 @@ public class TLV {
     }
     
     final ByteArrayWindow afterTagWindow = window.from(1);
-    
-    final Tuple2<Integer, ByteArrayWindow> lengthPart = lengthOf(afterTagWindow);
-    
-    final ByteArrayWindow lengthWindow = afterTagWindow.until(afterTagWindow.length - lengthPart.b.length);
+    final int shortLength = tagByte & 0x1f;
+    final Tuple2<Integer, ByteArrayWindow> lengthTuple = lengthOf(shortLength, afterTagWindow);
+    final ByteArrayWindow lengthWindow = afterTagWindow.until(afterTagWindow.length - lengthTuple.b.length);
+    final int length = lengthTuple.a;
     
     for (int i = 0; i < lengthWindow.length; ++i) {
       out.hex(lengthWindow.get(i)).$(' ');
     }
     
-    out.$(lengthPart.a);
+    out.hex(tagByte).$(' ').$('[');
+    
+    final Delimeter delimeter = new Delimeter("", " ");
+    
+    switch ((tagByte >> 6) & 0x3) {
+    case 0x00:
+      out.$(delimeter).$("UNIVERSAL");
+      break;
+    case 0x01:
+      out.$(delimeter).$("APPLICATION");
+      break;
+    case 0x02:
+      out.$(delimeter).$("CONTEXT");
+      break;
+    case 0x03:
+      out.$(delimeter).$("PRIVATE");
+      break;
+    }
+    
+    if ((tagByte & 0x20) != 0) {
+      out.$(delimeter).$("CONSTRUCTED");
+    } else {
+      out.$(delimeter).$("PRIMITIVE");
+    }
+    
+    out.$(delimeter).$(lengthTuple.a).$("] {").endln();
     
     try (final Indent indent = out.indent(2)) {
-      out.println("Hello");
+      out.$("Hello").endln();
     }
+    
+    out.$("}");
   }
   
   public static Tuple2<Integer, ByteArrayWindow> lengthOf(
+      final int shortLength,
       final ByteArrayWindow window) {
-    if (window.length == 0) {
-      return null;
+    if (shortLength < 32) {
+      return new Tuple2<Integer, ByteArrayWindow>(shortLength, window);
     }
     
     return lengthOf(window, 0);
