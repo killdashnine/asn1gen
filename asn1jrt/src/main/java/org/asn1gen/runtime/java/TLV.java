@@ -33,24 +33,16 @@ public class TLV {
     final Tuple2<Integer, ByteArrayWindow> tagTuple = tagOf(shortTag, afterTagWindow);
     final ByteArrayWindow lengthWindow = afterTagWindow.until(afterTagWindow.length - tagTuple.b.length);
     final int tag = tagTuple.a;
+    final TagClass tagClass = TagClass.fromTagByte(tagByte);
+    final TagForm tagForm = TagForm.fromTagByte(tagByte);
     
     for (int i = 0; i < lengthWindow.length; ++i) {
       out.hex(lengthWindow.get(i)).$(' ');
     }
     
-    out.hex(tagByte).$(' ').$('[');
-    
     final Delimeter delimeter = new Delimeter("", " ");
     
-    out.$(delimeter).$(TagClass.fromTagByte(tagByte));
-    
-    if ((tagByte & 0x20) != 0) {
-      out.$(delimeter).$("CONSTRUCTED");
-    } else {
-      out.$(delimeter).$("PRIMITIVE");
-    }
-    
-    out.$(delimeter).$(tag).$("] {").endln();
+    out.hex(tagByte).$(' ').$('[').$(delimeter).$(tagClass).$(delimeter).$(tagForm).$(delimeter).$(tag).$("] {").endln();
     
     try (final Indent indent = out.indent(2)) {
       out.$("Hello").endln();
