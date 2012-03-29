@@ -4,8 +4,8 @@ import java.nio.ByteBuffer;
 
 public class ByteArrayWindow {
   private final byte[] array;
-  private final int start;
-  private final int length;
+  public final int start;
+  public final int length;
   
   public ByteArrayWindow(final byte[] array, final int start, final int length) {
     assert start >= 0;
