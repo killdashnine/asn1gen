@@ -24,15 +24,15 @@ public class TLV {
     final byte tagByte = window.get(0);
     
     if (window.length == 1) {
-      out.$("<missing length part>");
+      out.$("<missing tag part>");
       return;
     }
     
     final ByteArrayWindow afterTagWindow = window.from(1);
-    final int shortLength = tagByte & 0x1f;
-    final Tuple2<Integer, ByteArrayWindow> lengthTuple = lengthOf(shortLength, afterTagWindow);
-    final ByteArrayWindow lengthWindow = afterTagWindow.until(afterTagWindow.length - lengthTuple.b.length);
-    final int length = lengthTuple.a;
+    final int shortTag = tagByte & 0x1f;
+    final Tuple2<Integer, ByteArrayWindow> tagTuple = tagOf(shortTag, afterTagWindow);
+    final ByteArrayWindow lengthWindow = afterTagWindow.until(afterTagWindow.length - tagTuple.b.length);
+    final int tag = tagTuple.a;
     
     for (int i = 0; i < lengthWindow.length; ++i) {
       out.hex(lengthWindow.get(i)).$(' ');
@@ -42,20 +42,7 @@ public class TLV {
     
     final Delimeter delimeter = new Delimeter("", " ");
     
-    switch ((tagByte >> 6) & 0x3) {
-    case 0x00:
-      out.$(delimeter).$("UNIVERSAL");
-      break;
-    case 0x01:
-      out.$(delimeter).$("APPLICATION");
-      break;
-    case 0x02:
-      out.$(delimeter).$("CONTEXT");
-      break;
-    case 0x03:
-      out.$(delimeter).$("PRIVATE");
-      break;
-    }
+    out.$(delimeter).$(TagClass.fromTagByte(tagByte));
     
     if ((tagByte & 0x20) != 0) {
       out.$(delimeter).$("CONSTRUCTED");
@@ -63,7 +50,7 @@ public class TLV {
       out.$(delimeter).$("PRIMITIVE");
     }
     
-    out.$(delimeter).$(lengthTuple.a).$("] {").endln();
+    out.$(delimeter).$(tag).$("] {").endln();
     
     try (final Indent indent = out.indent(2)) {
       out.$("Hello").endln();
@@ -72,17 +59,17 @@ public class TLV {
     out.$("}");
   }
   
-  public static Tuple2<Integer, ByteArrayWindow> lengthOf(
+  public static Tuple2<Integer, ByteArrayWindow> tagOf(
       final int shortLength,
       final ByteArrayWindow window) {
     if (shortLength < 32) {
       return new Tuple2<Integer, ByteArrayWindow>(shortLength, window);
     }
     
-    return lengthOf(window, 0);
+    return tagOf(window, 0);
   }
     
-  public static Tuple2<Integer, ByteArrayWindow> lengthOf(
+  public static Tuple2<Integer, ByteArrayWindow> tagOf(
       final ByteArrayWindow window,
       final int accumulator) {
     if (window.length == 0) {
@@ -92,7 +79,7 @@ public class TLV {
     final int value = (accumulator << 7) + (window.get(0) & (int)0x7f);
     
     if ((window.get(0) & 0x80) != 0) {
-      return lengthOf(window.from(1), value);
+      return tagOf(window.from(1), value);
     }
     
     return new Tuple2<Integer, ByteArrayWindow>(value, window.from(1));
