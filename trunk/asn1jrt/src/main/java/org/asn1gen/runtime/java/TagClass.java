@@ -12,7 +12,7 @@ public enum TagClass {
     this.value = value;
   }
   
-  public static TagClass fromTagByte(final byte value) {
+  public static TagClass fromTagByte(final int value) {
     switch ((value >> 6) & 0x3) {
     case 0: return UNIVERSAL;
     case 1: return APPLICATION;

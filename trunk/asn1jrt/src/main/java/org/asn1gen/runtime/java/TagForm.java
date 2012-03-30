@@ -10,7 +10,7 @@ public enum TagForm {
     this.value = value;
   }
   
-  public static TagForm fromTagByte(final byte value) {
+  public static TagForm fromTagByte(final int value) {
     switch ((value >> 5) & 0x1) {
     case 0: return PRIMITIVE;
     case 1: return CONSTRUCTED;
