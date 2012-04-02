@@ -67,8 +67,12 @@ public class ByteArrayWindow {
     
     return this.until(nextWindow.start - this.start);
   }
-  
+
   public ByteArrayWindowInputStream getInputStream() {
     return new ByteArrayWindowInputStream(this);
+  }
+  
+  public ByteArrayWindowOutputStream getOutputStream() {
+    return new ByteArrayWindowOutputStream(this);
   }
 }
