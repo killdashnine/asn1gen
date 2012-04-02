@@ -4,7 +4,6 @@ import java.io.IOException;
 
 public class TlvPullParser {
   private final BoundedInputStream is;
-  private TlvFrame frame = null;
   
   public TlvPullParser(final BoundedInputStream is) {
     this.is = is;
@@ -61,6 +60,6 @@ public class TlvPullParser {
     final long tagNo = readTagNo(firstTagByte);
     final long tagLength = readTagLength();
     
-    return this.frame = new TlvFrame(this.frame, tagClass, tagForm, tagNo, tagLength);
+    return new TlvFrame(tagClass, tagForm, tagNo, tagLength);
   }
 }
