@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class BoundedInputStream extends InputStream {
+  public final long bounds;
+  
   private final IndexedInputStream is;
-  private final long bounds;
   
   public BoundedInputStream(final IndexedInputStream is, final long bounds) {
     this.is = is;
@@ -28,5 +29,9 @@ public class BoundedInputStream extends InputStream {
   
   public boolean isEmpty() {
     return is.getIndex() >= bounds;
+  }
+  
+  public BoundedInputStream until(final long length) {
+    return new BoundedInputStream(is, Math.min(is.getIndex() + length, bounds));
   }
 }
