@@ -34,7 +34,7 @@ public class IndexedInputStream extends InputStream {
     return index;
   }
   
-  public BoundedInputStream unbounded(final long length) {
+  public BoundedInputStream unbounded() {
     return new BoundedInputStream(this, Long.MAX_VALUE);
   }
   
