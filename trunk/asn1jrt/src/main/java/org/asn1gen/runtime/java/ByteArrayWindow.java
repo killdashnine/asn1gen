@@ -1,9 +1,11 @@
 package org.asn1gen.runtime.java;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class ByteArrayWindow {
-  private final byte[] array;
+  final byte[] array;
   public final int start;
   public final int length;
   
@@ -64,5 +66,9 @@ public class ByteArrayWindow {
     assert this.start <= nextWindow.start;
     
     return this.until(nextWindow.start - this.start);
+  }
+  
+  public ByteArrayWindowInputStream getInputStream() {
+    return new ByteArrayWindowInputStream(this);
   }
 }
