@@ -19,7 +19,7 @@ public class IndexedInputStream extends InputStream {
   
   @Override
   public int read() throws IOException {
-    final int value = read();
+    final int value = is.read();
     
     if (value == -1) {
       throw new EOFException();
@@ -32,5 +32,13 @@ public class IndexedInputStream extends InputStream {
   
   public long getIndex() {
     return index;
+  }
+  
+  public BoundedInputStream unbounded(final long length) {
+    return new BoundedInputStream(this, Long.MAX_VALUE);
+  }
+  
+  public BoundedInputStream until(final long length) {
+    return new BoundedInputStream(this, index + length);
   }
 }
