@@ -7,17 +7,17 @@ import java.io.InputStream;
 public class ByteArrayWindowInputStream extends InputStream {
   private final byte[] array;
   public int start;
-  public final int length;
+  public final int end;
   
   public ByteArrayWindowInputStream(final ByteArrayWindow window) {
     this.array = window.array;
     this.start = window.start;
-    this.length = window.length;
+    this.end = window.start + window.length;
   }
   
   @Override
   public int read() throws IOException {
-    if (start >= length) {
+    if (start >= end) {
       throw new EOFException();
     }
     
@@ -29,10 +29,10 @@ public class ByteArrayWindowInputStream extends InputStream {
   }
   
   public ByteArrayWindow getWindow() {
-    return new ByteArrayWindow(array, start, length);
+    return new ByteArrayWindow(array, start, end - start);
   }
 
   public boolean isEmpty() {
-    return length == 0;
+    return start >= end;
   }
 }
