@@ -10,7 +10,7 @@ import org.asn1gen.runtime.java.TagForm;
 import org.asn1gen.runtime.java.TlvFrame;
 import org.junit.Test;
 
-public class TestTlvPullParser {
+public class TestTlvFrame {
   @Test
   public void tlvPullParser() throws IOException {
     System.err.println("foo");
