@@ -39,6 +39,10 @@ public class TlvFrame {
     return new TlvFrame(tagClass, tagForm, tagNo, tagLength, is.getWindow());
   }
   
+  public TlvFrame firstChild() throws IOException {
+    return readFrom(data.until((int)length));
+  }
+  
   public TlvFrame next() throws IOException {
     return readFrom(data.from((int)length));
   }
