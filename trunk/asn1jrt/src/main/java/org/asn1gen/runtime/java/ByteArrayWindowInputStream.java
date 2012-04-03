@@ -31,4 +31,8 @@ public class ByteArrayWindowInputStream extends InputStream {
   public ByteArrayWindow getWindow() {
     return new ByteArrayWindow(array, start, length);
   }
+
+  public boolean isEmpty() {
+    return length == 0;
+  }
 }
