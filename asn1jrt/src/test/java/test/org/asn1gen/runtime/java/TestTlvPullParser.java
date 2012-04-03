@@ -20,6 +20,7 @@ public class TestTlvPullParser {
     Assert.assertEquals(TagForm.CONSTRUCTED, frame.tagForm);
     Assert.assertEquals(17, frame.tagNo);
     Assert.assertEquals(12, frame.length);
-    System.out.println("moo");
+    final TlvFrame frame2 = frame.next();
+    Assert.assertEquals(null, frame2);
   }
 }
