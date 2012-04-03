@@ -1,7 +1,5 @@
 package org.asn1gen.runtime.java;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class ByteArrayWindow {
