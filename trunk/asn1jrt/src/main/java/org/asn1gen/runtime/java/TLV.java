@@ -17,46 +17,42 @@ public class TLV {
         new OnTlv<Void>() {
           @Override
           public ByteArrayWindow call(
+              final TlvFrame frame,
               final ByteArrayWindow tagWindow,
-              final TagClass tagClass,
-              final TagForm tagForm,
-              final long tagNo,
               final ByteArrayWindow lengthWindow,
-              final int length,
-              final ByteArrayWindow valueWindow,
               final Void[] result) {
             final Delimeter tagDelimeter = new Delimeter("", " ");
             
-            out.hex(tagWindow).$(' ').$('[').$(tagDelimeter).$(tagClass).$(tagDelimeter).$(tagForm).$(tagDelimeter).$(tagNo).$("]").$(' ');
-            out.hex(lengthWindow).$(' ').$('[').$(length).$(']');
+            out.hex(tagWindow).$(' ').$('[').$(tagDelimeter).$(frame.tagClass).$(tagDelimeter).$(frame.tagForm).$(tagDelimeter).$(frame.tagNo).$("]").$(' ');
+            out.hex(lengthWindow).$(' ').$('[').$(frame.length).$(']');
             
-            if (tagForm == TagForm.PRIMITIVE) {
-              if (tagNo == 1) {
-                assert length == 1;
-                out.$(' ').hex(valueWindow).$(' ');
-                out.$("[BOOLEAN:").$(valueWindow.get(0) != 0 ? "true" : "false").$("]");
-              } else if (tagNo == 4) { // Octet String
-                assert length == 1;
-                out.$(' ').hex(valueWindow).$(valueWindow.length > 0 ? " " : "");
+            if (frame.tagForm == TagForm.PRIMITIVE) {
+              if (frame.tagNo == 1) {
+                assert frame.length == 1;
+                out.$(' ').hex(frame.value).$(' ');
+                out.$("[BOOLEAN:").$(frame.value.get(0) != 0 ? "true" : "false").$("]");
+              } else if (frame.tagNo == 4) { // Octet String
+                assert frame.length == 1;
+                out.$(' ').hex(frame.value).$(frame.value.length > 0 ? " " : "");
                 out.$("[OCTET_STRING]");
-              } else if (tagNo == 10) {
-                assert length == 1;
-                out.$(' ').hex(valueWindow).$(' ');
-                out.$("[ENUMERATION:").$(intValue(valueWindow)).$("]");
+              } else if (frame.tagNo == 10) {
+                assert frame.length == 1;
+                out.$(' ').hex(frame.value).$(' ');
+                out.$("[ENUMERATION:").$(intValue(frame.value)).$("]");
               }
               out.endln();
             } else {
-              if (valueWindow.length > 0) {
+              if (frame.value.length > 0) {
                 out.$(" {").endln();
                 
                 try (final Indent indent = out.indent(2)) {
-                  switch (tagClass) {
+                  switch (frame.tagClass) {
                   case UNIVERSAL:
-                    switch (tagForm) {
+                    switch (frame.tagForm) {
                     case PRIMITIVE:
                     case CONSTRUCTED:
                       if (true) {
-                        ByteArrayWindow childWindow = valueWindow;
+                        ByteArrayWindow childWindow = frame.value;
                         while (childWindow.length > 0) {
                           childWindow = dump(out, childWindow);
                         }
@@ -65,7 +61,7 @@ public class TLV {
                     }
                     break;
                   default:
-                    out.hex(valueWindow).endln();
+                    out.hex(frame.value).endln();
                     break;
                   }
                 }
@@ -110,8 +106,9 @@ public class TLV {
     final ByteArrayWindow childWindow = windowPostLength.until(tagLength[0]);
     final ByteArrayWindow tagWindow = window.until(windowPostTagNo.start - window.start);
     final ByteArrayWindow lengthWindow = window.until(childWindow.start - windowPostTagNo.start);
+    final TlvFrame frame = new TlvFrame(tagClass, tagForm, tagNo[0], tagLength[0], childWindow);
     
-    onTlv.call(tagWindow, tagClass, tagForm, tagNo[0], lengthWindow, tagLength[0], childWindow, result);
+    onTlv.call(frame, tagWindow, lengthWindow, result);
     
     return windowPostLength.from(tagLength[0]);
   }
