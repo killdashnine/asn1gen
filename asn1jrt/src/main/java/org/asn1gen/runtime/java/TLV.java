@@ -38,7 +38,7 @@ public class TLV {
               } else if (frame.tagNo == 10) {
                 assert frame.length == 1;
                 out.$(' ').hex(frame.value).$(' ');
-                out.$("[ENUMERATION:").$(intValue(frame.value)).$("]");
+                out.$("[ENUMERATION:").$(longValue(frame.value)).$("]");
               }
               out.endln();
             } else {
@@ -78,11 +78,17 @@ public class TLV {
         result);
   }
   
-  private static int intValue(final ByteArrayWindow dataWindow) {
-    if (dataWindow.length == 0) {
+  public static long longValue(final ByteArrayWindow window) {
+    if (window.length == 0) {
       return 0;
     } else {
-      return dataWindow.get(0);
+      long intValue = window.get(0);
+      
+      for (int i = 1; i < window.length; ++i) {
+        intValue = (intValue << 8) | (window.get(i) & 0xff);
+      }
+      
+      return intValue;
     }
   }
 
