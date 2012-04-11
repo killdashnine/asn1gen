@@ -12,13 +12,13 @@ public class Journal extends org.asn1gen.runtime.java.AsnSequence {
     org.asn1gen.runtime.java.AsnOctetString.EMPTY,
     org.asn1gen.runtime.java.AsnOctetString.EMPTY);
 
-  /*GenJava.scala:306*/public final org.asn1gen.runtime.java.AsnOctetString title;
+  /*GenJava.scala:395*/public final org.asn1gen.runtime.java.AsnOctetString title;
   public final org.asn1gen.runtime.java.AsnOctetString edition;
 
   public Journal(
-      /*GenJava.scala:970*/final org.asn1gen.runtime.java.AsnOctetString title,
+      /*GenJava.scala:1361*/final org.asn1gen.runtime.java.AsnOctetString title,
       final org.asn1gen.runtime.java.AsnOctetString edition) {
-    /*GenJava.scala:960*/this.title = title;
+    /*GenJava.scala:1351*/this.title = title;
     this.edition = edition;
   }
 
@@ -36,7 +36,7 @@ public class Journal extends org.asn1gen.runtime.java.AsnSequence {
 
   public boolean equals(final Journal that) {
     assert that != null;
-    /*GenJava.scala:359*/
+    /*GenJava.scala:448*/
     if (!this.title.equals(that.title)) {
       return false;
     }
