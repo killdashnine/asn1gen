@@ -10,7 +10,7 @@ public class TLV {
   }
   
   public static ByteArrayWindow dump(final IndentWriter out, final ByteArrayWindow window) {
-    final TlvResult tlvResult = readTlv(window);
+    final DetailedTlvFrame tlvResult = readTlv(window);
     final TlvFrame frame = tlvResult.frame;
     
     final Delimeter tagDelimeter = new Delimeter("", " ");
@@ -84,7 +84,7 @@ public class TLV {
     dump(System.out, ByteArrayWindow.to(new byte[] { 0x31, 0x0c, 0x04, 0x00, 0x04, 0x00, 0x04, 0x00, 0x0a, 0x01, 0x00, 0x01, 0x01, 0x00 }));
   }
 
-  public static TlvResult readTlv(final ByteArrayWindow window) {
+  public static DetailedTlvFrame readTlv(final ByteArrayWindow window) {
     final int firstTagByte = window.get(0);
     
     final TagClass tagClass = TagClass.fromTagByte(firstTagByte);
@@ -99,7 +99,7 @@ public class TLV {
     final ByteArrayWindow lengthWindow = window.until(childWindow.start - windowPostTagNo.start);
     final TlvFrame frame = new TlvFrame(tagClass, tagForm, tagNo[0], tagLength[0], childWindow);
     
-    return new TlvResult(
+    return new DetailedTlvFrame(
         window,
         frame,
         tagWindow,
