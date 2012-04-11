@@ -13,6 +13,8 @@ public class TlvFrame {
       final long tagNo,
       final long length,
       final ByteArrayWindow value) {
+    assert value != null;
+    
     this.tagClass = tagClass;
     this.tagForm = tagForm;
     this.tagNo = tagNo;
