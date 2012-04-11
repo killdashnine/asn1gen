@@ -15,19 +15,19 @@ public class Book extends org.asn1gen.runtime.java.AsnSequence {
     BookCover.EMPTY,
     org.asn1gen.runtime.java.AsnBoolean.EMPTY);
 
-  /*GenJava.scala:306*/public final org.asn1gen.runtime.java.AsnOctetString isbn;
+  /*GenJava.scala:395*/public final org.asn1gen.runtime.java.AsnOctetString isbn;
   public final org.asn1gen.runtime.java.AsnOctetString title;
   public final org.asn1gen.runtime.java.AsnOctetString author;
   public final BookCover cover;
   public final org.asn1gen.runtime.java.AsnBoolean isInPrint;
 
   public Book(
-      /*GenJava.scala:970*/final org.asn1gen.runtime.java.AsnOctetString isbn,
+      /*GenJava.scala:1361*/final org.asn1gen.runtime.java.AsnOctetString isbn,
       final org.asn1gen.runtime.java.AsnOctetString title,
       final org.asn1gen.runtime.java.AsnOctetString author,
       final BookCover cover,
       final org.asn1gen.runtime.java.AsnBoolean isInPrint) {
-    /*GenJava.scala:960*/this.isbn = isbn;
+    /*GenJava.scala:1351*/this.isbn = isbn;
     this.title = title;
     this.author = author;
     this.cover = cover;
@@ -81,7 +81,7 @@ public class Book extends org.asn1gen.runtime.java.AsnSequence {
 
   public boolean equals(final Book that) {
     assert that != null;
-    /*GenJava.scala:359*/
+    /*GenJava.scala:448*/
     if (!this.isbn.equals(that.isbn)) {
       return false;
     }
