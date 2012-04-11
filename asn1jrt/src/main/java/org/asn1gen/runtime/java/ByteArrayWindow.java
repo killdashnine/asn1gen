@@ -26,7 +26,7 @@ public class ByteArrayWindow {
   
   public ByteArrayWindow from(final int offset) {
     assert offset >= 0;
-    assert start + offset <= length;
+    assert start + offset <= array.length;
     return new ByteArrayWindow(array, start + offset, length - offset);
   }
 

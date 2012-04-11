@@ -10,72 +10,60 @@ public class TLV {
   }
   
   public static ByteArrayWindow dump(final IndentWriter out, final ByteArrayWindow window) {
-    Void[] result = new Void[1];
+    final TlvResult tlvResult = readTlv(window);
+    final TlvFrame frame = tlvResult.frame;
     
-    return readTlv(
-        window,
-        new OnTlv<Void>() {
-          @Override
-          public ByteArrayWindow call(
-              final TlvFrame frame,
-              final ByteArrayWindow tagWindow,
-              final ByteArrayWindow lengthWindow,
-              final Void[] result) {
-            final Delimeter tagDelimeter = new Delimeter("", " ");
-            
-            out.hex(tagWindow).$(' ').$('[').$(tagDelimeter).$(frame.tagClass).$(tagDelimeter).$(frame.tagForm).$(tagDelimeter).$(frame.tagNo).$("]").$(' ');
-            out.hex(lengthWindow).$(' ').$('[').$(frame.length).$(']');
-            
-            if (frame.tagForm == TagForm.PRIMITIVE) {
-              if (frame.tagNo == 1) {
-                assert frame.length == 1;
-                out.$(' ').hex(frame.value).$(' ');
-                out.$("[BOOLEAN:").$(frame.value.get(0) != 0 ? "true" : "false").$("]");
-              } else if (frame.tagNo == 4) { // Octet String
-                assert frame.length == 1;
-                out.$(' ').hex(frame.value).$(frame.value.length > 0 ? " " : "");
-                out.$("[OCTET_STRING]");
-              } else if (frame.tagNo == 10) {
-                assert frame.length == 1;
-                out.$(' ').hex(frame.value).$(' ');
-                out.$("[ENUMERATION:").$(longValue(frame.value)).$("]");
-              }
-              out.endln();
-            } else {
-              if (frame.value.length > 0) {
-                out.$(" {").endln();
-                
-                try (final Indent indent = out.indent(2)) {
-                  switch (frame.tagClass) {
-                  case UNIVERSAL:
-                    switch (frame.tagForm) {
-                    case PRIMITIVE:
-                    case CONSTRUCTED:
-                      if (true) {
-                        ByteArrayWindow childWindow = frame.value;
-                        while (childWindow.length > 0) {
-                          childWindow = dump(out, childWindow);
-                        }
-                        break;
-                      }
-                    }
-                    break;
-                  default:
-                    out.hex(frame.value).endln();
-                    break;
-                  }
+    final Delimeter tagDelimeter = new Delimeter("", " ");
+    
+    out.hex(tlvResult.tagWindow).$(' ').$('[').$(tagDelimeter).$(frame.tagClass).$(tagDelimeter).$(frame.tagForm).$(tagDelimeter).$(frame.tagNo).$("]").$(' ');
+    out.hex(tlvResult.lengthWindow).$(' ').$('[').$(frame.length).$(']');
+    
+    if (frame.tagForm == TagForm.PRIMITIVE) {
+      if (frame.tagNo == 1) {
+        assert frame.length == 1;
+        out.$(' ').hex(frame.value).$(' ');
+        out.$("[BOOLEAN:").$(frame.value.get(0) != 0 ? "true" : "false").$("]");
+      } else if (frame.tagNo == 4) { // Octet String
+        out.$(' ').hex(frame.value).$(frame.value.length > 0 ? " " : "");
+        out.$("[OCTET_STRING]");
+      } else if (frame.tagNo == 10) {
+        assert frame.length == 1;
+        out.$(' ').hex(frame.value).$(' ');
+        out.$("[ENUMERATION:").$(longValue(frame.value)).$("]");
+      }
+      out.endln();
+    } else {
+      if (frame.value.length > 0) {
+        out.$(" {").endln();
+        
+        try (final Indent indent = out.indent(2)) {
+          switch (frame.tagClass) {
+          case UNIVERSAL:
+            switch (frame.tagForm) {
+            case PRIMITIVE:
+            case CONSTRUCTED:
+              if (true) {
+                ByteArrayWindow childWindow = frame.value;
+                while (childWindow.length > 0) {
+                  childWindow = dump(out, childWindow);
                 }
-                
-                out.$("}").endln();
-              } else {
-                out.endln();
+                break;
               }
             }
-            
-            return null;
+            break;
+          default:
+            out.hex(frame.value).endln();
+            break;
           }
-        },
-        result);
+        }
+        
+        out.$("}").endln();
+      } else {
+        out.endln();
+      }
+    }
+    
+    return tlvResult.remainder;
   }
   
   public static long longValue(final ByteArrayWindow window) {
@@ -96,10 +84,7 @@ public class TLV {
     dump(System.out, ByteArrayWindow.to(new byte[] { 0x31, 0x0c, 0x04, 0x00, 0x04, 0x00, 0x04, 0x00, 0x0a, 0x01, 0x00, 0x01, 0x01, 0x00 }));
   }
 
-  public static <T> ByteArrayWindow readTlv(
-      final ByteArrayWindow window,
-      final OnTlv<T> onTlv,
-      final T[] result) {
+  public static TlvResult readTlv(final ByteArrayWindow window) {
     final int firstTagByte = window.get(0);
     
     final TagClass tagClass = TagClass.fromTagByte(firstTagByte);
@@ -114,9 +99,12 @@ public class TLV {
     final ByteArrayWindow lengthWindow = window.until(childWindow.start - windowPostTagNo.start);
     final TlvFrame frame = new TlvFrame(tagClass, tagForm, tagNo[0], tagLength[0], childWindow);
     
-    onTlv.call(frame, tagWindow, lengthWindow, result);
-    
-    return windowPostLength.from(tagLength[0]);
+    return new TlvResult(
+        window,
+        frame,
+        tagWindow,
+        lengthWindow,
+        windowPostLength.from(tagLength[0]));
   }
   
   private static ByteArrayWindow readTagNo(
