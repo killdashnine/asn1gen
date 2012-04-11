@@ -1,6 +1,8 @@
 package org.asn1gen.runtime.java;
 
 public class AsnBitString implements AsnType {
+  public final static AsnBitString EMPTY = new AsnBitString(0, 0);
+  
   public final long value;
   public final int length;
   
