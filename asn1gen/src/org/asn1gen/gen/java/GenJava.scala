@@ -345,6 +345,22 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         out << "@SuppressWarnings(\"unused\")" << EndLn
         out << "public abstract class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnChoice {" << EndLn
         out.indent(2) {
+          out.trace("/*", "*/")
+          rootAlternativeTypeList match {
+            case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
+              namedTypes.firstOption foreach { namedType =>
+                namedType match {
+                  case ast.NamedType(ast.Identifier(name), _type) => {
+                    val safeName = safeId(name)
+                    val safeType = safeId(asnTypeOf(_type))
+                    val safeChoiceChoice = safeId(assignmentName + "_" + name)
+                    out << EndLn
+                    out << "public static final " << safeChoiceChoice << " EMPTY = " << safeChoiceChoice << ".EMPTY;" << EndLn
+                  }
+                }
+              }
+            }
+          }
           generateSimpleGetters(rootAlternativeTypeList)
           generateChoiceFieldTransformers(assignmentName, rootAlternativeTypeList)
         }
@@ -746,67 +762,67 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.ensureEmptyLines(1)
     builtinType match {
       case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-        out << "public static BerWriter decodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value);" << EndLn
+          out << "return decodePart_(value, window);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value);" << EndLn
+          out << "return decode_(value, window);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
-        out << "public static BerWriter decodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value);" << EndLn
+          out << "return decodePart_(value, window);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value);" << EndLn
+          out << "return decode_(value, window);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-        out << "public static BerWriter decodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value);" << EndLn
+          out << "return decodePart_(value, window);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value);" << EndLn
+          out << "return decode_(value, window);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.EnumeratedType(enumerations) => {
-        out << "public static BerWriter decodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value);" << EndLn
+          out << "return decodePart_(value, window);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value);" << EndLn
+          out << "return decode_(value, window);" << EndLn
         }
         out << "}" << EndLn
       }
       case setOfType: ast.SetOfType => {
-        out << "public static BerWriter decodePart(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value);" << EndLn
+          out << "return decodePart_(value, window);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value);" << EndLn
+          out << "return decode_(value, window);" << EndLn
         }
         out << "}" << EndLn
       }
@@ -1048,9 +1064,9 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.ensureEmptyLines(1)
     builtinType match {
       case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-        out << "public static BerWriter decodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "switch (value.choiceId()) {" << EndLn
+          out << "/*switch (value.choiceId()) {" << EndLn
           rootAlternativeTypeList match {
             case ast.RootAlternativeTypeList(ast.AlternativeTypeList(namedTypes)) => {
               namedTypes foreach { namedType =>
@@ -1064,7 +1080,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                           case ast.Type(ast.TypeReference(typeRef), Nil) => {
                             out << "case " << tag << ":" << EndLn
                             out.indent(2) {
-                              out << "return decodePart((" << safeId(typeRef) << ")value.element());" << EndLn
+                              out << "return decodePart((" << safeId(typeRef) << ")value.element(), window);" << EndLn
                             }
                           }
                         }
@@ -1079,39 +1095,38 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           out.indent(2) {
             out << "throw new AsnException();" << EndLn
           }
-          out << "}" << EndLn
+          out << "}*/" << EndLn
+          
+          out << "return " << assignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          var firstIndex: Option[Long] = None
-          out << "final BerWriter dataWriter = decode(value);" << EndLn
-          out << EndLn
-          out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, value.choiceId()).length(dataWriter.length).then(dataWriter);" << EndLn
+          out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
-        out << "public static BerWriter decodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out.trace("/*", "*/")
+          out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out.trace("/*", "*/")
+          out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-        out << "public static BerWriter decodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
           val list = (list1.toList:::list2.toList).map { componentTypeList =>
             componentTypeList.componentTypes
           }.flatten
-          out << "return BerWriter.EMPTY"
+          out << "/*return BerWriter.EMPTY"
           out.indent(4) {
             list foreach {
               case ast.NamedComponentType(ast.NamedType(ast.Identifier(identifier), _type), value) => {
@@ -1119,37 +1134,70 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                 out << ".then(decode(value." << safeId(identifier) << "))"
               }
             }
-            out << ";" << EndLn
+            out << ";*/" << EndLn
           }
+          out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "final BerWriter dataWriter = decodePart(value);" << EndLn
-          out << EndLn
-          out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);" << EndLn
+          out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.EnumeratedType(enumerations) => {
-        out << "public static BerWriter decodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart(value.value);" << EndLn
+          out << "final long intValue = TLV.longValue(window);" << EndLn
+          out << EndLn
+          out << "if (intValue == BookCover.hardCover.value) {" << EndLn
+          out.indent(2) {
+            out << "return BookCover.hardCover;" << EndLn
+          }
+          out << "} else if (intValue == BookCover.paperBack.value) {" << EndLn
+          out.indent(2) {
+            out << "return BookCover.paperBack;" << EndLn
+          }
+          out << "} else {" << EndLn
+          out.indent(2) {
+            out << "throw new AsnException();" << EndLn
+          }
+          out << "}" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          var firstIndex: Option[Long] = None
-          out << "final BerWriter dataWriter = decodePart(value.value);" << EndLn
+          
+          
+          out << "final DetailedTlvFrame detailedFrame = TLV.readTlv(window);" << EndLn
+          out << "final TlvFrame frame = detailedFrame.frame;" << EndLn
           out << EndLn
-          out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 10).length(dataWriter.length).then(dataWriter);" << EndLn
+          out << "if (frame.tagClass != TagClass.UNIVERSAL) {" << EndLn
+          out.indent(2) {
+            out << "throw new AsnException();" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
+          out << "if (frame.tagForm != TagForm.PRIMITIVE) {" << EndLn
+          out.indent(2) {
+            out << "throw new AsnException();" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
+          out << "if (frame.tagNo != 10) {" << EndLn
+          out.indent(2) {
+            out << "throw new AsnException();" << EndLn
+          }
+          out << "}" << EndLn
+          out << EndLn
+          out << "return decodePart(value, frame.value);" << EndLn
         }
         out << "}" << EndLn
       }
       case setOfType: ast.SetOfType => {
-        out << "public static BerWriter decodePart_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
           val safeAssignmentName = safeId(assignmentName)
           setOfType match {
@@ -1157,7 +1205,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
               elementType match {
                 case ast.TypeReference(referencedType) => {
                   val safeReferenceType = safeId(referencedType)
-                  out << "BerWriter dataWriter = BerWriter.EMPTY;" << EndLn
+                  out << "/*BerWriter dataWriter = BerWriter.EMPTY;" << EndLn
                   out << EndLn
                   out << "for (final " << referencedType << " item: value.items) {" << EndLn
                   out.indent(2) {
@@ -1165,7 +1213,8 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                   }
                   out << "}" << EndLn
                   out << EndLn
-                  out << "return dataWriter;" << EndLn
+                  out << "return dataWriter;*/" << EndLn
+                  out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
                 }
                 case sequenceType: ast.SequenceType => {
                   assert(false)
@@ -1184,11 +1233,9 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static BerWriter decode_(final " << safeAssignmentName << " value) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "final BerWriter dataWriter = decodePart(value);" << EndLn
-          out << EndLn
-          out << "return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);" << EndLn
+          out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
       }
