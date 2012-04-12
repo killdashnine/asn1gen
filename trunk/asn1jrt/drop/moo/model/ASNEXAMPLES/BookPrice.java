@@ -12,13 +12,13 @@ public class BookPrice extends org.asn1gen.runtime.java.AsnSequence {
     org.asn1gen.runtime.java.AsnOctetString.EMPTY,
     org.asn1gen.runtime.java.AsnInteger.EMPTY);
 
-  /*GenJava.scala:395*/public final org.asn1gen.runtime.java.AsnOctetString isbn;
+  /*GenJava.scala:411*/public final org.asn1gen.runtime.java.AsnOctetString isbn;
   public final org.asn1gen.runtime.java.AsnInteger price;
 
   public BookPrice(
-      /*GenJava.scala:1361*/final org.asn1gen.runtime.java.AsnOctetString isbn,
+      /*GenJava.scala:1408*/final org.asn1gen.runtime.java.AsnOctetString isbn,
       final org.asn1gen.runtime.java.AsnInteger price) {
-    /*GenJava.scala:1351*/this.isbn = isbn;
+    /*GenJava.scala:1398*/this.isbn = isbn;
     this.price = price;
   }
 
@@ -36,7 +36,7 @@ public class BookPrice extends org.asn1gen.runtime.java.AsnSequence {
 
   public boolean equals(final BookPrice that) {
     assert that != null;
-    /*GenJava.scala:448*/
+    /*GenJava.scala:464*/
     if (!this.isbn.equals(that.isbn)) {
       return false;
     }

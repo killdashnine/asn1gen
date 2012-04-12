@@ -13,133 +13,146 @@ import static moo.codec.ASNEXAMPLES.BerToAsn.*;
 @SuppressWarnings("unused")
 public class ShadowBerToAsn {
 
-  public static BerWriter decodePart_(final Books value) throws AsnException {
-    BerWriter dataWriter = BerWriter.EMPTY;
+  public static Books decodePart_(final Books value, final ByteArrayWindow window) throws AsnException {
+    /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Book item: value.items) {
       dataWriter = dataWriter.then(decode(item));
     }
 
-    return dataWriter;
+    return dataWriter;*/
+    return Books.EMPTY;
   }
 
-  public static BerWriter decode_(final Books value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);
+  public static Books decode_(final Books value, final ByteArrayWindow window) throws AsnException {
+    return Books.EMPTY;
   }
 
-  public static BerWriter decodePart_(final BookPrice value) throws AsnException {
-    return BerWriter.EMPTY
+  public static BookPrice decodePart_(final BookPrice value, final ByteArrayWindow window) throws AsnException {
+    /*return BerWriter.EMPTY
         .then(decode(value.isbn))
-        .then(decode(value.price));
+        .then(decode(value.price));*/
+    return BookPrice.EMPTY;
   }
 
-  public static BerWriter decode_(final BookPrice value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);
+  public static BookPrice decode_(final BookPrice value, final ByteArrayWindow window) throws AsnException {
+    return BookPrice.EMPTY;
   }
 
-  public static BerWriter decodePart_(final BookPrices value) throws AsnException {
-    BerWriter dataWriter = BerWriter.EMPTY;
+  public static BookPrices decodePart_(final BookPrices value, final ByteArrayWindow window) throws AsnException {
+    /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Book item: value.items) {
       dataWriter = dataWriter.then(decode(item));
     }
 
-    return dataWriter;
+    return dataWriter;*/
+    return BookPrices.EMPTY;
   }
 
-  public static BerWriter decode_(final BookPrices value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);
+  public static BookPrices decode_(final BookPrices value, final ByteArrayWindow window) throws AsnException {
+    return BookPrices.EMPTY;
   }
 
-  public static BerWriter decodePart_(final BookCover value) throws AsnException {
-    return decodePart(value.value);
+  public static BookCover decodePart_(final BookCover value, final ByteArrayWindow window) throws AsnException {
+    final long intValue = TLV.longValue(window);
+
+    if (intValue == BookCover.hardCover.value) {
+      return BookCover.hardCover;
+    } else if (intValue == BookCover.paperBack.value) {
+      return BookCover.paperBack;
+    } else {
+      throw new AsnException();
+    }
   }
 
-  public static BerWriter decode_(final BookCover value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value.value);
+  public static BookCover decode_(final BookCover value, final ByteArrayWindow window) throws AsnException {
+    final DetailedTlvFrame detailedFrame = TLV.readTlv(window);
+    final TlvFrame frame = detailedFrame.frame;
 
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, 10).length(dataWriter.length).then(dataWriter);
+    if (frame.tagClass != TagClass.UNIVERSAL) {
+      throw new AsnException();
+    }
+
+    if (frame.tagForm != TagForm.PRIMITIVE) {
+      throw new AsnException();
+    }
+
+    if (frame.tagNo != 10) {
+      throw new AsnException();
+    }
+
+    return decodePart(value, frame.value);
   }
 
-  public static BerWriter decodePart_(final Book value) throws AsnException {
-    return BerWriter.EMPTY
+  public static Book decodePart_(final Book value, final ByteArrayWindow window) throws AsnException {
+    /*return BerWriter.EMPTY
         .then(decode(value.isbn))
         .then(decode(value.title))
         .then(decode(value.author))
         .then(decode(value.cover))
-        .then(decode(value.isInPrint));
+        .then(decode(value.isInPrint));*/
+    return Book.EMPTY;
   }
 
-  public static BerWriter decode_(final Book value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);
+  public static Book decode_(final Book value, final ByteArrayWindow window) throws AsnException {
+    return Book.EMPTY;
   }
 
-  public static BerWriter decodePart_(final Journals value) throws AsnException {
-    BerWriter dataWriter = BerWriter.EMPTY;
+  public static Journals decodePart_(final Journals value, final ByteArrayWindow window) throws AsnException {
+    /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Journal item: value.items) {
       dataWriter = dataWriter.then(decode(item));
     }
 
-    return dataWriter;
+    return dataWriter;*/
+    return Journals.EMPTY;
   }
 
-  public static BerWriter decode_(final Journals value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);
+  public static Journals decode_(final Journals value, final ByteArrayWindow window) throws AsnException {
+    return Journals.EMPTY;
   }
 
-  public static BerWriter decodePart_(final Item value) throws AsnException {
-    switch (value.choiceId()) {
+  public static Item decodePart_(final Item value, final ByteArrayWindow window) throws AsnException {
+    /*switch (value.choiceId()) {
     case 1:
-      return decodePart((Book)value.element());
+      return decodePart((Book)value.element(), window);
     case 2:
-      return decodePart((Journal)value.element());
+      return decodePart((Journal)value.element(), window);
     default:
       throw new AsnException();
-    }
+    }*/
+    return Item.EMPTY;
   }
 
-  public static BerWriter decode_(final Item value) throws AsnException {
-    final BerWriter dataWriter = decode(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.PRIMITIVE, value.choiceId()).length(dataWriter.length).then(dataWriter);
+  public static Item decode_(final Item value, final ByteArrayWindow window) throws AsnException {
+    return Item.EMPTY;
   }
 
-  public static BerWriter decodePart_(final Journal value) throws AsnException {
-    return BerWriter.EMPTY
+  public static Journal decodePart_(final Journal value, final ByteArrayWindow window) throws AsnException {
+    /*return BerWriter.EMPTY
         .then(decode(value.title))
-        .then(decode(value.edition));
+        .then(decode(value.edition));*/
+    return Journal.EMPTY;
   }
 
-  public static BerWriter decode_(final Journal value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);
+  public static Journal decode_(final Journal value, final ByteArrayWindow window) throws AsnException {
+    return Journal.EMPTY;
   }
 
-  public static BerWriter decodePart_(final Items value) throws AsnException {
-    BerWriter dataWriter = BerWriter.EMPTY;
+  public static Items decodePart_(final Items value, final ByteArrayWindow window) throws AsnException {
+    /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Item item: value.items) {
       dataWriter = dataWriter.then(decode(item));
     }
 
-    return dataWriter;
+    return dataWriter;*/
+    return Items.EMPTY;
   }
 
-  public static BerWriter decode_(final Items value) throws AsnException {
-    final BerWriter dataWriter = decodePart(value);
-
-    return BerWriter.EMPTY.tag(AsnClass.UNIVERSAL, AsnForm.CONSTRUCTED, 17).length(dataWriter.length).then(dataWriter);
+  public static Items decode_(final Items value, final ByteArrayWindow window) throws AsnException {
+    return Items.EMPTY;
   }
 }

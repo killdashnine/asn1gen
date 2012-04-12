@@ -11,110 +11,76 @@ import static moo.codec.ASNEXAMPLES.ShadowBerToAsn.*;
 
 @SuppressWarnings("unused")
 public class BerToAsn {
-  public static BookCover decode(
-      final BookCover value,
-      final ByteArrayWindow window) throws AsnException {
-    final DetailedTlvFrame detailedFrame = TLV.readTlv(window);
-    final TlvFrame frame = detailedFrame.frame;
-    
-    if (frame.tagClass != TagClass.UNIVERSAL) {
-      throw new AsnException();
-    }
-    
-    if (frame.tagForm != TagForm.PRIMITIVE) {
-      throw new AsnException();
-    }
-    
-    if (frame.tagNo != 10) {
-      throw new AsnException();
-    }
-    
-    return decodePart(value, frame.value);
-  }
-  
-  public static BookCover decodePart(
-      final BookCover value,
-      final ByteArrayWindow window) throws AsnException {
-    final long intValue = TLV.longValue(window);
-    
-    if (intValue == BookCover.hardCover.value) {
-      return BookCover.hardCover;
-    } else if (intValue == BookCover.paperBack.value) {
-      return BookCover.paperBack;
-    } else {
-      throw new AsnException();
-    }
+
+  public static Books decodePart(final Books value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final Books value) throws AsnException {
-    return decodePart_(value);
+  public static Books decode(final Books value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final Books value) throws AsnException {
-    return decode_(value);
+  public static BookPrice decodePart(final BookPrice value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final BookPrice value) throws AsnException {
-    return decodePart_(value);
+  public static BookPrice decode(final BookPrice value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final BookPrice value) throws AsnException {
-    return decode_(value);
+  public static BookPrices decodePart(final BookPrices value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final BookPrices value) throws AsnException {
-    return decodePart_(value);
+  public static BookPrices decode(final BookPrices value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final BookPrices value) throws AsnException {
-    return decode_(value);
+  public static BookCover decodePart(final BookCover value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final BookCover value) throws AsnException {
-    return decodePart_(value);
+  public static BookCover decode(final BookCover value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final BookCover value) throws AsnException {
-    return decode_(value);
+  public static Book decodePart(final Book value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final Book value) throws AsnException {
-    return decodePart_(value);
+  public static Book decode(final Book value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final Book value) throws AsnException {
-    return decode_(value);
+  public static Journals decodePart(final Journals value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final Journals value) throws AsnException {
-    return decodePart_(value);
+  public static Journals decode(final Journals value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final Journals value) throws AsnException {
-    return decode_(value);
+  public static Item decodePart(final Item value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final Item value) throws AsnException {
-    return decodePart_(value);
+  public static Item decode(final Item value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final Item value) throws AsnException {
-    return decode_(value);
+  public static Journal decodePart(final Journal value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final Journal value) throws AsnException {
-    return decodePart_(value);
+  public static Journal decode(final Journal value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 
-  public static BerWriter decode(final Journal value) throws AsnException {
-    return decode_(value);
+  public static Items decodePart(final Items value, final ByteArrayWindow window) throws AsnException {
+    return decodePart_(value, window);
   }
 
-  public static BerWriter decodePart(final Items value) throws AsnException {
-    return decodePart_(value);
-  }
-
-  public static BerWriter decode(final Items value) throws AsnException {
-    return decode_(value);
+  public static Items decode(final Items value, final ByteArrayWindow window) throws AsnException {
+    return decode_(value, window);
   }
 }

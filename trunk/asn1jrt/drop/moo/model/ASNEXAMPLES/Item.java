@@ -8,7 +8,9 @@ import static org.asn1gen.runtime.java.Statics.*;
 
 @SuppressWarnings("unused")
 public abstract class Item extends org.asn1gen.runtime.java.AsnChoice {
-  /*GenJava.scala:1480*/
+  /*GenJava.scala:348*/
+  public static final Item_book EMPTY = Item_book.EMPTY;
+  /*GenJava.scala:1527*/
   public Option<Book> getBook() {
     return None.instance();
   }
@@ -16,11 +18,11 @@ public abstract class Item extends org.asn1gen.runtime.java.AsnChoice {
   public Option<Journal> getJournal() {
     return None.instance();
   }
-  /*GenJava.scala:1456*/
+  /*GenJava.scala:1503*/
   public Item_book withBook(final Book value) {
     return new Item_book(value);}
 
   public Item_journal withJournal(final Journal value) {
     return new Item_journal(value);}
 }
-/*GenJava.scala:352*//*GenJava.scala:1377*//*GenJava.scala:1377*/
+/*GenJava.scala:368*//*GenJava.scala:1424*//*GenJava.scala:1424*/
