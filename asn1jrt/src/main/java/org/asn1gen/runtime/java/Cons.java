@@ -2,7 +2,7 @@ package org.asn1gen.runtime.java;
 
 import java.util.Iterator;
 
-public class Cons<T> implements ConsList<T> {
+public class Cons<T> extends ConsList<T> {
   public final T value;
   public final ConsList<T> tail;
   
