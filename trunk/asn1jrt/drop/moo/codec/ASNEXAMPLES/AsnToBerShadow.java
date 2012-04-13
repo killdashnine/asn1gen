@@ -7,8 +7,8 @@ import org.asn1gen.runtime.java.*;
 import static org.asn1gen.runtime.java.Statics.*;
 
 import moo.model.ASNEXAMPLES.*;
-import static org.asn1gen.runtime.java.AsnToBerEncoder.*;
-import static moo.codec.ASNEXAMPLES.AsnToBerEncoder.*;
+import static org.asn1gen.runtime.java.AsnToBer.*;
+import static moo.codec.ASNEXAMPLES.AsnToBer.*;
 
 @SuppressWarnings("unused")
 public class AsnToBerShadow {

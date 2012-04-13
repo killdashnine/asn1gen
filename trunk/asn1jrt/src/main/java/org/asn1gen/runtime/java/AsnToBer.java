@@ -2,7 +2,7 @@ package org.asn1gen.runtime.java;
 
 import java.nio.charset.Charset;
 
-public class AsnToBerEncoder {
+public class AsnToBer {
   public static final BerWriter EMPTY = BerWriter.EMPTY;
   public static final BerWriter ASN_TRUE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0xff);
   public static final BerWriter ASN_FALSE = BerWriter.EMPTY.ibyte(0x01).ibyte(0x01).ibyte(0x00);

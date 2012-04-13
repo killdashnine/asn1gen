@@ -11,7 +11,7 @@ import static org.asn1gen.runtime.java.BerToAsn.*;
 import static moo.codec.ASNEXAMPLES.BerToAsn.*;
 
 @SuppressWarnings("unused")
-public class ShadowBerToAsn {
+public class BerToAsnShadow {
 
   public static Books decodePart_(final Books value, final ByteArrayWindow window) throws AsnException {
     /*BerWriter dataWriter = BerWriter.EMPTY;
