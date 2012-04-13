@@ -37,8 +37,8 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     (codecPath / "AsnToBerEncoder.java").withIndentWriter { out =>
       generateAsnToBerEncoder(module, out)
     }
-    (codecPath / "ShadowAsnToBerEncoder.java").withIndentWriter { out =>
-      generateShadowAsnToBerEncoder(module, out)
+    (codecPath / "AsnToBerShadow.java").withIndentWriter { out =>
+      generateAsnToBerShadow(module, out)
     }
     (codecPath / "BerToAsn.java").withIndentWriter { out =>
       generateBerToAsn(module, out)
@@ -92,7 +92,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
   def generateAsnToBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(codecPackage(module))(module, out)
     out << "import " << modelPackage(module) << ".*;" << EndLn
-    out << "import static " << codecPackage(module) << ".ShadowAsnToBerEncoder.*;" << EndLn
+    out << "import static " << codecPackage(module) << ".AsnToBerShadow.*;" << EndLn
     out << EndLn
     out << "@SuppressWarnings(\"unused\")" << EndLn
     out << "public class AsnToBerEncoder {" << EndLn
@@ -119,17 +119,17 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out << "}" << EndLn
   }
   
-  def generateShadowAsnToBerEncoder(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnToBerShadow(implicit module: Module, out: IndentWriter): Unit = {
     generatePackageAndImports(codecPackage(module))(module, out)
     out << "import " << modelPackage(module) << ".*;" << EndLn
     out << "import static org.asn1gen.runtime.java.AsnToBerEncoder.*;" << EndLn
     out << "import static " << codecPackage(module) << ".AsnToBerEncoder.*;" << EndLn
     out << EndLn
     out << "@SuppressWarnings(\"unused\")" << EndLn
-    out << "public class ShadowAsnToBerEncoder {" << EndLn
+    out << "public class AsnToBerShadow {" << EndLn
     out.indent(2) {
       module.types.foreach { case (_, namedType: NamedType) =>
-        generateShadowAsnToBerEncoder(namedType)
+        generateAsnToBerShadow(namedType)
       }
     }
     out << "}" << EndLn
@@ -258,10 +258,10 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     }
   }
   
-  def generateShadowAsnToBerEncoder(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnToBerShadow(namedType: NamedType)(implicit module: Module, out: IndentWriter): Unit = {
     namedType._type match {
       case ast.Type(builtinType: ast.BuiltinType, _) => {
-        generateShadowAsnToBerEncoder(builtinType, namedType.name)
+        generateAsnToBerShadow(builtinType, namedType.name)
       }
       case t@ast.Type(referencedType: ast.ReferencedType, _) => {
         referencedType match {
@@ -868,7 +868,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     }
   }
   
-  def generateShadowAsnToBerEncoder(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
+  def generateAsnToBerShadow(builtinType: ast.BuiltinType, assignmentName: String)(implicit module: Module, out: IndentWriter): Unit = {
     val safeAssignmentName = safeId(assignmentName)
     out.ensureEmptyLines(1)
     builtinType match {
