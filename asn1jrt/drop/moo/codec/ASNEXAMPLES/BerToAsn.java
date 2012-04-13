@@ -7,7 +7,7 @@ import org.asn1gen.runtime.java.*;
 import static org.asn1gen.runtime.java.Statics.*;
 
 import moo.model.ASNEXAMPLES.*;
-import static moo.codec.ASNEXAMPLES.ShadowBerToAsn.*;
+import static moo.codec.ASNEXAMPLES.BerToAsnShadow.*;
 
 @SuppressWarnings("unused")
 public class BerToAsn {
