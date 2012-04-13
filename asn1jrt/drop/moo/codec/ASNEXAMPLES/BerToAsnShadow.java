@@ -13,7 +13,7 @@ import static moo.codec.ASNEXAMPLES.BerToAsn.*;
 @SuppressWarnings("unused")
 public class BerToAsnShadow {
 
-  public static Books decodePart_(final Books value, final ByteArrayWindow window) throws AsnException {
+  public static Books decodePart_(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Book item: value.items) {
@@ -24,22 +24,22 @@ public class BerToAsnShadow {
     return Books.EMPTY;
   }
 
-  public static Books decode_(final Books value, final ByteArrayWindow window) throws AsnException {
+  public static Books decode_(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return Books.EMPTY;
   }
 
-  public static BookPrice decodePart_(final BookPrice value, final ByteArrayWindow window) throws AsnException {
+  public static BookPrice decodePart_(final BookPrice value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*return BerWriter.EMPTY
         .then(decode(value.isbn))
         .then(decode(value.price));*/
     return BookPrice.EMPTY;
   }
 
-  public static BookPrice decode_(final BookPrice value, final ByteArrayWindow window) throws AsnException {
+  public static BookPrice decode_(final BookPrice value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return BookPrice.EMPTY;
   }
 
-  public static BookPrices decodePart_(final BookPrices value, final ByteArrayWindow window) throws AsnException {
+  public static BookPrices decodePart_(final BookPrices value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Book item: value.items) {
@@ -50,11 +50,11 @@ public class BerToAsnShadow {
     return BookPrices.EMPTY;
   }
 
-  public static BookPrices decode_(final BookPrices value, final ByteArrayWindow window) throws AsnException {
+  public static BookPrices decode_(final BookPrices value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return BookPrices.EMPTY;
   }
 
-  public static BookCover decodePart_(final BookCover value, final ByteArrayWindow window) throws AsnException {
+  public static BookCover decodePart_(final BookCover value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     final long intValue = TLV.longValue(window);
 
     if (intValue == BookCover.hardCover.value) {
@@ -66,7 +66,7 @@ public class BerToAsnShadow {
     }
   }
 
-  public static BookCover decode_(final BookCover value, final ByteArrayWindow window) throws AsnException {
+  public static BookCover decode_(final BookCover value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     final DetailedTlvFrame detailedFrame = TLV.readTlv(window);
     final TlvFrame frame = detailedFrame.frame;
 
@@ -82,10 +82,10 @@ public class BerToAsnShadow {
       throw new AsnException();
     }
 
-    return decodePart(value, frame.value);
+    return decodePart(value, frame.value, consumed);
   }
 
-  public static Book decodePart_(final Book value, final ByteArrayWindow window) throws AsnException {
+  public static Book decodePart_(final Book value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*return BerWriter.EMPTY
         .then(decode(value.isbn))
         .then(decode(value.title))
@@ -95,11 +95,11 @@ public class BerToAsnShadow {
     return Book.EMPTY;
   }
 
-  public static Book decode_(final Book value, final ByteArrayWindow window) throws AsnException {
+  public static Book decode_(final Book value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return Book.EMPTY;
   }
 
-  public static Journals decodePart_(final Journals value, final ByteArrayWindow window) throws AsnException {
+  public static Journals decodePart_(final Journals value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Journal item: value.items) {
@@ -110,11 +110,11 @@ public class BerToAsnShadow {
     return Journals.EMPTY;
   }
 
-  public static Journals decode_(final Journals value, final ByteArrayWindow window) throws AsnException {
+  public static Journals decode_(final Journals value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return Journals.EMPTY;
   }
 
-  public static Item decodePart_(final Item value, final ByteArrayWindow window) throws AsnException {
+  public static Item decodePart_(final Item value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*switch (value.choiceId()) {
     case 1:
       return decodePart((Book)value.element(), window);
@@ -126,22 +126,22 @@ public class BerToAsnShadow {
     return Item.EMPTY;
   }
 
-  public static Item decode_(final Item value, final ByteArrayWindow window) throws AsnException {
+  public static Item decode_(final Item value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return Item.EMPTY;
   }
 
-  public static Journal decodePart_(final Journal value, final ByteArrayWindow window) throws AsnException {
+  public static Journal decodePart_(final Journal value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*return BerWriter.EMPTY
         .then(decode(value.title))
         .then(decode(value.edition));*/
     return Journal.EMPTY;
   }
 
-  public static Journal decode_(final Journal value, final ByteArrayWindow window) throws AsnException {
+  public static Journal decode_(final Journal value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return Journal.EMPTY;
   }
 
-  public static Items decodePart_(final Items value, final ByteArrayWindow window) throws AsnException {
+  public static Items decodePart_(final Items value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     /*BerWriter dataWriter = BerWriter.EMPTY;
 
     for (final Item item: value.items) {
@@ -152,7 +152,7 @@ public class BerToAsnShadow {
     return Items.EMPTY;
   }
 
-  public static Items decode_(final Items value, final ByteArrayWindow window) throws AsnException {
+  public static Items decode_(final Items value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
     return Items.EMPTY;
   }
 }

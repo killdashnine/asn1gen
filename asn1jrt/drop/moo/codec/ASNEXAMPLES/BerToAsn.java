@@ -12,75 +12,75 @@ import static moo.codec.ASNEXAMPLES.BerToAsnShadow.*;
 @SuppressWarnings("unused")
 public class BerToAsn {
 
-  public static Books decodePart(final Books value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static Books decodePart(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static Books decode(final Books value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static Books decode(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static BookPrice decodePart(final BookPrice value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static BookPrice decodePart(final BookPrice value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static BookPrice decode(final BookPrice value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static BookPrice decode(final BookPrice value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static BookPrices decodePart(final BookPrices value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static BookPrices decodePart(final BookPrices value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static BookPrices decode(final BookPrices value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static BookPrices decode(final BookPrices value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static BookCover decodePart(final BookCover value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static BookCover decodePart(final BookCover value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static BookCover decode(final BookCover value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static BookCover decode(final BookCover value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static Book decodePart(final Book value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static Book decodePart(final Book value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static Book decode(final Book value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static Book decode(final Book value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static Journals decodePart(final Journals value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static Journals decodePart(final Journals value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static Journals decode(final Journals value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static Journals decode(final Journals value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static Item decodePart(final Item value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static Item decodePart(final Item value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static Item decode(final Item value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static Item decode(final Item value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static Journal decodePart(final Journal value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static Journal decodePart(final Journal value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static Journal decode(final Journal value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static Journal decode(final Journal value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 
-  public static Items decodePart(final Items value, final ByteArrayWindow window) throws AsnException {
-    return decodePart_(value, window);
+  public static Items decodePart(final Items value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decodePart_(value, window, consumed);
   }
 
-  public static Items decode(final Items value, final ByteArrayWindow window) throws AsnException {
-    return decode_(value, window);
+  public static Items decode(final Items value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
+    return decode_(value, window, consumed);
   }
 }
