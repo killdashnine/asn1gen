@@ -10,13 +10,13 @@ import static org.asn1gen.runtime.java.Statics.*;
 public class Journals extends org.asn1gen.runtime.java.AsnList {
   public static Journals EMPTY = new Journals(org.asn1gen.runtime.java.Nil.<Journal>instance());
 
-  public final org.asn1gen.runtime.java.List<Journal> items;
+  public final org.asn1gen.runtime.java.ConsList<Journal> items;
 
-  public Journals(final org.asn1gen.runtime.java.List<Journal> items) {
+  public Journals(final org.asn1gen.runtime.java.ConsList<Journal> items) {
     this.items = items;
   }
 
-  public Journals withItems(final org.asn1gen.runtime.java.List<Journal> value) {
+  public Journals withItems(final org.asn1gen.runtime.java.ConsList<Journal> value) {
     return new Journals(value);
   }
 

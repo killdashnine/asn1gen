@@ -2,7 +2,7 @@ package org.asn1gen.runtime.java;
 
 import java.util.Iterator;
 
-public class Nil<T> implements List<T> {
+public class Nil<T> implements ConsList<T> {
   private static final Nil<Object> instance_ = new Nil<Object>();
   
   @SuppressWarnings("unchecked")
@@ -20,7 +20,7 @@ public class Nil<T> implements List<T> {
   }
 
   @Override
-  public List<T> tail() {
+  public ConsList<T> tail() {
     throw new RuntimeException();
   }
 
