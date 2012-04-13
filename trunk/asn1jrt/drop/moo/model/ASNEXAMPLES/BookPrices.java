@@ -10,13 +10,13 @@ import static org.asn1gen.runtime.java.Statics.*;
 public class BookPrices extends org.asn1gen.runtime.java.AsnList {
   public static BookPrices EMPTY = new BookPrices(org.asn1gen.runtime.java.Nil.<Book>instance());
 
-  public final org.asn1gen.runtime.java.List<Book> items;
+  public final org.asn1gen.runtime.java.ConsList<Book> items;
 
-  public BookPrices(final org.asn1gen.runtime.java.List<Book> items) {
+  public BookPrices(final org.asn1gen.runtime.java.ConsList<Book> items) {
     this.items = items;
   }
 
-  public BookPrices withItems(final org.asn1gen.runtime.java.List<Book> value) {
+  public BookPrices withItems(final org.asn1gen.runtime.java.ConsList<Book> value) {
     return new BookPrices(value);
   }
 

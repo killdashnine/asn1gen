@@ -10,13 +10,13 @@ import static org.asn1gen.runtime.java.Statics.*;
 public class Items extends org.asn1gen.runtime.java.AsnList {
   public static Items EMPTY = new Items(org.asn1gen.runtime.java.Nil.<Item>instance());
 
-  public final org.asn1gen.runtime.java.List<Item> items;
+  public final org.asn1gen.runtime.java.ConsList<Item> items;
 
-  public Items(final org.asn1gen.runtime.java.List<Item> items) {
+  public Items(final org.asn1gen.runtime.java.ConsList<Item> items) {
     this.items = items;
   }
 
-  public Items withItems(final org.asn1gen.runtime.java.List<Item> value) {
+  public Items withItems(final org.asn1gen.runtime.java.ConsList<Item> value) {
     return new Items(value);
   }
 
