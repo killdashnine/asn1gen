@@ -2,7 +2,7 @@ package org.asn1gen.runtime.java;
 
 import java.util.Iterator;
 
-public class Nil<T> implements ConsList<T> {
+public class Nil<T> extends ConsList<T> {
   private static final Nil<Object> instance_ = new Nil<Object>();
   
   @SuppressWarnings("unchecked")
