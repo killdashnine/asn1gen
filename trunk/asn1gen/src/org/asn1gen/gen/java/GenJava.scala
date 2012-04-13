@@ -762,67 +762,67 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.ensureEmptyLines(1)
     builtinType match {
       case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value, window);" << EndLn
+          out << "return decodePart_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value, window);" << EndLn
+          out << "return decode_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
-        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value, window);" << EndLn
+          out << "return decodePart_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value, window);" << EndLn
+          out << "return decode_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value, window);" << EndLn
+          out << "return decodePart_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value, window);" << EndLn
+          out << "return decode_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.EnumeratedType(enumerations) => {
-        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value, window);" << EndLn
+          out << "return decodePart_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value, window);" << EndLn
+          out << "return decode_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
       }
       case setOfType: ast.SetOfType => {
-        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decodePart_(value, window);" << EndLn
+          out << "return decodePart_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
-          out << "return decode_(value, window);" << EndLn
+          out << "return decode_(value, window, consumed);" << EndLn
         }
         out << "}" << EndLn
       }
@@ -1064,7 +1064,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
     out.ensureEmptyLines(1)
     builtinType match {
       case ast.ChoiceType(ast.AlternativeTypeLists(rootAlternativeTypeList, _, _, _)) => {
-        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           out << "/*switch (value.choiceId()) {" << EndLn
           rootAlternativeTypeList match {
@@ -1101,27 +1101,27 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.Empty) => {
-        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.SequenceType(ast.ComponentTypeLists(list1, extension, list2)) => {
-        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           val list = (list1.toList:::list2.toList).map { componentTypeList =>
             componentTypeList.componentTypes
@@ -1140,14 +1140,14 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
         out << "}" << EndLn
       }
       case ast.EnumeratedType(enumerations) => {
-        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           out << "final long intValue = TLV.longValue(window);" << EndLn
           out << EndLn
@@ -1167,7 +1167,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           
           
@@ -1192,12 +1192,12 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
           }
           out << "}" << EndLn
           out << EndLn
-          out << "return decodePart(value, frame.value);" << EndLn
+          out << "return decodePart(value, frame.value, consumed);" << EndLn
         }
         out << "}" << EndLn
       }
       case setOfType: ast.SetOfType => {
-        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decodePart_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           val safeAssignmentName = safeId(assignmentName)
           setOfType match {
@@ -1233,7 +1233,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
         }
         out << "}" << EndLn
         out << EndLn
-        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window) throws AsnException {" << EndLn
+        out << "public static " << safeAssignmentName << " decode_(final " << safeAssignmentName << " value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {" << EndLn
         out.indent(2) {
           out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
         }
@@ -1317,15 +1317,15 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             out.indent(2) {
               out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.runtime.java.Nil.<" << safeReferenceType << ">instance());" << EndLn
               out << EndLn
-              out << "public final org.asn1gen.runtime.java.List<" << safeReferenceType << "> items;" << EndLn
+              out << "public final org.asn1gen.runtime.java.ConsList<" << safeReferenceType << "> items;" << EndLn
               out << EndLn
-              out << "public " << safeAssignmentName << "(final org.asn1gen.runtime.java.List<" << safeReferenceType << "> items) {" << EndLn
+              out << "public " << safeAssignmentName << "(final org.asn1gen.runtime.java.ConsList<" << safeReferenceType << "> items) {" << EndLn
               out.indent(2) {
                 out << "this.items = items;" << EndLn
               }
               out << "}" << EndLn
               out << EndLn
-              out << "public " << safeAssignmentName << " withItems(final org.asn1gen.runtime.java.List<" << safeReferenceType << "> value) {" << EndLn
+              out << "public " << safeAssignmentName << " withItems(final org.asn1gen.runtime.java.ConsList<" << safeReferenceType << "> value) {" << EndLn
               out.indent(2) {
                 out << "return new " << safeAssignmentName << "(value);" << EndLn
               }
