@@ -1,7 +1,7 @@
 package test.moo.codec.asnexamples;
 
 import moo.model.ASNEXAMPLES.Book;
-import static moo.codec.ASNEXAMPLES.AsnToBerEncoder.*;
+import static moo.codec.ASNEXAMPLES.AsnToBer.*;
 
 import org.asn1gen.runtime.java.AsnException;
 import org.asn1gen.runtime.java.BerWriter;

@@ -10,7 +10,7 @@ import moo.model.ASNEXAMPLES.*;
 import static moo.codec.ASNEXAMPLES.AsnToBerShadow.*;
 
 @SuppressWarnings("unused")
-public class AsnToBerEncoder {
+public class AsnToBer {
 
   public static BerWriter encodePart(final Books value) throws AsnException {
     return encodePart_(value);
