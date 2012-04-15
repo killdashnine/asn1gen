@@ -8,7 +8,7 @@ import static org.asn1gen.runtime.java.Statics.*;
 
 @SuppressWarnings("unused")
 public class Items extends org.asn1gen.runtime.java.AsnList {
-  public static Items EMPTY = new Items(org.asn1gen.runtime.java.Nil.<Item>instance());
+  public static Items EMPTY = new Items(org.asn1gen.runtime.java.ConsList.<Item>nil());
 
   public final org.asn1gen.runtime.java.ConsList<Item> items;
 

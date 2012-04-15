@@ -8,7 +8,7 @@ import static org.asn1gen.runtime.java.Statics.*;
 
 @SuppressWarnings("unused")
 public class BookPrices extends org.asn1gen.runtime.java.AsnList {
-  public static BookPrices EMPTY = new BookPrices(org.asn1gen.runtime.java.Nil.<Book>instance());
+  public static BookPrices EMPTY = new BookPrices(org.asn1gen.runtime.java.ConsList.<Book>nil());
 
   public final org.asn1gen.runtime.java.ConsList<Book> items;
 

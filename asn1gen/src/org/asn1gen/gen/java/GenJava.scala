@@ -997,11 +997,11 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                   val assignmentElementName = assignmentName + "_element"
                   val safeAssignmentElementName = safeId(assignmentElementName)
                   out << "type " << safeAssignmentName << " = List[" << safeAssignmentElementName << "]" << EndLn
-                  out << "lazy val " << safeAssignmentName << " = Nil: List[" << safeAssignmentElementName << "]" << EndLn
+                  out << "lazy val " << safeAssignmentName << " = nil: List[" << safeAssignmentElementName << "]" << EndLn
                   generate(sequenceType, assignmentElementName)
                 }
                 case builtinType: ast.BuiltinType => {
-                  out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = Nil: List[" << asnTypeOf(builtinType) << "]"
+                  out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = nil: List[" << asnTypeOf(builtinType) << "]"
                 }
               }
             }
@@ -1221,11 +1221,11 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
                   val assignmentElementName = assignmentName + "_element"
                   val safeAssignmentElementName = safeId(assignmentElementName)
                   out << "type " << safeAssignmentName << " = List[" << safeAssignmentElementName << "]" << EndLn
-                  out << "lazy val " << safeAssignmentName << " = Nil: List[" << safeAssignmentElementName << "]" << EndLn
+                  out << "lazy val " << safeAssignmentName << " = nil: List[" << safeAssignmentElementName << "]" << EndLn
                   generate(sequenceType, assignmentElementName)
                 }
                 case builtinType: ast.BuiltinType => {
-                  out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = Nil: List[" << asnTypeOf(builtinType) << "]"
+                  out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = nil: List[" << asnTypeOf(builtinType) << "]"
                 }
               }
             }
@@ -1366,12 +1366,12 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             val safeAssignmentElementName = safeId(assignmentElementName)
             out.ensureEmptyLines(1)
             out << "type " << safeAssignmentName << " = List[" << safeAssignmentElementName << "]" << EndLn
-            out << "lazy val " << safeAssignmentName << " = Nil: List[" << safeAssignmentElementName << "]" << EndLn
+            out << "lazy val " << safeAssignmentName << " = nil: List[" << safeAssignmentElementName << "]" << EndLn
             generate(sequenceType, assignmentElementName)
           }
           case builtinType: ast.BuiltinType => {
             out.ensureEmptyLines(1)
-            out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = Nil: List[" << asnTypeOf(builtinType) << "]"
+            out  << "type " << safeAssignmentName << " = List[" << asnTypeOf(builtinType) << "]" << "lazy val " << safeAssignmentName << " = nil: List[" << asnTypeOf(builtinType) << "]"
           }
         }
       }
