@@ -1,6 +1,49 @@
 package org.asn1gen.runtime.java;
 
+import java.util.Iterator;
+
 public abstract class ConsList<T> implements Iterable<T> {
+  private static final ConsList<Object> nil = new ConsList<Object>() {
+    public boolean empty() {
+      return true;
+    }
+
+    @Override
+    public Object value() {
+      throw new RuntimeException();
+    }
+
+    @Override
+    public ConsList<Object> tail() {
+      throw new RuntimeException();
+    }
+
+    @Override
+    public Iterator<Object> iterator() {
+      return new Iterator<Object>() {
+        @Override
+        public boolean hasNext() {
+          return false;
+        }
+
+        @Override
+        public Object next() {
+          throw new RuntimeException();
+        }
+
+        @Override
+        public void remove() {
+          throw new RuntimeException();
+        }
+      };
+    }
+  };
+  
+  @SuppressWarnings("unchecked")
+  public static <T> ConsList<T> nil() {
+    return (ConsList<T>)nil;
+  }
+  
   public abstract boolean empty();
   
   public abstract T value();
@@ -12,7 +55,7 @@ public abstract class ConsList<T> implements Iterable<T> {
   }
   
   public ConsList<T> reverse() {
-    ConsList<T> target = Nil.<T>instance();
+    ConsList<T> target = ConsList.<T>nil();
     
     for (final T item: this) {
       target = target.prepend(item);
