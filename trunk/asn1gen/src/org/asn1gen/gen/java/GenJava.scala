@@ -1315,7 +1315,7 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
             out << "@SuppressWarnings(\"unused\")" << EndLn
             out << "public class " << safeAssignmentName << " extends org.asn1gen.runtime.java.AsnList {" << EndLn
             out.indent(2) {
-              out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.runtime.java.Nil.<" << safeReferenceType << ">instance());" << EndLn
+              out << "public static " << safeAssignmentName << " EMPTY = new " << safeAssignmentName << "(org.asn1gen.runtime.java.ConsList.<" << safeReferenceType << ">nil());" << EndLn
               out << EndLn
               out << "public final org.asn1gen.runtime.java.ConsList<" << safeReferenceType << "> items;" << EndLn
               out << EndLn

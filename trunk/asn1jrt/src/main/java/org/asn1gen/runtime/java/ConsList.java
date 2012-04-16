@@ -54,6 +54,49 @@ public abstract class ConsList<T> implements Iterable<T> {
     return new Cons<T>(item, this);
   }
   
+  public static <T> ConsList<T> cons(final T item, final ConsList<T> tail) {
+    return new ConsList<T>() {
+      public T value() {
+        return item;
+      }
+      
+      public boolean empty() {
+        return false;
+      }
+
+      @Override
+      public ConsList<T> tail() {
+        return tail;
+      }
+
+      @Override
+      public Iterator<T> iterator() {
+        final ConsList<T> self = this;
+        
+        return new Iterator<T>() {
+          private ConsList<T> cons = self;
+          
+          @Override
+          public boolean hasNext() {
+            return !cons.empty();
+          }
+
+          @Override
+          public T next() {
+            final T value = cons.value();
+            cons = cons.tail();
+            return value;
+          }
+
+          @Override
+          public void remove() {
+            throw new RuntimeException();
+          }
+        };
+      }
+    };
+  }
+  
   public ConsList<T> reverse() {
     ConsList<T> target = ConsList.<T>nil();
     
