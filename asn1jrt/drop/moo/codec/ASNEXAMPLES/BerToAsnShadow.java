@@ -14,17 +14,14 @@ import static moo.codec.ASNEXAMPLES.BerToAsn.*;
 public class BerToAsnShadow {
 
   public static Books decodePart_(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
-    ByteArrayWindow childrenWindow = window;
-    ConsList<Book> children = ConsList.<Book>nil();
-    int childrenConsumed = 0;
-    
-    while (window.length > 0) {
-      children = children.prepend(decode(Book.EMPTY, childrenWindow, consumed));
-      childrenConsumed += consumed.value;
+    /*BerWriter dataWriter = BerWriter.EMPTY;
+
+    for (final Book item: value.items) {
+      dataWriter = dataWriter.then(decode(item));
     }
-    
-    consumed.value = childrenConsumed;
-    return new Books(children.reverse());
+
+    return dataWriter;*/
+    return Books.EMPTY;
   }
 
   public static Books decode_(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
