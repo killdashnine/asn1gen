@@ -22,12 +22,12 @@ public class Book extends org.asn1gen.runtime.java.AsnSequence {
   public final org.asn1gen.runtime.java.AsnBoolean isInPrint;
 
   public Book(
-      /*GenJava.scala:1408*/final org.asn1gen.runtime.java.AsnOctetString isbn,
+      /*GenJava.scala:1410*/final org.asn1gen.runtime.java.AsnOctetString isbn,
       final org.asn1gen.runtime.java.AsnOctetString title,
       final org.asn1gen.runtime.java.AsnOctetString author,
       final BookCover cover,
       final org.asn1gen.runtime.java.AsnBoolean isInPrint) {
-    /*GenJava.scala:1398*/this.isbn = isbn;
+    /*GenJava.scala:1400*/this.isbn = isbn;
     this.title = title;
     this.author = author;
     this.cover = cover;

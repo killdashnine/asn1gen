@@ -16,9 +16,9 @@ public class BookPrice extends org.asn1gen.runtime.java.AsnSequence {
   public final org.asn1gen.runtime.java.AsnInteger price;
 
   public BookPrice(
-      /*GenJava.scala:1408*/final org.asn1gen.runtime.java.AsnOctetString isbn,
+      /*GenJava.scala:1410*/final org.asn1gen.runtime.java.AsnOctetString isbn,
       final org.asn1gen.runtime.java.AsnInteger price) {
-    /*GenJava.scala:1398*/this.isbn = isbn;
+    /*GenJava.scala:1400*/this.isbn = isbn;
     this.price = price;
   }
 
