@@ -1205,16 +1205,18 @@ class GenJava(model: JavaModel, outDirectory: File, namespace: Option[String], m
               elementType match {
                 case ast.TypeReference(referencedType) => {
                   val safeReferenceType = safeId(referencedType)
-                  out << "/*BerWriter dataWriter = BerWriter.EMPTY;" << EndLn
+                  
+                  out << "ByteArrayWindow myWindow = window;" << EndLn
+                  out << "ConsList<" << referencedType << "> children = ConsList.<" << referencedType << ">nil();" << EndLn
                   out << EndLn
-                  out << "for (final " << referencedType << " item: value.items) {" << EndLn
+                  out << "while (myWindow.length > 0) {" << EndLn
                   out.indent(2) {
-                    out << "dataWriter = dataWriter.then(decode(item));" << EndLn
+                    out << "children = children.prepend(decode(" << referencedType << ".EMPTY, myWindow, consumed));" << EndLn
+                    out << "myWindow = myWindow.from(consumed.value);" << EndLn
                   }
                   out << "}" << EndLn
                   out << EndLn
-                  out << "return dataWriter;*/" << EndLn
-                  out << "return " << safeAssignmentName << ".EMPTY;" << EndLn
+                  out << "return new " << assignmentName << "(children);" << EndLn
                 }
                 case sequenceType: ast.SequenceType => {
                   assert(false)

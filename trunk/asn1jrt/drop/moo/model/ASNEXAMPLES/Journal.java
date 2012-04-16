@@ -16,9 +16,9 @@ public class Journal extends org.asn1gen.runtime.java.AsnSequence {
   public final org.asn1gen.runtime.java.AsnOctetString edition;
 
   public Journal(
-      /*GenJava.scala:1408*/final org.asn1gen.runtime.java.AsnOctetString title,
+      /*GenJava.scala:1410*/final org.asn1gen.runtime.java.AsnOctetString title,
       final org.asn1gen.runtime.java.AsnOctetString edition) {
-    /*GenJava.scala:1398*/this.title = title;
+    /*GenJava.scala:1400*/this.title = title;
     this.edition = edition;
   }
 

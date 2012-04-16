@@ -14,14 +14,15 @@ import static moo.codec.ASNEXAMPLES.BerToAsn.*;
 public class BerToAsnShadow {
 
   public static Books decodePart_(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
-    /*BerWriter dataWriter = BerWriter.EMPTY;
+    ByteArrayWindow myWindow = window;
+    ConsList<Book> children = ConsList.<Book>nil();
 
-    for (final Book item: value.items) {
-      dataWriter = dataWriter.then(decode(item));
+    while (myWindow.length > 0) {
+      children = children.prepend(decode(Book.EMPTY, myWindow, consumed));
+      myWindow = myWindow.from(consumed.value);
     }
 
-    return dataWriter;*/
-    return Books.EMPTY;
+    return new Books(children);
   }
 
   public static Books decode_(final Books value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
@@ -40,14 +41,15 @@ public class BerToAsnShadow {
   }
 
   public static BookPrices decodePart_(final BookPrices value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
-    /*BerWriter dataWriter = BerWriter.EMPTY;
+    ByteArrayWindow myWindow = window;
+    ConsList<Book> children = ConsList.<Book>nil();
 
-    for (final Book item: value.items) {
-      dataWriter = dataWriter.then(decode(item));
+    while (myWindow.length > 0) {
+      children = children.prepend(decode(Book.EMPTY, myWindow, consumed));
+      myWindow = myWindow.from(consumed.value);
     }
 
-    return dataWriter;*/
-    return BookPrices.EMPTY;
+    return new BookPrices(children);
   }
 
   public static BookPrices decode_(final BookPrices value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
@@ -100,14 +102,15 @@ public class BerToAsnShadow {
   }
 
   public static Journals decodePart_(final Journals value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
-    /*BerWriter dataWriter = BerWriter.EMPTY;
+    ByteArrayWindow myWindow = window;
+    ConsList<Journal> children = ConsList.<Journal>nil();
 
-    for (final Journal item: value.items) {
-      dataWriter = dataWriter.then(decode(item));
+    while (myWindow.length > 0) {
+      children = children.prepend(decode(Journal.EMPTY, myWindow, consumed));
+      myWindow = myWindow.from(consumed.value);
     }
 
-    return dataWriter;*/
-    return Journals.EMPTY;
+    return new Journals(children);
   }
 
   public static Journals decode_(final Journals value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
@@ -142,14 +145,15 @@ public class BerToAsnShadow {
   }
 
   public static Items decodePart_(final Items value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
-    /*BerWriter dataWriter = BerWriter.EMPTY;
+    ByteArrayWindow myWindow = window;
+    ConsList<Item> children = ConsList.<Item>nil();
 
-    for (final Item item: value.items) {
-      dataWriter = dataWriter.then(decode(item));
+    while (myWindow.length > 0) {
+      children = children.prepend(decode(Item.EMPTY, myWindow, consumed));
+      myWindow = myWindow.from(consumed.value);
     }
 
-    return dataWriter;*/
-    return Items.EMPTY;
+    return new Items(children);
   }
 
   public static Items decode_(final Items value, final ByteArrayWindow window, final ReturnInteger consumed) throws AsnException {
